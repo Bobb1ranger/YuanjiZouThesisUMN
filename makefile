@@ -1,4 +1,4 @@
-LATEXMK=./latexmk/latexmk
+LATEXMK=perl ./latexmk/latexmk
 
 # Various dependencies
 MAIN=thesis
