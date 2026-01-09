@@ -1,0 +1,831 @@
+\chapter{Networked Systems}
+\label{chap:networksys}
+\section{Networked Systems}\label{sec:nwsys}
+
+
+
+We will define the networked system in this section. The definition applies to both the networked plant and the networked controller. 
+% We may later use subscripts \(p\) or \(c\) to respectively indicate the plant or the controller.
+
+
+
+% We will introduce the networked system and the distributed control problem. After that, we synthesize the task into a centralized optimal control problem that fits within the generalized plant framework with an extra constraint that heuristically handles the network structure.
+
+\subsection{Systems interacting over a directed graph}
+
+
+
+
+% We will explain the networked system setup primarily from a plant-centric perspective. In contrast, when describing a networked feedback controller, the states are denoted by \(x_{c_i}\), the system inputs by \(y_i\), and the outputs by \(u_i\). 
+
+% It is typically assumed that the controller computations are noiseless, i.e., \(w = \mathbf{0}\), and there is no associated performance output \(z\).
+
+% \subsubsection{Network Topology}
+A networked system consists of multiple dynamical subsystems interacting over a directed graph \(\mathcal{G}= (\mathcal{V}, \mathcal{A}, \mathcal{W})\). 
+\(\mathcal{V}\) is the set of vertices enumerated from 1 to \(n\). \
+\(\mathcal{A} = \left[a_{ij}\right]\) is an \(n \times n\) square matrix, known as the binary adjacency matrix of the graph that indicates the connectivity between vertices:
+\[
+\mathcal{A} = \left[a_{ij}\right]\colon a_{ij} = \begin{cases}
+1 & \ (j,i) \text{ is an edge}\\
+0 & \text{Otherwise}.
+\end{cases}.
+\]
+\(\mathcal{W} = [w_{ij}] \in \mathbb{Z}_{\ge 0}^{n\times n} \) assigns nonnegative integer weights representing communication delays on edges. 
+
+There is a dynamical subsystem $H_i$ at each vertex \(i \in \mathcal{V}\), 
+\begin{equation}\label{eqn::subsysmaps}
+H_i \colon \begin{bmatrix}
+    \mu_i \\ \zeta_i
+\end{bmatrix}
+\mapsto
+\begin{bmatrix}
+    \nu_i \\ \eta_i
+\end{bmatrix}.
+\end{equation}
+\(\mu_i, \nu_i\) are local input and output signals of \(H_i\). We refer to \(\zeta_i\) as the network input, representing the dynamic influence received from its in-neighbors. In math, we can write it as a vertical concatenation as $\zeta_i = \ver[\zeta_{ij}]_{j \in \mathcal{N}_{i-}}$, where \(\mathcal{N}_{i-} \coloneqq \{j | j \neq i, a_{ij} = 1\}\) is the set of in-neighbors of \(i\) in graph \(\mathcal{G}\). In analogy, the output \(\eta_i\) is the dynamics influence signal exerted on its out-neighbors. $\eta_i = \ver[\eta_{ri}]_{r \in \mathcal{N}_{i+}}$, where \(\mathcal{N}_{i+} = \{j | j \neq i, a_{ji} = 1\}\) is the set of out-neighbors.
+
+Since we primarily deal with linear time-invariant (LTI) systems, we use state-space equations to represent the dynamics,
+\begin{equation}\label{eqn::delaynet_subsys}\small
+\begin{split}
+    H_i\colon & x_i[t+1]=  A^i x_i[t] + B_\mu^i \mu_i[t]  + \sum_{j\in \mathcal{N}_{i-}} B_\zeta^{ij} \zeta_{ij}[t]; \\
+    & \nu_i[t] =  C_{\nu}^i x_i[t] + D_{\nu\mu}^i \mu_i[t] + \sum_{j\in \mathcal{N}_{i-}} D_{\nu\zeta}^{ij} \zeta_{ij}[t]; \\
+    & \eta_{ri}[t]= C_\eta^{ri} x_i[t] + D_{\eta \mu}^{ri} \mu_i[t] + \sum_{j\in \mathcal{N}_{i-}} D_{\eta\zeta}^{rij} \zeta_{ij}[t],\quad \forall r\in \mathcal{N}_{i+}
+\end{split}
+\end{equation}
+Note that we write for compactness later:
+\[\small
+\sum_{j\in \mathcal{N}_{i-}} B_\zeta^{ij} \zeta_{ij}[t] = B_\zeta^{i} \zeta_{i}[t], 
+\sum_{j\in \mathcal{N}_{i-}} D_{\nu\zeta}^{ij} \zeta_{ij}[t] = D_{\nu\zeta}^{i} \zeta_{i}[t].
+\]
+The network induced by \(\mathcal{G}\) is modeled as a pure-delay dynamical system \(N_{\cal G}\) where each edge imposes a fixed communication delay on the transmitted signals, that is:
+\[
+\zeta_{ij} = \frac{1}{z^{w_{ij}}} \eta_{ij},\quad \forall a_{ij} = 1.
+\]
+Collectively: \(
+\zeta = N_{\cal G} \eta,\ \zeta \coloneqq \ver[\zeta_{i}]_{i \in \cal V},\ \eta \coloneqq  \ver[\eta_{i}]_{i \in \cal V}\).
+% Both \(\eta\) and \(\zeta\) are concatenations of signals transmitted through all edges, but arranged in different sequences, one sorted by the input indices, while the other by the output indices. 
+\(N_{\cal G} = \left[N_{ij}\right]\) is block-structured according to the adjacency matrix \(\mathcal{A}\) and each non-zero block \(N_{ij}\) contains a delay of \(w_{ij}\) steps:
+\[\small
+\left[N_{ij}\right] = \begin{cases}
+\frac{1}{z^{w_{ij}}} \Pi_{ij}, & a_{ij} = 1\\
+\mathbf{0}, & a_{ij} = 0 
+\end{cases}.
+% \quad
+% \Pi_{ij} = \begin{bmatrix}
+% \mathbf{0} & \hdots & \mathbf{0} & \hdots & \mathbf{0} \\
+% \vdots &  & \vdots &  & \vdots \\
+% \mathbf{0} & \hdots & I & \hdots & \mathbf{0} \\
+% \vdots &  & \vdots &  & \vdots \\
+% \mathbf{0} & \hdots & \mathbf{0} & \hdots & \mathbf{0} \\
+% \end{bmatrix}
+\]
+Here, \(\Pi_{ij}\) is a sparse block-selection matrix that extracts the signal \(\eta_{ij}\) from the sender’s output \(\eta_j\) and injects it into the receiver’s input \(\zeta_{ij}\) within \(\zeta_i\). 
+% Each \(\Pi_{ij}\) contains a single identity block at the appropriate location, with all other entries being zero. 
+\begin{rem}
+\(N_{\cal G}\) has a compatible size and partitions according to the dimension of the transmitted signal on each edge. 
+Some blocks of \(N_{\cal G}\) may be structurally empty (i.e., contain zero rows or columns) when \(a_{ij} = 0\), corresponding to subsystems that are not influenced or not influencing others.
+\end{rem}
+
+
+
+% Refer to Example \ref{exp:4nodediamond} and \ref{exp::3nodesys} for concrete illustrations.
+We now formally define an LTI networked system.
+\begin{defn}[Networked system on a graph]
+Given a directed graph \(\mathcal{G}= (\mathcal{V}, \mathcal{A}, \mathcal{W})\), we say an LTI system \(H\) is an LTI networked system on  \(\mathcal{G}\) if it consists of \(n\) LTI subsystems \(\{H_j\}_{j = 1}^ n\) defined in (\ref{eqn::subsysmaps}) which are interconnected with a pure-delay dynamical system \(N_{\cal G}\). Informally, \(H \coloneqq \lft(\diag[H_j], N_{\cal G})\).
+\end{defn}
+
+\begin{rem}
+We slightly abuse the denotation of linear fractional transformation (\(\lft\)) here, as the diagonal concatenation of \(\{P_i\}\) mixes 
+local and network signals rather than aggregating them into separate blocks.
+\end{rem}
+% \begin{cor}
+% Given \(\mathcal{G}^1= (\mathcal{V}, \mathcal{A}^1, \mathcal{W}^1)\) that shares the same nodes as  \(\mathcal{G}\), \(\mathcal{A}^1 \leq \mathcal{A}\), \(\mathcal{W}^1 \geq \mathcal{W}\), which essentially means that \(\mathcal{G}\) has at least the same edges and at most the same delays in all edges as \(\mathcal{G}^1\), if \(H^1\) is an LTI  networked system on \(\mathcal{G}^1\), then \(H^1\) is also an LTI  networked system on \(\mathcal{G}\).
+% \end{cor}
+% \begin{proof}
+% Consider extra delays \(w_{ij}^1 - w_{ij}\) on edge \((j,i)\) as strict properness in subsystems \(H_j\).
+% \end{proof}
+The following definition categorizes networked systems on the same directed graph by their input and output channel partitions. As a convention, we use two \(n\)-tuples, \(\mathcal{P}_i\) and \(\mathcal{P}_o\), to indicate the input partitions and output partitions, respectively.
+\begin{defn}[Set of networked system]
+Given a directed graph \(\mathcal{G}\), non-negative integer-valued \(n\)-tuples, \(\mathcal{P}_i\) and \(\mathcal{P}_o\), we denote by \(\mathfrak{S}(\mathcal{G}, \mathcal{P}_o, \mathcal{P}_i)\) the set of all LTI networked systems \(H\), such that their \(j\)-th LTI subsystems \(H_j\) has \(\mathcal{P}_i(j)\) inputs and \(\mathcal{P}_o(j)\) outputs, \(\forall j \in \mathcal{V}\).
+\end{defn}
+
+% \begin{lemma}[Parallel and serial interconnection]
+% Given a directed graph \(\mathcal{G}\) and networked system \(H^1 \in \mathfrak{S}(\mathcal{G}, \mathcal{P}_o^1, \mathcal{P}_i^1)\) and \(H^2 \in \mathfrak{S}(\mathcal{G}, \mathcal{P}_o^2, \mathcal{P}_i^2)\) with \(\mathcal{P}_o^1 = \mathcal{P}_i^2\), the serial interconnection of \(H^1\) and \(H^2\), denoted by \(H\), is still a networked system on \(G\). Especially, \(H\in  \mathfrak{S}(\mathcal{G}, \mathcal{P}_o^2, \mathcal{P}_i^1)\).
+    
+% \end{lemma}
+
+
+\subsection{State-space representation of networked systems}
+For simplicity of exposition, herein we make the following assumption without loss of generality, and without affecting the effectiveness of our method:
+\begin{assumption}
+\(w_{ij} = 1,\ \forall a_{ji} = 1.
+\)
+\end{assumption}
+This means all edges in \(\mathcal{G}\) have one delay, that is, \(
+\zeta_{ij} = \frac{1}{z} \eta_{ij}\). In the rest of this paper, we drop out \(\mathcal{W}\) and use \(\mathcal{G}= (\mathcal{V}, \mathcal{A})\) to describe a network graph. This assumption significantly simplifies the construction of the state-space representation for the entire networked system. It also directly visualizes the network topology in the aggregate realization of the networked system, as discussed in this subsection.
+
+
+% The input signals are: 
+% \begin{enumerate}
+%     \item The exogenous noise \(w\) includes both process and measurement disturbances. In each subsystem \(H_i\), only certain components of \(w\) are relevant, so \(B_w^i\) and \(D_{yw}^i\) are typically selective and not full column rank. This formulation allows subsystems to share or correlate noise components.
+%     \item The local input \(u_i\): this signal is injected only at subsystem \(i\). Its influence can propagate to other subsystems.
+%     \item Dynamical influences \(\zeta_{ij}\) from its in-neighbors \(j\), collected in the set \(\mathcal{N}_{i-}\). To simplify the equations, we vertically concatenate all incoming network signals to subsystem \(i\) as the vector
+%     \(\zeta_i = \ver[\zeta_{ij}],\ j \in \mathcal{N}_{i -}\)
+% The terms:
+% \[
+% \sum_{j\in \mathcal{N}_{i-}} B_\zeta^{ij} \zeta_{ij}[t] = B_\zeta^{i} \zeta_{i}[t]
+% ,\ B_\zeta^{i} = \hor[B_\zeta^{ij}]_{j\in \mathcal{N}_{i-}}
+% \]
+% And
+% \[
+% \sum_{j\in \mathcal{N}_{i-}} D_{y\zeta}^{ij} \zeta_{ij}[t] = D_{y\zeta}^{i} \zeta_{i}[t]
+% ,\ D_{y\zeta}^{i} = \hor[D_{y\zeta}^{ij}]_{j\in \mathcal{N}_{i-}}
+% \]
+% \end{enumerate}
+% The output signals are: 
+% \begin{enumerate}
+%     \item Local Output \(y_i\)
+%     \item Dynamical influences \(\eta_{ri}\) to its out-neighbors \(r \in \mathcal{N}_{i+}\). Like \(\zeta_i\), we define the vector of all outgoing network signals from subsystem \(i\) as 
+% \(\eta_i = \ver[\eta_{ri}],\ r\in \mathcal{N}_{i +}\).
+% \end{enumerate}
+
+
+% \subsubsection{Transmission delays and equivalent strictly causal network}
+
+
+
+
+
+We uniformly absorb all the unit delays in the edges into the upstream subsystems. Specifically, define \(\bar{\eta}_i \doteq \frac{1}{z} {\eta}_i\) as the new network output at subsystem \(H_i\).
+This is equivalent to augmenting the state with delayed \(\eta_i\) and adding some poles at \(0\) to the original subsystem:
+\[
+\bar{x}_i[t] \coloneqq
+\begin{bmatrix}
+    x_i[t] \\
+    \eta_i[t - 1]
+\end{bmatrix}, \quad \bar{\eta}_i[t]= C_\eta^{i}\bar{x}_i[t] = \begin{bmatrix}
+    \mathbf{0} & I
+\end{bmatrix}\bar{x}_i[t].
+\]
+\begin{equation*}\small
+\begin{split}
+\bar{x}_i[t + 1] &= \begin{bmatrix}
+A^i & \mathbf{0} \\
+\ver[C_\eta^{ri}] & \mathbf{0}
+\end{bmatrix}\bar{x}_i[t]
++ \begin{bmatrix}
+B_\mu^i \\
+\ver[D_{\eta \mu}^{ri}]
+\end{bmatrix} \mu_i[t]
++ \begin{bmatrix}
+B_{\zeta}^i \\
+D_{\eta\zeta}^{i}
+\end{bmatrix} \zeta_i[t];\\
+\nu_i[t] & = 
+\begin{bmatrix}
+    C_{\nu}^i & \mathbf{0}
+\end{bmatrix}
+\bar{x}_i[t] + D_{\nu\mu}^i \mu_i[t] + D_{\nu\zeta}^{i} \zeta_{i}[t].
+\end{split}
+\end{equation*}
+
+In return, we transform a network with one-step delay into a strictly causal network, where the term "strictly causal" refers to the delays becoming strict properness of subsystems. The edges in the strictly causal network are all static, delay-free, and noiseless identity connections, characterized by:
+\[
+\zeta = \bar{N}_{\cal G} \bar{\eta}, \quad 
+\bar{N}_{\cal G} = \left[\bar{N}_{ij}\right] = \begin{cases}
+\Pi_{ij}, & a_{ij} = 1\\
+\mathbf{0}, & a_{ij} = 0 
+\end{cases}.
+\]
+The new subsystem, combined with outflow communication delays, has a state-space representation:
+\begin{equation}
+\begin{split}
+    \bar{H}_i &\colon \bar{x}_i[t+1]=  A^i \bar{x}_i[t] + B_{\mu}^i \mu_i[t]  + B_\zeta^{i} \zeta_{i}[t]; \\
+    & \nu_i[t] = C_{\nu}^i \bar{x}_i[t] + D_{\nu\mu}^i \mu_i[t] + D_{\nu\zeta}^{i} \zeta_{i}[t]; \\
+    & \bar{\eta}_{i}[t]= C_\eta^{i} \bar{x}_i[t]. 
+\end{split}
+\end{equation}
+Here we reuse the notation for brevity. $A^i, B_\mu^i, C_\nu^i, B_\zeta^i$ are with respect to the extended state $\bar{x}_i$. This conversion is known to be reversible and preserves system dynamics; see \cite{Vamsi_Realizable, naghnaeian2019youla}.
+We can rewrite the networked system as:
+\[
+H = \lft(\diag[H_i], N_{\cal G}) =  \lft(\diag[\bar{H}_i], \bar{N}_{\cal G}).
+\]
+% \subsubsection{Network interconnection}
+Let \(x = \ver[\bar{x}_i],\ \mu = \ver[\mu_i],\ \nu = \ver[\nu_i]\). 
+% \begin{equation*}
+%     x = \ver[\bar{x}_i];\ 
+%     \mu = \ver[\mu_i];\ 
+%     \nu = \ver[\nu_i].
+% \end{equation*}
+The aggregate state-space representation of the networked system is:
+\begin{equation*}
+\begin{split}
+    & x[t + 1] = A x[t] + B_\mu \mu[t] \\
+    &= (\diag[A^i] + \diag[B_\zeta^i] \cdot \bar{N}_{\cal G} \cdot \diag[C_\eta^i]) x[t] + \diag[B_\mu^i] \mu[t];
+\end{split}
+\end{equation*}
+\begin{equation*}
+\begin{split}
+    & \nu[t]  = C_\nu x[t] + D_{\nu\mu} \mu[t] \\
+    & = (\diag[C_\nu^i] + \diag[D_{\nu\zeta}^i] \cdot \bar{N}_{\cal G} \cdot \diag[C_\eta^i]) x[t] + \diag[D_{\nu\mu}^i] \mu[t].
+\end{split}
+\end{equation*}
+% Define the aggregate state-space matrices for the networked system: \(= \diag[A^i] + \diag[B_\zeta^i] \cdot \bar{N}_{\cal G} \cdot \diag[C_\eta^i]\), \(B_u = \diag[B_u^i]\), \(C_y = \diag[C_y^i] + \diag[D_{y\zeta}^i] \cdot \bar{N}_{\cal G} \cdot \diag[C_\eta^i]\), and \(D_{yu} = \diag[D_{yu}^i]\).
+\(A\) and \(C_\nu\) exhibit block sparsity that follows the structure of \(\mathcal{A}\), i.e. \(A_{ij}\) and \(C_\nu^{ij}\) are nonzero blocks if \(a_{ij} = 1\). \(B_\mu\) and \(D_{\nu\mu}\) are block diagonal matrices.
+We define block-sparse matrices to compactly represent these matrix sparsity structures.
+\begin{defn}\label{defn::strmat}
+Given an \(n\times n\) binary matrix \(J\) and n-tuples \(\mathcal{P}_o\) and  \(\mathcal{P}_i\), \(S(J,\mathcal{P}_o,\mathcal{P}_i)\) 
+denotes the set of matrices that are partitioned according to \((\mathcal{P}_o,\mathcal{P}_i)\), and sparse according to \(J\).
+\end{defn}
+
+For instance, we have \(A \in S(I_n + \mathcal{A}, \mathcal{P}_x, \mathcal{P}_x)\) and \(C_\nu \in S(I_n + \mathcal{A}, \mathcal{P}_\nu, \mathcal{P}_x)\) according to this definition.
+We will henceforth abuse the notation slightly and denote this structure simply as \(A \in S(\mathcal{A},\mathcal{P}_x, \mathcal{P}_x)\).
+The example illustrated in Fig.~\ref{fig:Vamsi_net} concretizes the structure of the state-space matrices of a networked system. This example is later used to showcase our synthesis approach in Section~\ref{sec::numex}.
+\begin{example}[3-node example]\label{exp::3nodesys}
+\begin{figure}[ht]
+   \centering    
+     \includegraphics[scale=0.35]{figures/DisCtrlfigure/Vamsi3node.png}
+     \caption{The networked plant \(P\) and controller \(K\) share the same graph adjacency matrix. The edges are $(1,2)$, $(1,3)$, and $(2,1)$, in addition to self-loops at each node.}
+     \label{fig:Vamsi_net}
+\end{figure}
+The adjacency matrix shared by both the plant and the controller is:
+\begin{equation*}\small
+\mathcal{A}^c = \mathcal{A}^p = \mathcal{A} =
+\left[
+\begin{array}{ccc}
+0 & 1 & 0\\
+1 & 0 & 0\\
+1 & 0 & 0\\
+\end{array}
+\right]    
+\end{equation*}
+Let's focus on the plant. After absorbing the unit delays into sub-plants, the network inputs are
+\(\zeta_1 = \left[\zeta_{12}\right],\ \zeta_2 = \left[\zeta_{21}\right],\ \zeta_3 = \left[\zeta_{31}\right]\); the network outputs are \(\bar{\eta}_1 = \begin{bmatrix}
+    \bar{\eta}_{21} \\ \bar{\eta}_{31}
+\end{bmatrix},\ \bar{\eta}_2 = \left[\bar{\eta}_{12}\right],\ \bar{\eta}_3 = \left[\empty\right]\).
+The static network \(\bar{N}_{\mathcal{G}}\) is given by:
+\[\small
+\begin{bmatrix}
+    \zeta_{1} \\ \zeta_{2} \\ \zeta_{3}
+\end{bmatrix} = \bar{N}_{\mathcal{G}} \begin{bmatrix}
+    \bar{\eta}_{1} \\ \bar{\eta}_{2} \\ \bar{\eta}_{3}
+\end{bmatrix} = 
+\left[
+\begin{array}{c:c:c}
+    \mathbf{0}\ \mathbf{0} & I & \empty\\
+    \hdashline
+    I\ \mathbf{0} & \mathbf{0} & \empty\\
+    \hdashline
+    \mathbf{0}\ I & \mathbf{0} & \empty
+\end{array}\right]\begin{bmatrix}
+    \bar{\eta}_{1} \\ \bar{\eta}_{2} \\ \bar{\eta}_{3}
+\end{bmatrix}.
+\]
+The state-space matrices for the aggregate networked system are then:
+\begin{equation*}\small
+A=\begin{bmatrix}
+        A^{1}& B_\zeta^{12}  C_\eta^{12} & \mathbf{0}\\
+        B_\zeta^{21} C_\eta^{21}& A^{2}& \mathbf{0}\\
+        B_\zeta^{31} C_\eta^{31}& \mathbf{0} & A^{3}
+\end{bmatrix}; \ 
+C_y=\begin{bmatrix}
+        C_y^1& D_{y\zeta}^{12}  C_\eta^{12}&\mathbf{0}\\
+        D_{y\zeta}^{21}  C_\eta^{21}& C_y^2&\mathbf{0}\\
+        D_{y\zeta}^{31}  C_\eta^{31}& \mathbf{0} & C_y^3
+    \end{bmatrix};
+\end{equation*}
+\begin{equation}\small
+    B_u = \diag[B_{u}^i]; \quad
+    D_{yu} = \diag[D_{yu}^i].
+\end{equation}
+\end{example}
+
+
+
+\subsection{Interconnection between networked systems}
+Interconnection between networked systems is an important concept to be understood for designing networked controllers. 
+
+\begin{lemma}[Networked systems interconnection]\label{lm:nwsint}
+Assume networked system \(H^1\) is on a directed graph \(\mathcal{G}^1 = (\mathcal{V}, \mathcal{A}^1)\) and networked system \(H^2\) is on another directed graph \(\mathcal{G}^2 = (\mathcal{V}, \mathcal{A}^2)\). \(\mathcal{G}^1\) and \(\mathcal{G}^2\) share the set of vertices \(\mathcal{V}\).
+In compact form, with the corresponding input–output partitions, \(H^1 \in \mathfrak{S}(\mathcal{G}^1, \mathcal{P}_o^1, \mathcal{P}_i^1)\) and \(H^2 \in \mathfrak{S}(\mathcal{G}^2, \mathcal{P}_o^2, \mathcal{P}_i^2)\). Define a new graph \(\mathcal{G} = (\mathcal{V}, \mathcal{A})\) where \(\mathcal{A} = \mathcal{A}^1 + \mathcal{A}^2\). We have:
+\begin{enumerate}
+    \item if \(\mathcal{P}_i^1 = \mathcal{P}_i^2\) and \(\mathcal{P}_o^1 = \mathcal{P}_o^2\), then the parallel interconnection of \(H^1\) and \(H^2\), denoted by \(H = H^1 + H^2\) is a networked system on \(\mathcal{G}\). \(H\in \mathfrak{S}(\mathcal{G}, \mathcal{P}_o^1, \mathcal{P}_i^1)\).
+    \item if \(\mathcal{P}_o^2 = \mathcal{P}_i^1\), the serial interconnection of \(H^1\) and \(H^2\), denoted by \(H = H^1 \cdot H^2\) is a networked system on \(\mathcal{G}\). \(H\in \mathfrak{S}(\mathcal{G}, \mathcal{P}_o^1, \mathcal{P}_i^2)\).
+    \item if \(\mathcal{P}_o^1 \succeq \mathcal{P}_i^2\) and \(\mathcal{P}_i^1 \succeq \mathcal{P}_o^2\), the lower fractional feedback interconnection, denoted by \(H\coloneqq \mathcal{F}_l(H^1, H^2)\) is a networked system on \(\mathcal{G}\). \(H\in \mathfrak{S}(\mathcal{G}, \mathcal{P}_o^1 - \mathcal{P}_i^2, \mathcal{P}_i^1 -\mathcal{P}_o^2)\). 
+\end{enumerate}
+
+\end{lemma}
+
+\begin{cor}
+When \(\mathcal{A}^2 \succeq \mathcal{A}^1\), we have \(\mathcal{G} = \mathcal{G}^2\). In other words, when one graph is at least as well-connected as the other, the resulting interconnections follow those of the more strongly connected graph.   
+\end{cor}
+Since \(\mathcal{A}^c = \mathcal{A}^p\) in Example~\ref{exp::3nodesys}, the feedback interconnection between \(P\) and \(K\) remains a networked system defined on the same underlying graph. We now consider a case where the plant \(P\) and controller \(K\) are defined on different graphs, i.e., their adjacency matrices are not identical.
+% \begin{rem}
+% In the feedback interconnection between networked plant and networked controller, let \(H^1\) be the plant and \(H^2\) be the controller, the \(\mathcal{P}_o^1 = \mathcal{P}_i^2 = \mathcal{P}_y\) and \(\mathcal{P}_o^2 = \mathcal{P}_i^1 = \mathcal{P}_u\). \(H\) becomes an automatic system by the above definition. To characterize the regulated behavior from \(u\) to \(y\), one can take an augmented plant to define the feedback interconnection. Instead of letting \(H^1 = P\), we can let
+% \[
+% H^1 \coloneqq \begin{bmatrix}
+%     I \\
+%     I
+% \end{bmatrix} P 
+% \begin{bmatrix}
+%     I & I
+% \end{bmatrix} \in \mathfrak{S}(\mathcal{G}^1, 2\mathcal{P}_y, 2\mathcal{P}_u).
+% \]
+% By that, \(H = \mathcal{F}_l(H^1, H^2) = P(I - KP)^{-1} \in\mathfrak{S}(\mathcal{G}, \mathcal{P}_y, \mathcal{P}_u)\).
+% \end{rem}
+
+\begin{example}[4-node different graphs example]\label{exp:4nodediamond}
+\begin{figure}[th]
+    \centering
+    \includegraphics[width=0.45\linewidth]{figures/DisCtrlfigure/node4CtExRealization.png}
+    \caption{A networked system where the plant and controller network graphs have different edges.}
+    \label{fig:4nodecannot_real}
+\end{figure}
+In Fig.~\ref{fig:4nodecannot_real}, \(\mathcal{V} = \{1,2,3,4\}\). Sub-plants \(P_1\) and \(P_3\) have dynamical influences on subsystems \(P_2\) and \(P_4\) in the plant while sub-controllers \(K_1\) and \(K_3\) receive information from sub-controllers \(K_2\) and \(K_4\). The graph \(\mathcal{G}^p = (\mathcal{V}, \mathcal{A}^p)\) and \(\mathcal{G}^c = (\mathcal{V}, \mathcal{A}^c)\) are respectively the topology of plant and controller networks, where:
+\begin{equation*}\small
+\mathcal{A}^p = \begin{bmatrix}
+        0 & 0 & 0 & 0\\
+        1 & 0 & 1 & 0\\
+        0 & 0 & 0 & 0\\
+        1 & 0 & 1 & 0\\
+\end{bmatrix},\quad 
+\mathcal{A}^c = \begin{bmatrix}
+        0 & 1 & 0 & 1\\
+        0 & 0 & 0 & 0\\
+        0 & 1 & 0 & 1\\
+        0 & 0 & 0 & 0\\
+\end{bmatrix}.
+\end{equation*}
+As a result, the closed-loop system is a networked system on \(\mathcal{G} =(\mathcal{V}, \mathcal{A})\).
+\begin{equation*}\small
+\mathcal{A}= \mathcal{A}^p + \mathcal{A}^c = \begin{bmatrix}
+        0 & 1 & 0 & 1\\
+        1 & 0 & 1 & 0\\
+        0 & 1 & 0 & 1\\
+        1 & 0 & 1 & 0\\
+\end{bmatrix}.
+\end{equation*}
+\end{example}
+
+
+
+% {\color{red} the idea was to define the networked system over delay networks, if it is too difficult or cumbersome, go back to the  setting of the strictly causal network and simply say : "For simplicity of exposure we present the definitions of networked system over a strictly causal network, the results apply  to systems over more general delay networks. ". 
+% Show constructive example. 
+% Logically, there should be a symmetry between $P_{22}$ and $K$ those are the networked systems. The derivations of the Generalized plant should come later. Finally, maybe we should remove Figure 1, which does not correspond to something tangible or easy to explain mathematically. 
+% }
+
+% After grouping the delays, we obtain a collection of new subsystems \(\bar{H}_i\):
+
+% Note that \(A_i, B_{u_i}, C_{y_i}, B_{ij}, C_{ri}\) have changed from (\ref{eqn::delaynet_subsys}) after changing state variable to \(\bar{x}_i\) but we abuse the notations here. Replace \(\zeta_{ji}[t]\) with \(\eta_{ji}[t]\):
+% \begin{equation}
+% \begin{split}
+%     \bar{H}_i &\colon \bar{x}_i[t+1]=  A_i \bar{x}_i[t] + B_{u_i} u_i[t] +  \sum_{j\in \mathcal{V}_{\mathcal{G}}^-(i)} B_{ij}C_{ij} \bar{x}_j[t]\\
+%     & y_i[t] =  C_{y_i} \bar{x}_i[t] + D_{yu_{i}} u_i[t] + \sum_{j\in \mathcal{V}_{\mathcal{G}}^-(i)} D_{y\zeta_{ij}} C_{ij} \bar{x}_j[t]\\
+% \end{split}
+% \end{equation}
+
+
+\subsection{Structures of Transfer Functions of Networked Systems}
+The transfer function matrix (TFM) of network systems in \(\mathfrak{S}(\mathcal{G}, \mathcal{P}_o, \mathcal{P}_i)\) manifests some structures introduced by the network topology. There are mainly two types of structures in the TFMs. The block sparsity reflects the lack of paths between vertices. The block-wise strictly properness reflects communication delays between sub-systems.
+
+When interconnected within a network, one subsystem can influence another directly through an immediate edge or indirectly via transitive pathways.
+Both the direct and indirect interactions are incorporated in the transitive
+closure of the graph ${\mathcal G}$ denoted by \(\bar{\mathcal G}\mathcal{=}\left({\mathcal V}, {\bar{\mathcal A}}, {\bar{\mathcal W}}\right)\)~\cite{naghnaeian2019youla}. It has the same set of vertices but with a modified adjacency matrix representing the transitive connectivity and a weight matrix informing the minimal path length given by:
+\(\bar{\mathcal A} = [\bar{a}_{ij}]\), \(\bar{\mathcal W}= [\bar{w}_{ij}]\)
+\[\small
+\bar{a}_{ij} = \begin{cases}
+1 & \ j \rightarrow i\text{ is a path in }\mathcal G\\
+0 & \text{Otherwise}.
+\end{cases};\ 
+\bar{w}_{ij} = 
+\begin{cases}
+1, & i = j \\
+l_{j \rightarrow i}
+, & \text{if } \bar{a}_{ij} = 1 \\
+0, & \text{Otherwise.}
+\end{cases}.
+\]
+\(l_{j \rightarrow i}\) means the weight of the shortest path from \(j\) to \(i\).
+
+\begin{defn}[Graph structured TFMs] 
+\label{def:weak_strcuture}~\cite{naghnaeian2019youla}
+Let $\mathcal{G}=\left( {\mathcal V}, \mathcal{A}\right) $ be a directed graph and let \(\bar{\mathcal G}\mathcal{=}\left({\mathcal V}, {\bar{\mathcal A}}, {\bar{\mathcal W}}\right)\) be its transitive closure. Let $\mathcal{P}_r= \left( r_{1}, r_{2}, ..., r_{n}\right) \in \mathbb{Z}^{n}$ and $\mathcal{P}_c = \left( c_{1}, c_{2}, ..., c_{n}\right) \in \mathbb{Z}^{n}$ be two non-negative integer valued \(n\)-tuples. Then, the set of rational TFMs conforming to the graph \(\mathcal{G}\) structure is defined by
+\begin{equation*}\small
+\mathfrak{T}(\mathcal{G},\mathcal{P}_r,\mathcal{P}_c)
+ = \left\{H \left\vert H = 
+\begin{cases}
+\left[h_{ij}\right] & i = j\\
+\left[ z^{-\bar{w}_{ij}}h_{ij}\right] & \bar{e}_{ij} = 1\\
+\mathbf{0}_{r_i \times c_j} & \text{Otherwise}.
+\end{cases}\right.\right\},
+\end{equation*}
+where \({h}_{ij}\) is a proper TFM with \(c_{j}\) inputs and \(r_i\) outputs, i.e. \(h_{ij} \in \mathcal{R}_p^{r_i\times c_j}\).
+Besides, we denote by \(\mathfrak{T}^s(\mathcal{G},\mathcal{P}_r,\mathcal{P}_c)\) the subclass of TFMs that are analytic on \(\mathbb{C} \backslash \bar{\mathbb{D}}\), i.e. \(h_{ij} \in \mathcal{RH}_\infty^{r_i\times c_j}\).
+\end{defn}
+% Since we use uppercase letter to denote both transfer function matrices and state-space model, we will use \(\mathrm{tf}(\cdot)\) to convert a state-space model into its transfer function matrix.
+
+
+
+In reference to Fig.~\ref{fig:Vamsi_net},
+The transitive closure of \(\mathcal{G}\) is given by \(\bar{\mathcal G}^c(\mathcal{V}, \bar{\mathcal{A}}^c, \bar{\mathcal{W}}^c)\):
+\[\small
+\bar{\mathcal{A}}^c = \begin{bmatrix}
+        0 & 1 & 0\\
+        1 & 0 & 0\\
+        1 & 1 & 0\\
+\end{bmatrix};\quad 
+\bar{\mathcal{W}}^c = \begin{bmatrix}
+        1 & 1 & 0\\
+        1 & 1 & 0\\
+        1 & 2 & 1\\
+\end{bmatrix}.
+\]
+This defines the domain of TFM for controller synthesis, assuming \(\mathcal{P}_y = \mathcal{P}_u = \mathbf{1}_3\) in accordance with Definition~\ref{def:weak_strcuture}:
+\begin{equation}\label{eqn::TFMconstr1}\small
+\mathfrak{T}(\mathcal{G},\mathcal{P}_u,\mathcal{P}_y) = 
+\left[
+\begin{array}{ccc}
+\mathcal{R}_p & \frac{1}{z}\mathcal{R}_p & 0 \\
+\frac{1}{z}\mathcal{R}_p & \mathcal{R}_p & 0 \\
+\frac{1}{z}\mathcal{R}_p & \frac{1}{z^2}\mathcal{R}_p & \mathcal{R}_p \\
+\end{array}
+\right].
+\end{equation}
+The sparsity constraints reflect the lack of a path from vertex $3$ to either vertex $1$ or vertex $2$. The influence propagates from node $2$ to $3$ after two steps.
+
+
+
+
+
+
+
+% {\color{red}stress that the TFMs of networked systems have sparsity and delay constraints consistent with the network topology}
+
+% \begin{defn}
+% \label{def:weak_strcuture}
+% Let $\mathcal{G}=\left( {\mathcal V}, \mathcal{E}, \mathcal{W} \right) $ be an arbitrary graph, with $n$ number of vertices, and let $\mathcal{P}_r= \left( r_{1}, r_{2}, ..., r_{n}\right) \in \mathbb{Z}^{n}$ and $\mathcal{P}_c= \left( c_{1}, c_{2}, ..., c_{n}\right) \in \mathbb{Z}^{n}$ be two positive integer valued \(n\)-tuples. Then, the set of causal operators conforming to the graph \(\mathcal{G}\) structure is defined by
+% \begin{equation*}
+% \begin{split}
+% &\mathcal{S}\left( \mathcal{G}, \mathcal{P}_r,\mathcal{P}_c\right)
+% = \\
+% & \{ \mathbf{H} = 
+% \begin{cases}
+% \left[ z^{-\alpha }h_{ij}\right],\ \alpha = w(j,i) & (j,i)\in \mathcal{E} \text{ or } i = j\\
+% \mathbf{0}_{r_i \times c_j} & \text{Otherwise}.
+% \end{cases}\} 
+% \end{split}
+% \end{equation*}
+% where \({h}_{ij}\) is a causal operator with \(c_{j}\) inputs and \(r_i\) outputs.
+% \end{defn}
+
+% \begin{lemma}\label{lm:clsdmul}
+% \label{lem:cls}Suppose $\mathcal{G}$ is an arbitrary graph. Then $\mathcal{S} \left( \mathcal{G}, \mathcal{P}_r,\mathcal{P}_c\right) $ is closed under addition for any integer valued positive vectors $\mathcal{P}_r$ and $\mathcal{P}_c$. 
+% Furthermore, if $\mathcal{G}$ is transitively closed then $ \mathbf{H}_{1}\mathbf{H}_{2}\in \mathcal{S}\left( \mathcal{G}, \mathcal{P}_{r_1}, \mathcal{P}_{c_2}\right)$ for any $\mathbf{H}_{1}\in \mathcal{S}\left( \mathcal{G}, \mathcal{P}_{r_1}, \mathcal{P}_{c_1}\right) $ and $\mathbf{H}_{2}\in \mathcal{S}\left( \mathcal{G}, \mathcal{P}_{r_2}, \mathcal{P}_{c_2}\right) $ with $ \mathcal{P}_{r_2} =\mathcal{P}_{c_1} $.
+% \end{lemma}
+
+% \begin{rem}
+% Since dynamical influence often propagates beyond neighbors in a networked system, we frequently consider the operator on transitive closure \(\mathcal{S}\left(\bar{\mathcal{G}} , \cdot, \cdot\right)\) rather than the set \(\mathcal{S}\left(\mathcal{G} , \cdot, \cdot\right)\) on original topology.
+% \end{rem}
+
+
+
+\begin{cor}[Closed under addition and multiplication]\cite{naghnaeian2019youla}
+\label{cor:cls}
+Suppose $\mathcal{G}$ is an arbitrary graph. Then $\mathfrak{T} \left( \mathcal{G}, \mathcal{P}_r,\mathcal{P}_c\right) $ is closed under addition for any integer valued positive vectors $\mathcal{P}_r$ and $\mathcal{P}_c$.
+% {\color{blue} is an additive abelian group}. 
+Furthermore, $ T_1 T_2 \in \mathfrak{T}\left( \mathcal{G}, \mathcal{P}_{r_1}, \mathcal{P}_{c_2}\right)$ for any $T_1\in \mathfrak{T}\left( \mathcal{G}, \mathcal{P}_{r_1}, \mathcal{P}_{c_1}\right) $ and $T_2\in \mathfrak{T}\left(\mathcal{G}, \mathcal{P}_{r_2}, \mathcal{P}_{c_2}\right) $ with $\mathcal{P}_{r_2} =\mathcal{P}_{c_1} $. 
+% {\color{blue} is a ring when \(\mathcal{P}_r = \mathcal{P}_c\), otherwise bimodule}    
+\end{cor}
+Corollary \ref{cor:cls} presents a central property of the TFMs conforming to a network graph. Essentially, it means that the sum and product of TFMs of networked systems on the same graph with compatible partitions are still TFMs of a networked system on that graph. Corollary \ref{cor:cls} can be understood as the TFM interpretation of Lemma \ref{lm:nwsint}.
+
+\subsection{Comparison of different synthesis methods} \label{subsec::MethodsCompare}
+
+
+Here, we outline how existing methods can address the proposed Problem \ref{Prob::networkoptcontrol}.
+\subsubsection{System Level Synthesis}
+\begin{equation}
+    \underset{\bf{R},\bf{M},\bf{N},\bf{L}\in \mathcal{RH}_\infty}{\mathrm{minimize}} 
+    \left\|{\left[\begin{array}{cc}
+    C_z & D_{zu}\\
+    \end{array}\right]
+    \left[\begin{array}{cc}
+    \bf{R} & \bf{N}\\
+    \bf{M} & \bf{L}
+    \end{array}\right]
+    \left[\begin{array}{c}
+    B_w \\
+    D_{yw}\\
+    \end{array}\right]+D_{zw}}
+    \right\|_2
+\end{equation}
+subject to
+\begin{equation}\label{eqn::SLCstruct}
+    \bf{L} \in \mathfrak{T}^s(\mathcal{G},\mathcal{P}_u,\mathcal{P}_y)
+\end{equation}
+\begin{equation}\label{eqn::SLCleft}
+    \left[\begin{array}{cc}
+    zI-A & B_u\\
+\end{array}\right]
+\left[\begin{array}{cc}
+    \bf{R} & \bf{N}\\
+    \bf{M} & \bf{L}
+\end{array}\right]
+=\left[\begin{array}{cc}
+    I & \mathbf{0}\\
+\end{array}\right]
+\end{equation}
+\begin{equation}\label{eqn::SLCright}
+\left[\begin{array}{cc}
+    \bf{R} & \bf{N}\\
+    \bf{M} & \bf{L}
+\end{array}\right]
+\left[\begin{array}{c}
+    zI-A \\
+    C_y\\
+\end{array}\right]
+=\left[\begin{array}{c}
+    I \\
+    \mathbf{0}\\
+\end{array}\right]
+\end{equation}
+The main idea of the System-Level approach is to find a set of closed-loop responses achieved by an internally stabilizing controller directly.
+The set of \(\bf{R},\bf{M},\bf{N},\bf{L}\) satisfying System Level constraints (\ref{eqn::SLCleft},\ref{eqn::SLCright}) are a set of CL transfer function from perturbation \(\delta_x,\delta_u\) to signal \(x,u\) in Figure \ref{fig:SLSstructure}. The internally stabilizing controller \(K=\bf{L} -\bf{M}\bf{R}^{-1}\bf{N}\) achieves the desired response. And under the Assumption \ref{ass::samegraph},\ref{Assumption::statespace}, the constraint (\ref{eqn::SLCstruct}) ensures the stabilizing controller \(K\) parametrized satisfies the structural constraint \(K\in\mathfrak{T}(\mathcal{G},\mathcal{P}_u,\mathcal{P}_y)\).
+\begin{figure}[h]
+    \centering
+    \includegraphics[scale=0.7]{figures/LiteratureFigure/SLSblkdiagram.png}
+    \caption{The picture comes from \cite{SLSparametrization}, showing the output feedback controller structure in System Level synthesis. \(\tilde{R}^+= z(I-zR), \tilde{M}=zM, \tilde{N}= -zN\)}
+    \label{fig:SLSstructure}
+\end{figure}
+
+The affine constraints (\ref{eqn::SLCstruct},\ref{eqn::SLCleft},\ref{eqn::SLCright}) are cumbersome in infinite horizon time response. One approach is to approximately solve the sub-optimal controller parameterized by \(\bf{R},\bf{M},\bf{N},\bf{L}\) in an FIR subspace. Accuracy is improved by increasing the truncation level. However, this approximation method lacks a guarantee of convergence speed, and as a consequence, it leads to controller order inflation. Besides, as pointed out in \cite{naghnaeian2019youla}, forcing the CL system responses to be FIR could require huge control input and harm robustness.
+\subsubsection{Input-Output Synthesis}
+\begin{equation}
+    \underset{\bf{X},\bf{Y},\bf{W},\bf{Z}\in \mathcal{RH}_\infty}{\mathrm{minimize}} 
+    \left\|P_{11}+ P_{12} {\bf{Y}} P_{21}
+    \right\|_2
+\end{equation}
+subject to
+\begin{equation}\label{eqn::IOPstruct}
+    \bf{Y} \in \mathfrak{T}^s(\mathcal{G},\mathcal{P}_u,\mathcal{P}_y)
+\end{equation}
+\begin{equation}\label{eqn::IOCleft}
+    \left[\begin{array}{cc}
+    I & -P_{22}\\
+\end{array}\right]
+\left[\begin{array}{cc}
+    \bf{X} & \bf{W}\\
+    \bf{Y} & \bf{Z}
+\end{array}\right]
+=\left[\begin{array}{cc}
+    I & \mathbf{0}\\
+\end{array}\right]
+\end{equation}
+\begin{equation}\label{eqn::IOCright}
+\left[\begin{array}{cc}
+    \bf{X} & \bf{W}\\
+    \bf{Y} & \bf{Z}
+\end{array}\right]
+\left[\begin{array}{c}
+    -P_{22} \\
+    I\\
+\end{array}\right]
+=\left[\begin{array}{c}
+    I \\
+    \mathbf{0}\\
+\end{array}\right]
+\end{equation}
+The optimal controller can be retrieved by K = \(\mathbf{Y}\mathbf{X}^{-1}\).
+
+The main concept of IOP is analogous to SLP. In contrast, IOP searches for the closed-loop response from perturbation \(\delta_y,\delta_u\) to \(y,u\) instead. Despite \(P_{22}\) could be an unstable operator with infinite horizon time response, it's still possible to choose FIR \(\bf{X, Y, W, Z}\) to cancel poles of \(P_{22}\) and make the product on LHS of (\ref{eqn::IOCleft},\ref{eqn::IOCright}) to be an FIR. 
+For the \(\mathcal{H}_2\)-norm minimization, their solution is approximated by FIR with increasing truncation levels as SLP.
+
+\subsubsection{Youla Operator state-space}
+\begin{figure}[h]
+    \centering
+    \includegraphics[scale=0.6]{figures/LiteratureFigure/YOSSarchitecture.png}
+    \caption{The implementation of Observer-based controller\cite{naghnaeian2019youla}. The generalized observer is found to estimate the states. The estimated states \(\hat{x}\) and output \(y\) are fed into the state-like controller to make control decisions.
+    \(
+    u = K_1\hat{x} +K_2 y
+    \)}
+    \label{fig:YOSSarchitecture}
+\end{figure}
+Because the separation principle shows that any stabilizing controller is achievable beginning from any Generalized Luenberger Observer (GLO). The problem is split into a two-step design. First, find the GLO by convex searching \(\mathbf{Q}_L, \mathbf{Z}_L\). 
+\begin{equation}
+    \mathbf{Q}_L \in \mathfrak{T}^s(\mathcal{G},\mathcal{P}_x,\mathcal{P}_x);\ 
+    \mathbf{Z}_L \in \mathfrak{T}^s(\mathcal{G},\mathcal{P}_x,\mathcal{P}_y);\ 
+\end{equation}
+subject to:
+\begin{equation}\label{eqn::YOSS_GLOcons}
+    \| A + \mathbf{Z}_L C_y - \mathbf{Q}_L (I- z^{-1} A)\|<1
+\end{equation}
+After that, a convex optimization on 4 parameters is to solve towards the optimal controller. Ideally, the problem is posed as, 
+\begin{equation}
+    \underset{\mathbf{R}_0}{\mathrm{minimize}} 
+    \left\|\mathbf{H} + \mathbf{U} \mathbf{R}_0 \mathbf{V}
+    \right\|_2
+\end{equation}
+subject to
+\begin{equation}
+\begin{split}
+&\mathbf{R}_0 = \left[
+\begin{array}{cc}
+    z^{-1} \mathbf{Q}_1^0 & z^{-1} \mathbf{Q}_2^0\\
+    \mathbf{Z}_1^0 & \mathbf{Z}_2^0
+\end{array}
+\right]; \\
+&\mathbf{Q}_1^0\in\mathfrak{T}^s(\mathcal{G},\mathcal{P}_x,\mathcal{P}_x); \mathbf{Q}_2^0\in\mathfrak{T}^s(\mathcal{G},\mathcal{P}_x,\mathcal{P}_y);\\  &\mathbf{Z}_1^0\in\mathfrak{T}^s(\mathcal{G},\mathcal{P}_u,\mathcal{P}_x); \mathbf{Z}_2^0\in\mathfrak{T}^s(\mathcal{G},\mathcal{P}_u,\mathcal{P}_y);\\
+\end{split}
+\end{equation}
+\begin{equation}\label{eqn::YOSSstatecont_const}
+    \left[\begin{array}{cc}
+    A & \mathbf{0}  
+\end{array} \right] + 
+\left[\begin{array}{cc}
+    z^{-1} A- I & B_u  
+\end{array} \right] \mathbf{R}_0 = 
+\left[\begin{array}{cc}
+    \mathbf{0} & \mathbf{0}  
+\end{array} \right]
+\end{equation}
+We omit the construction of \(\mathbf{H,U,V}\) for brevity and refer readers to the equation (58,59,60) in \cite{naghnaeian2019youla}.
+The State-like controller in Figure \ref{fig:YOSSarchitecture} can be retrieved by:
+\begin{equation}
+\left[\begin{array}{cc}
+    K_1 & K_2  
+\end{array} \right]= 
+\mathbf{Z}(I+\tilde{\mathbf{Q}})^{-1}
+\end{equation}
+where,
+\begin{equation}
+    \mathbf{Z} = \left[\begin{array}{cc}
+    \mathbf{Z}_1^0 & \mathbf{Z}_2^0  
+\end{array} \right];\ 
+\tilde{\mathbf{Q}} =  \left[\begin{array}{cc}
+    z^{-1} \mathbf{Q}_1^0 & z^{-1}\mathbf{Q}_2^0\\
+    C_y (I +z^{-1}\mathbf{Q}_1^0) +D_{yu} \mathbf{Z}_1^0 & z^{-1}C_y \mathbf{Q}_2^0 +D_{yu} \mathbf{Z}_2^0 
+\end{array} \right];
+\end{equation}
+Technically, they can truncate the \(\mathbf{Q},\mathbf{Z}\) into FIR and relax the equality constraint in (\ref{eqn::YOSSstatecont_const}) into a norm inequality constraint. A key contribution of the YOSS method is that it guarantees lower and upper bounds for FIR truncated solution performance. Furthermore, the lower and upper bounds converge to the optimal performance value as the truncation level increases.
+
+However, despite these advantages, the YOSS method involves four constrained variables in the convex search, which results in a computational load comparable to that of SLS and IOP methods.
+
+\subsubsection{Augmented system's Youla parameterization}
+\begin{equation}
+    \underset{\bar{Q}\in \mathcal{RH}_\infty}{\mathrm{minimize}} 
+    \left\|\bar{P}_{11}+ \bar{P}_{12} \bar{Q} \bar{P}_{21}
+    \right\|_2
+\end{equation}
+subject to
+\begin{equation}\label{eqn::GulnihalCons_1}
+    \left[\begin{array}{cc}
+    z^{-1}A- I&  z^{-1} A B_u\\
+    \end{array}\right] \bar{Q}= \left[\begin{array}{cc}
+    I & \mathbf{0}\\
+\end{array}\right]
+\end{equation}
+\begin{equation}\label{eqn::GulnihalCons_2}
+    \bar{Q} \left[\begin{array}{c}
+    z^{-1}A- I \\
+    z^{-1}C_y\\
+\end{array}\right]
+    =\left[\begin{array}{c}
+    I \\ \mathbf{0}\\
+\end{array}\right]
+\end{equation}
+\begin{equation}\label{eqn::GulnihalCons_struct}
+    \left[\begin{array}{cc}
+    \mathbf{0}& I\\
+    \end{array}\right]
+    \bar{Q} \left[\begin{array}{c}
+    \mathbf{0} \\
+    I
+    \end{array}\right]
+    \in \mathfrak{T}^s(\mathcal{G},\mathcal{P}_u,\mathcal{P}_y)
+\end{equation}
+\begin{figure}[h]
+    \centering
+    \includegraphics[scale=0.7]{figures/LiteratureFigure/GulnihalDiagram.png}
+    \caption{An equivalent block diagram of feedback interconnection of a plant and its internally stabilizing controller. Only \(\bar{P}_{22}\) is shown here, which doesn't affect the essence of the methodology. The picture comes from \cite{ThesisGulnihal}}
+    \label{fig:Gulnihalarchitecture}
+\end{figure}
+Given \(\bar{Q}\), the controller can be retrieved by
+\begin{equation}
+    K = - \left[\begin{array}{cc}
+    \mathbf{0}& I\\
+    \end{array}\right]
+    \mathrm{lft}(\bar{Q},\bar{P}_{22}) \left[\begin{array}{c}
+    \mathbf{0} \\
+    I
+    \end{array}\right]
+\end{equation}
+
+
+The main idea of this method is that a given controller \(K\) internally stabilizes plant \(P_{22}\) if and only if an augmented controller constructed by \(\bar{K} = \mathrm{diag}(I,K)\) is a stabilizing controller for an augmented plant \(\bar{P}_{22}\). The augmented plant is defined in.
+\begin{equation}
+    \bar{P} = \left[\begin{array}{c|c}
+    \bar{P}_{11} & \bar{P}_{12} \\
+    \hline
+    \bar{P}_{21} & \bar{P}_{22}
+    \end{array}\right]
+    =
+    \left[\begin{array}{c|cc}
+    z^{-1} C_z B_w + D_{zw} & z^{-1} C_z &z^{-1} C_z B_u +D_{zu} \\
+    \hline
+    z^{-1} A B_w & z^{-1} A & z^{-1} A B_u\\
+    z^{-1} C_y B_w + D_{yw} & z^{-1} C_y & z^{-1} C_y B_u
+    \end{array}\right]
+\end{equation}
+The two-block-diagonal and first block being identity structure in \(\bar{K}\) leads to the constraint on augmented Youla Parameter \(\bar{Q}\) in Equation (\ref{eqn::GulnihalCons_1}), (\ref{eqn::GulnihalCons_2}).
+The structure constraint is imposed on \(\bar{Q}\)'s bottom right block, which has the same dynamics as the closed loop transfer function from actuators to sensors.
+
+\subsubsection{Standard Youla Parameterization with Model-matching solution}
+\begin{opt}\label{Prob::H2minafterpara}
+\begin{equation}
+    \underset{Q\in \mathcal{RH}_\infty}{\mathrm{minimize}} \|H - U Q V\|_2 
+\end{equation}
+subject to
+\begin{equation}\label{eqn:mmstructconstr}
+    (Y_r - M_r Q) M_l\in\mathfrak{T}^s(\mathcal{G},\mathcal{P}_u,\mathcal{P}_y)
+\end{equation}
+\end{opt}
+Based on the standard Youla-Parameterization Method, one can construct an initial stabilizing controller and doubly coprime factorization of the plant \(P_{22}\) and initial controller \(K_0\)  such that \(P_{22} = N_r {M_r}^{-1} = {M_l}^{-1} N_l, K_0 = Y_r {X_r}^{-1} = {Y_l}^{-1} X_l\) given any full state feedback gain \(F\) and Luenberger observer \(L\) such that \(A_F= A+B_u F\) and \(A_L = A+LC_y\) are Schur.
+\begin{equation}\label{eqn::DCF}
+    \left[\begin{array}{cc}
+    M_r & Y_r \\
+    N_r & X_r
+    \end{array}\right]
+    =\left[
+    \begin{array}{c|cc}
+        A_F & B_u & -L \\
+        \hline
+        F & I & \mathbf{0}\\
+        C_y & \mathbf{0} & I
+    \end{array}\right];\ 
+    \left[\begin{array}{cc}
+    X_l & -Y_l \\
+    -N_l & M_l
+    \end{array}\right]
+    =\left[
+    \begin{array}{c|cc}
+        A_L & B_u & -L \\
+        \hline
+        -F & I & \mathbf{0}\\
+        -C_y & \mathbf{0} & I
+    \end{array}\right]
+\end{equation}
+
+All stabilizing controllers for the plant and resulting closed-loop maps from \(w\), \(z\) can be parametrized as:
+\begin{equation}\label{eqn::allstabc}
+\begin{split}
+    K_{\mathrm{stab}} &= (Y_r - M_r Q) (X_r - N_r Q)^{-1};\ Q \in \mathcal{RH}_\infty \\
+    \mathrm{CL} &= \mathrm{lft}(P,K_{\mathrm{stab}}) = H -U Q V.
+\end{split}
+\end{equation}
+Where,
+\begin{equation}
+    H = \mathrm{lft}(P,K_0)= \left[\begin{array}{cc|c}
+    A_F & -B_u F & B_w\\
+   \mathbf{0} & A_L & B_w + L D_{yw}\\
+    \hline
+    C_z + D_{zu}F & -D_{zu}F & D_{zw}
+\end{array}\right]
+\end{equation}
+\begin{equation}
+U = \left[
+    \begin{array}{c|c}
+        A_F & B_u \\
+        \hline
+        C_z + D_{zu}F & D_{zu} \\
+    \end{array}\right];\ 
+V = \left[
+    \begin{array}{c|c}
+        A_L & B_w + L D_{yw}\\
+        \hline
+        C_y & D_{yw} \\
+    \end{array}\right]
+\end{equation}
+The quadratic invariance assumption ensures the equivalence of \(K\in\mathfrak{T}(\mathcal{G},\mathcal{P}_u,\mathcal{P}_y)\) and \(Z\in\mathfrak{T}^s(\mathcal{G},\mathcal{P}_u,\mathcal{P}_y)\). Consequently, it becomes feasible to impose a structural constraint on controllers onto a model-matching constraint (\ref{eqn:mmstructconstr}) on Youla Parameter \(Q\), which is first proposed in \cite{Sabau2011Vec}, recaptured in Theorem \ref{thm:struct_stab_cont_para}. The main strength of this method is that it simplifies the search to a single variable, despite the convolution constraint, compared to other methods.
+
+\begin{thm}\label{thm:struct_stab_cont_para}
+If a transfer function class \(\mathcal{S}\) is QI with plant \(P_{22}\)
+A controller \(K\in \mathcal{S}\) internally stabilizes \(P_{22}\), if and only if there is a transfer matrix \(Q\in\mathcal{RH}_\infty\) such that:
+\begin{equation}
+K =  (Y_r - M_r Q) (X_r -N_r Q)^{-1},\ Z=(Y_r -M_r Q)M_l \in \mathcal{S}
+\end{equation}
+\end{thm}
+\begin{rem}
+If the Youla Parameterization is initialized with the \(\mathcal{H}_2\) controller, obtained through the process in Appendix \ref{appsec::optimalH2}, Problem \ref{Prob::H2minafterpara} can be further simplified as:
+\begin{opt}\label{Prob::H2min_infHorQuad}
+\begin{equation}
+    \underset{Q\in \mathcal{RH}_\infty}{\mathrm{minimize}} \|\Gamma_b^{\frac{1}{2}}Q \Gamma_c^{\frac{1}{2}}\|_2 
+\end{equation}
+subject to
+\[
+Z = (Y_{r_0} - M_r Q) M_l\in\mathfrak{T}^s(\mathcal{G},\mathcal{P}_u,\mathcal{P}_y)
+\]
+\end{opt}
+\end{rem}
+The solution for strongly connected graph \(\mathcal{G}\) is included in \cite{Lamperski2015H2}. 
+Lamperski and Doyle took advantage of the inner-outer doubly co-prime factorization to further simplify the cost function of the 2-norm minimization case. 
+Thus they solved the strongly connected network \(\mathcal{H}_2\) optimal controllers problem subject to finite steps communication delays. The essence of their approach is that all nodes (agents) can access the information of all the others finally in strongly connected graphs. So a stabilizing controller is guaranteed to be found. This characteristic manifests as a time-varying Discrete Algebraic Riccati Equation (DARE) converging into a stable \(A\) matrix within a finite number of steps, ensuring that the stabilizing solution can be found through backward recursion.
+However, the solution is still missing for the non-strongly connected case. We propose a solution in the next section.

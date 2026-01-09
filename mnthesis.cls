@@ -69,8 +69,14 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % The mnthesis document class is based on the report document class.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\ProvidesClass{mnthesis}
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesClass{mnthesis}[2025/11/22 UMN thesis class (patched)]
+% Pass any class options (11pt, oneside, etc.) through to report
+\DeclareOption*{\PassOptionsToClass{\CurrentOption}{report}}
+\ProcessOptions\relax
 \LoadClass{report}
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -86,8 +92,10 @@
 \setlength{\paperwidth}{8.5in}
 
 %\setlength{\oddsidemargin}{1.937cm}  % default -> 2.0 cm odd side
-\setlength{\oddsidemargin}{0.55in} % final version to grad school
+%\setlength{\oddsidemargin}{0.55in} % final version to grad school
+\setlength{\oddsidemargin}{0.55in}
 \setlength{\evensidemargin}{0.1in} % default -> 3.4 cm even side
+%\setlength{\evensidemargin}{0.1in} % default -> 3.4 cm even side
 
 %\setlength{\topmargin}{0.75in}
 \setlength{\topmargin}{0.25in}
@@ -108,7 +116,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Documentstyle Modifications
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\brokenpenalty=10000 % Do not break pages at hyphens.
+\brokenpenalty = 10000 % Do not break pages at hyphens.
 
 % use baselinestretch of 2.0 for 10 pt
 % use baselinestretch of 1.6 for 11 pt

@@ -1,0 +1,776 @@
+\chapter{Distributed Control}
+
+\section{Spectral Factorization and Optimal \(\mathcal{H}_2\) control}\label{appsec::optH2}
+\subsection{State-space representation of the model-matching TFMs}
+\begin{equation*}\small
+    G_{11} = \left[\begin{array}{cc|c}
+    A_F & -B_u F & B_w\\
+   \mathbf{0}_{n_x,n_x} & A_L & B_w + L D_{yw}\\
+    \hline
+    C_z + D_{zu}F & -D_{zu}F & D_{zw}
+\end{array}\right];
+\end{equation*}
+\begin{equation*}\small
+G_{12} = \left[
+    \begin{array}{c|c}
+        A_F & B_u \\
+        \hline
+        C_z + D_{zu}F & D_{zu} \\
+    \end{array}\right];\ 
+G_{21} = \left[
+    \begin{array}{c|c}
+        A_L & B_w + L D_{yw}\\
+        \hline
+        C_y & D_{yw} \\
+    \end{array}\right].
+\end{equation*}
+\subsection{Spectral Factorization construction and Properties}
+Let \(D_{zu}^\perp\) and \(D_{yw}^\perp\) be the orthogonal complement of \(D_{zu}\) and \(D_{yw}\). Denote \(A_b = A - B_u D_{zu}^\perp C_z,\ A_c = A -B_w D_{yw}^\perp C_y\). Then let \(X_b\), \(X_c\) be the unique stabilizing solution of the Riccati equations:
+\begin{equation}\label{eqn::DAREH2optcont}
+\begin{split}
+% X_b &= C_z^\top {D_{zu}^\perp} {D_{zu}^\perp}^\top C_z +A_b^\top X_b A_b - A_b^\top X_b B_u (I + B_u^\top X_b B_u)^{-1} B_u^\top X_b A_b  
+X_b = &\mathrm{DARE}(A_b,B_u, C_z^\top {D_{zu}^\perp} {D_{zu}^\perp}^\top C_z,I)
+\\
+% X_c &= B_w {D_{yw}^\perp}^\top {D_{yw}^\perp} B_w +A_c X_c A_c^\top - A_c X_c C_y^\top (I + C_y X_c C_y^\top)^{-1} C_y X_c A_c^\top 
+X_c = &\mathrm{DARE}(A_c^\top,C_y^\top, B_w {D_{yw}^\perp}^\top {D_{yw}^\perp} B_w,I)
+\end{split}
+\end{equation}
+Define:
+\begin{equation} \label{eqn::centralizedH2contParas}\small
+\begin{split}
+    \Gamma_b &=I +B_u^\top X_b B_u,\ F = -{\Gamma_b}^{-1}(B_u^\top X_b A + D_{zu}^\top C_{z});\\
+    \Gamma_c & = I +C_y X_c C_y^\top,\ L = -(A^\top X_c C_y + B_w D_{yw}^\top) {\Gamma_c}^{-1}.\\
+\end{split}
+\end{equation}
+\begin{equation}\label{eqn:YP_R0}\small
+\begin{split}
+    R_0 = &\Gamma_b^{-1}(B_u^\top X_b A X_c C_y^\top + D_{zu}^\top C_z X_c C_y^\top \\
+    &+ B_u^\top X_2 B_w D_{yw}^\top +D_{zu}^\top D_{zw} D_{yw}^\top) \Gamma_c^{-1}.
+\end{split}
+\end{equation}
+
+\begin{lemma}
+The DCF defined by \(F,L\) given in ~\eqref{eqn::centralizedH2contParas} ensures that \(\|G_{11} - G_{12} Q G_{21}\|_{\mathcal{H}_2}^2 = \|G_{11}^0\|_{\mathcal{H}_2}^2 + \|\Gamma_b^{\frac{1}{2}}(Q-R_0) \Gamma_c^{\frac{1}{2}}\|_{\mathcal{H}_2}^2\), 
+where \(G_{11}^0 \coloneqq G_{11}- G_{12} R_0 G_{21}\), \(R_0\) is given in ~\eqref{eqn:YP_R0}.
+\end{lemma}
+\begin{proof}
+Denote \(\bar{Q} = Q - R_0\). Rewrite the \(\mathcal{H}_2\) norm into the inner product form.
+\begin{equation*}
+\begin{split}
+    & \|G_{11} - G_{12} Q G_{21}\|_{\mathcal{H}_2}^2 = \|G_{11}^0 - G_{12} \bar{Q} G_{21}\|_{\mathcal{H}_2}^2 \\
+    & = \langle G_{11}^0 - G_{12} \bar{Q} G_{21}, G_{11}^0 - G_{12} \bar{Q} G_{21}\rangle\\
+    & = \langle G_{11}^0, G_{11}^0 \rangle + 2\langle G_{11}^0,G_{12}\bar{Q} G_{21}\rangle + \langle G_{12} \bar{Q} G_{21}, G_{12} \bar{Q} G_{21}\rangle \\
+    & = \| G_{11}^0\|_{\mathcal{H}_2}^2 +2\langle G_{11}^0,G_{12}\bar{Q} G_{21}\rangle + \langle G_{12} \bar{Q} G_{21}, G_{12} \bar{Q} G_{21}\rangle
+\end{split}
+\end{equation*}
+\(\|G_{11}^0\|_{\mathcal{H}_2}^2\) is a constant that represents the value of optimal CL \(\mathcal{H}_2\) cost. The cross term,
+\begin{equation}
+    \langle G_{11}^0,G_{12}\bar{Q} G_{21}\rangle = \langle G_{12}^{\sim} G_{11}^0 G_{21}^{\sim},\bar{Q}\rangle =0
+\end{equation}
+from \((G_{12}^{\sim} G_{11}^0 G_{21}^{\sim}) \in \mathcal{RH}_2^\perp\) and \(\bar{Q}\in \mathcal{RH}_2\). Using the properties \(
+G_{12}^{\sim} G_{12} =\Gamma_b, \ G_{21} G_{21}^{\sim} =\Gamma_c\),
+the quadratic term:
+\begin{equation*}\small
+    \langle G_{12} \bar{Q} G_{21}, G_{12} \bar{Q} G_{21}\rangle = \langle G_{12}^{\sim} G_{12}\bar{Q}G_{21} G_{21}^{\sim},\bar{Q}\rangle 
+    = \|\Gamma_b^{\frac{1}{2}}\bar{Q} \Gamma_c^{\frac{1}{2}}\|_{\mathcal{H}_2}^2.
+\end{equation*}
+Putting together all the terms, we show that: 
+\[\small
+\|G_{11} - G_{12} Q G_{21}\|_{\mathcal{H}_2}^2= \|G_{11}^0\|_{\mathcal{H}_2}^2 + \|\Gamma_b^{\frac{1}{2}}(Q-R_0) \Gamma_c^{\frac{1}{2}}\|_{\mathcal{H}_2}^2.
+\]
+\end{proof}
+\section{Proofs for main results}\label{sec:app_vecssana}
+\subsection{Proof of Theorem~\ref{thm:vectimeresp}}
+\begin{proof}
+Since \(M_r\) and \(M_l\) are invertible linear operators (though their inverses are unbounded operators), \(\Phi = (Y_r - M_r Q) M_l\) is the unique linear operator such \[
+Q = {M_r}^{-1}(Y_r -  \Phi {M_l}^{-1}) \in \mathcal{RH}_\infty
+\]
+The realization of \({M_r}^{-1} Y_r\), \({M_r}^{-1}\) and \({M_l}^{-1}\) are:
+\begin{equation}
+    {M_r}^{-1} = \left[
+    \begin{array}{c|c}
+        A & B_u \\
+        \hline
+        -F & I \\
+    \end{array}\right];\;    
+    {M_l}^{-1} = \left[
+    \begin{array}{c|c}
+        A & -L \\
+        \hline
+        C_y & I \\
+    \end{array}\right];\; 
+    {M_r}^{-1}Y_r = \left[
+    \begin{array}{c|c}
+        A & L \\
+        \hline
+        -F & \mathbf{0} \\
+    \end{array}\right].
+\end{equation}
+
+As vectorization preserves the original additive and multiplicative relationship between rational functions, we can reshape the entire algebraic constraint into a vector.
+\begin{equation}\label{eqn::QPhirelation}
+    \vc(Q) = \vc(M_r^{-1}Y_r)-{M_l}^{-\top} \otimes {M_r}^{-1} \vc(\Phi)\\
+\end{equation}
+Using the realization in Appendix~\ref{appsec::sskron},
+\[
+ \vc(M_r^{-1}Y_r) = \left[
+    \begin{array}{c|c}
+        A_v & b_0 \\
+        \hline
+        C_v & \mathbf{0} \\
+    \end{array}\right];\ 
+- {M_l}^{-\top} \otimes {M_r}^{-1} =
+\left[\begin{array}{c|c}
+    A_v & B_v \\
+    \hline
+    C_v & D_v \\
+\end{array}\right].
+\]
+\(A_v,B_v,C_v,D_v,b_0\) are given in~\eqref{eqn::ss::vecmat}. Multiplying unit impulse \(\delta\) on both sides, we find that the unilateral impulse responses \(q[i] =\vc(Q[i])\) and \(\phi[i] =\vc(\Phi[i])\) match the output and input of state-space~\eqref{eqn::ss::vecPhitovecQ}. 
+
+Since \(A_v +B_v C_v\) is Schur, \((A_v, C_v)\) is detectable. The detectability ensures the state sequence \(\eta\in\ell_2\) by \(q,\phi \in\ell_2\).
+\end{proof}
+
+
+
+% By letting \(\phi[i] = C_v \eta[i] + s[i]\) in (\ref{eqn::ss::vecPhitovecQ}), we observe that  \(q \equiv s\) where \(s\) is an arbitrary sequence. Once \(s\in \ell_2\), \(\phi,\eta\) are both \(\ell_2\) sequences. This implies that the process of inverting and vectorizing the constraint (\ref{eqn:mmstructconstr}) introduces no loss, thus fully parameterizing the set of all stable closed-loop systems.
+
+
+\subsection{Proof of Lemma~\ref{lemma:redsys}}
+\begin{proof}
+\(T_r\) is \(A_v\) left-invariant by construction. Therefore, \(T_l^\perp A T_r =\mathbf{0}\). 
+Since \(T_r\) is the orthonormal basis of the reachable subspace of \((A_v,[B_v E_m,b_0])\), \(B_v E_i\) and \(b_0\) are covered by \(T_r\) and thus orthogonal to \(T_l^\perp\). Therefore, \(T_l^\perp B_v E_i =\mathbf{0}\), \(T_l^\perp b_0=\mathbf{0}\).
+\begin{equation*}\small
+\begin{split}
+&\left[
+\begin{array}{c}
+    T_l  \\
+    T_l^\perp 
+\end{array}\right] \eta[i+1] = 
+\left[
+\begin{array}{c}
+    T_l  \\
+    T_l^\perp 
+\end{array}\right] A_v \left[
+\begin{array}{cc}
+    T_r & T_r^\perp 
+\end{array}\right] 
+\left[
+\begin{array}{c}
+    T_l  \\
+    T_l^\perp 
+\end{array}\right]\eta[i] \\&+ \left[\begin{array}{c}
+    T_l  \\
+    T_l^\perp 
+\end{array}\right]B_v E_i u[i] + \left[\begin{array}{c}
+    T_l  \\
+    T_l^\perp 
+\end{array}\right] b_0 \delta \\
+& = \left[
+\begin{array}{cc}
+    A_r & T_l A_v T_r^\perp \\
+    \mathbf{0} & T_l^\perp A_v T_r^\perp
+\end{array}\right]
+\left[
+\begin{array}{c}
+    T_l  \\
+    T_l^\perp 
+\end{array}\right] \eta[i] + \left[
+\begin{array}{cc}
+    B_r^i \\
+    \mathbf{0}
+\end{array}\right] u[i] + \left[\begin{array}{c}
+    b_r \\
+    \mathbf{0}
+\end{array}\right] \delta
+\end{split}
+\end{equation*}
+In this state iteration, we can show that \(T_l^\perp \eta[i] = \mathbf{0}\) by induction from \(\eta[0] = \mathbf{0}\). Let \(\xi[i] = T_l \eta[i]\), we have that \(\xi[0] =\mathbf{0}\) and
+\begin{equation*}\small
+\begin{split}
+\xi[i+1] & = A_r \xi[i] + T_l A_v T_r^\perp T_l^\perp \eta[i] + B_r^i u[i] + b_r\delta \\
+& = A_r \xi[i] + B_r^i u[i] + b_r\delta
+\end{split}
+\end{equation*}
+The output at each step is
+\begin{equation*}\small
+\begin{split}
+y[i] &= C_v \eta[i] + D_v E_i u[i] = C_v \left[
+\begin{array}{cc}
+    T_r & T_r^\perp 
+\end{array}\right] 
+\left[
+\begin{array}{c}
+    T_l  \\
+    T_l^\perp 
+\end{array}\right] \eta[i]
+ + E_i  u[i]\\
+& = \left[
+\begin{array}{cc}
+     C_r & C_v T_r^\perp 
+\end{array}\right] 
+\left[
+\begin{array}{c}
+    \xi[i]  \\
+    T_l^\perp  \eta[i]
+\end{array}\right] + E_i u[i] = C_r \xi[i] + E_i u[i]
+\end{split}
+\end{equation*}
+which concludes the proof.
+\end{proof}
+
+\subsection{Proof of Lemma~\ref{lm:poly_nonzero_inner_product}}
+\begin{proof}
+Let \( p(\lambda) \) be any polynomial such that \( p(\lambda_0) \neq 0 \).  
+Using polynomial division, we can write \(p(\lambda) = p(\lambda_0) + (\lambda - \lambda_0) q(\lambda)\) for some polynomial \( q(\lambda) \in \mathbb{C}[\lambda] \). Then:
+\[
+p(A) = p(\lambda_0) I + (A - \lambda_0 I) q(A)
+\]
+Now apply this to the inner product:
+\[
+v^\top p(A) g = p(\lambda_0) v^\top g + v^\top (A - \lambda_0 I) q(A) g
+\]
+
+Because \(v^\top (A - \lambda_0 I) A^k g = 0,\ \forall k \in \mathbb{N}\). We have \(\Rightarrow v^\top (A - \lambda_0 I) h = 0\), for all \(h \in \text{span}\{A^k g\}\).
+Since \( q(A) g \in \text{span}\{A^k g\} \), it follows that \(v^\top (A - \lambda_0 I) q(A) g = 0\).
+Hence, \(v^\top p(A) g = p(\lambda_0) v^\top g\).
+Since \( p(\lambda_0) \neq 0 \) and \( v^\top g \neq 0 \), we conclude \(v^\top p(A) g \neq 0\).
+\end{proof}
+
+
+\subsection{Proof of Corollary \ref{cor:diagA}}
+
+\begin{lemma}
+Let $(A, B)$ be a pair of matrices with $A \in \mathbb{R}^{n \times n}$ and $B \in \mathbb{R}^{n \times m}$, and let $\mathcal{X}_{\mathrm{stab}} \subseteq \mathbb{R}^n$ denote the \emph{stabilizable subspace} of $(A, B)$. Suppose a vector $b \in \mathbb{R}^n$ satisfies $b \notin \mathcal{X}_{\mathrm{stab}}$. Then, there exists a \emph{left generalized eigenvector} $w_\lambda^\top$ of $A$, associated with an \emph{unstable eigenvalue} $\lambda$ (i.e., $|\lambda| \ge 1$), such that
+\[
+w_\lambda^\top x = 0 \quad \forall x \in \mathcal{X}_{\mathrm{stab}}, \quad \text{and} \quad w_\lambda^\top b \ne 0.
+\]
+
+
+\end{lemma}
+\begin{proof}
+Define the orthogonal complement subspace of \(\mathcal{X}_{stab}\), denoted by \(\mathcal{X}_{stab}^\perp\):
+\[
+\mathcal{X}_{stab}^\perp := \left\{ w^\top \in \mathbb{R}^{1 \times n} \mid w^\top x = 0 \text{ for all } x \in \mathcal{X}_{stab} \right\}.
+\]
+
+Let \( w^\top \in \mathcal{X}_{stab}^\perp\).
+Because \(\mathcal{X}_{stab} \in \mathbb{R}^n\) is an \( A \)-invariant subspace (i.e., \( A x \in \mathcal{X}_{stab} \) for all \( x \in \mathcal{X}_{stab} \)), we have \(w^\top A x = 0\). Thus, \( A^\top w \in \mathcal{X}_{stab}^\perp\), i.e. \(
+A^\top (\mathcal{X}_{stab}^\perp) \subseteq \mathcal{X}_{stab}^\perp\).
+So \( \mathcal{X}_{stab}^\perp \) is invariant under \( A^\top \).
+
+
+By the Jordan decomposition theorem, any invariant subspace of a matrix is spanned by a subset of its generalized eigenvectors. Therefore, since \( \mathcal{X}_{stab}^\perp \) is \( A^\top \)-invariant, it follows that a subclass of left generalized eigenvectors of \(A\) forms the basis of \(\mathcal{X}_{stab}^\perp\).
+If \(b_0\) doesn't lies in \(\mathcal{X}_{stab}\), then there is at least one generalized eigenvector \(w^\top\in \mathcal{X}_{stab}^\perp\) of \(A\) corresponding to an unstable eigenvalue \(\lambda\) such that \(w^\top b_0 \neq 0\).
+\end{proof}
+
+\begin{lemma}\label{lm::Avindex2}
+Let $A \in \mathbb{R}^{n_x \times n_x}$ be diagonalizable, and define
+\[
+A_v =
+\begin{bmatrix}
+I_{n_y} \otimes A & \mathbf{0}_{n_y n_x,\, n_x n_u} \\
+- C_y^\top \otimes F & A^\top \otimes I_{n_u}
+\end{bmatrix}.
+\]
+Then, for every eigenvalue $\lambda$ of $A_v$, the largest Jordan block corresponding to $\lambda$ has size at most $2 \times 2$ (equivalently, the nilpotent index of $\lambda$ is at most $2$).
+\end{lemma}
+\begin{proof}
+We provide sketch proof only. 
+we show that any vector \(z^\top\) satisfying \(z^\top(\lambda I - A_v)^3 = 0\) must also satisfy \(z^\top(\lambda I - A_v)^2 = 0\). 
+This result follows from the diagonalizability of \(A\), which guarantees that all higher-order terms vanish after two multiplications. 
+Therefore, every Jordan block of \(A_v\) has size at most \(2\).
+\end{proof}
+% \begin{proof}
+% We prove the claim by showing that for any row vector \( z^\top \) satisfying 
+% \(z^\top (\lambda I - A_v)^3 = \mathbf{0},\)
+% it must also hold that \(z^\top (\lambda I - A_v)^2 = \mathbf{0}.\)
+
+% % This implies that the nilpotent index of any eigenvalue \(\lambda\) of \(A_v\) is at most 2.
+% We partition \(z^T =[z_{1}^\top,z_{2}^\top]\) and denote the matrices they are vectorized from as \(z_1 = \vc(Z_1)\), \(z_2 = \vc(Z_2)\). 
+% \begin{equation}\label{eqn::prflm::Avindex2}\small
+%     \left[
+% \begin{array}{cc}
+%     z_1^T & z_2^T \\
+% \end{array}\right]
+% \left[
+% \begin{array}{cc}
+%     I_{n_y}\otimes (\lambda I -A)^3 & \mathbf{0}_{n_y n_x,n_x n_u} \\
+%   \Omega_3 & (\lambda I -A^\top)^3\otimes I_{n_u}\\
+% \end{array}\right] = \mathbf{0}
+% \end{equation}
+% where we define:
+% \[\small
+% \begin{split}
+% \Omega_n & \doteq \sum\limits_{j = 0}^{n-1}\left((\lambda I -A^\top)^{n-1-j} \otimes I_{n_u}) (C_y^\top \otimes F)(I_{n_y}\otimes (\lambda I -A)^j\right) \\
+% &= \sum\limits_{j = 0}^{n-1}\left((\lambda I -A^\top)^{n-1-j} C_y^\top \otimes F (\lambda I -A)^j\right).
+% \end{split}
+% \]
+% From the second column of (\ref{eqn::prflm::Avindex2}), \(z_2^T (\lambda I -A^\top)^3\otimes I_{n_u} =\mathbf{0}\). By reversing the vectorization, 
+% \(Z_2 (\lambda I - A^\top)^3 = \mathbf{0}\). This implies that each row of \(Z_2\) is an eigenvector of \(A\). Therefore, \(Z_2(\lambda I - A^\top) = \mathbf{0}\). 
+% The first column of (\ref{eqn::prflm::Avindex2}) gives:
+% % Since \(A\) is diagonalizable, both \(I_{n_y} \otimes A\) and \(A^\top \otimes I_{n_u}\) are diagonalizable matrices. Thus, the diagonal blocks of \(A_v\) are diagonalizable.
+% \[
+% z_1^T (I_{n_y}\otimes (\lambda I -A)^3) + z_2^T \Omega_3 = \mathbf{0}
+% \]
+% Taking transposes and substituting \(z_1 = \vc(Z_1)\), \(z_2 = \vc(Z_2)\):
+% \[
+% \begin{split}
+% &(I_{n_y}\otimes (\lambda I -A^\top)^3) \vc(Z_1)  \\ 
+% & + \sum\limits_{j = 0}^{2}\left(C_y (\lambda I -A)^{2-j}\otimes (\lambda I -A^\top)^j F^\top\right) \vc(Z_2) = \mathbf{0}.
+% \end{split}
+% \]
+% \[
+% \Leftrightarrow \sum\limits_{j = 0}^{2}\left((\lambda I -A^\top)^j F^\top Z_2 (\lambda I -A^\top)^{2-j} C_y^\top\right) +(\lambda I -A^\top)^3 Z_1 = \mathbf{0}.
+% \]
+% Plug in \(Z_2 (\lambda I -A^\top) = \mathbf{0}\), the higher-order terms vanish, and we obtain:
+% \[
+% \begin{split}
+% & (\lambda I -A^\top)^2 F^\top Z_2 C_y^\top + (\lambda I -A^\top)^3 Z_1 \\
+% & = (\lambda I -A^\top)^2 (F^\top Z_2 C_y^\top + (\lambda I -A^\top) Z_1) =\mathbf{0}. 
+% \end{split}
+% \]
+% Let \(W_1 = F^\top Z_2 C_y^\top + (\lambda I -A^\top) Z_1\). Again, since \(A^\top\) is diagonalizable, we conclude \((\lambda I - A^\top) W_1 = \mathbf{0}\), implying each column of \(W_1\) is eigenvector of \(A^\top\).
+% Now, vectorizing the equation leads to:
+% \[
+% z_1^\top (I_{n_y} \otimes (\lambda I - A)^2) + z_2^\top \Omega_2 = \mathbf{0},
+% \]
+% and the bottom block satisfies \(z_2^\top ((\lambda I - A^\top)^2 \otimes I_{n_u}) = \mathbf{0}\).
+
+% Thus, we have shown that \(z^\top (\lambda I - A_v)^2 = \mathbf{0}\). Since every generalized left eigenvector of order three is annihilated at index 2, the nilpotent index of any eigenvalue of \(A_v\) is at most 2.
+% \end{proof}
+% \begin{rem}
+% This lemma is a special case of a general result in matrix theory: when two diagonalizable blocks are connected via a single-step off-diagonal coupling, the largest Jordan block associated with any eigenvalue can grow by at most 1.
+% \end{rem}
+
+
+
+\begin{proof}
+Now we start the proof of Corollary \ref{cor:diagA}. \paragraph{\(\Leftarrow\)}
+% If \(b_0\) doesn't lies in \(\mathcal{X}_{stab}\), then \(\Psi_{A_v}^s b_0\) doesn't lie in \(\mathcal{R}_{A_v,B_v E_m}\). There's a vector \(v^\top\) such that \(v^\top \mathcal{R}_{A_v,B_v E_m} = \mathbf{0}\), but \(v^\top \Psi_{A_v}^s b_0 \neq 0\).
+
+% Construct \(w^\top =v^\top \Psi_{A_v}^s\). Because \(\mathcal{R}_{A_v,B_v E_m}\) is \(A_v\) invariant, \(w^\top \mathcal{R}_{A_v,B_v E_m} = \mathbf{0}\). Because \(w^\top  \Psi_{A_v}^{ns} =\mathbf{0} \) always, \(w^\top\) is a linear combination of the vectors in the left null space of \(\Psi_{A_v}^{ns}\), which has the basis as the left ordinary and general eigenvectors of \(A_v\). 
+
+% Therefore, we can write \(w^\top\) as:
+
+% \[
+% w^\top = k_1 w_{\lambda_1}^\top + k_2 w_{\lambda_2}^\top + \hdots + k_n w_{\lambda_n}^\top
+% \]
+% where \(w_{\lambda_j}^\top\) is a (general) eigenvector of \(A_v\) corresponding to the eigenvalue 
+% \(\lambda_j\). The eigenvalue \(\lambda_j\) are assumed to be distinct, as components associated with the same eigenspace can be grouped together. We guarantee that either \(w_{\lambda_j}^\top \mathcal{R}_{A_v,B_v E_m}\neq \mathbf{0}\) or \(w_{\lambda_j}^\top b_0 \neq 0\) for each \(j\) as it can be removed from \(w^\top\) otherwise.
+
+% We claim that there is a (general) eigenvector \(w_\lambda\) associated with \(\lambda\) such that \(w_\lambda^\top b_0 \neq 0\) and \(w_\lambda^\top \mathcal{R}_{A_v,B_v E_m} = \mathbf{0}\).
+
+% If the claim doesn't hold, then  \(w_{\lambda_j}^\top \mathcal{R}_{A_v,B_v E_m}\neq \mathbf{0}\) for all \(j\).
+
+
+
+
+\(b_0\) doesn't lie in \(\mathcal{X}_{stab}\), there is at least one generalized eigenvector \(w^\top\in \mathcal{X}_{stab}^\perp\) of \(A\) corresponding to an unstable eigenvalue \(\lambda\) such that \(w^\top b_0 \neq 0\).
+
+First, we show that this can't be an ordinary eigenvector. 
+There's a left eigenvector of \(A_v\), denoted as \(w^\top\), such that 
+\[
+w^\top 
+\left[\begin{array}{cc}
+    \lambda I - A_v & B_v E_m \\ 
+\end{array}  \right] =\mathbf{0}.
+\]
+Let \(w_\lambda^\top= \left[\begin{array}{cc}
+    w_1^\top & w_2^\top\\
+\end{array}\right]\), \(w_1\in\mathbb{C}^{n_y n_x}\), \(w_2\in\mathbb{C}^{n_u n_x}\).
+\begin{equation}\label{eqn:proofcor1}\small
+\left[
+\begin{array}{cc}
+    w_1^\top & w_2^\top \\
+\end{array}\right]
+\left[
+\begin{array}{cc}
+    I_{n_y}\otimes A & \mathbf{0}_{n_y n_x,n_x n_u}\\
+   -C_y^\top \otimes F & A^\top\otimes I_{n_u}\\
+\end{array}\right] = \lambda(\left[
+\begin{array}{cc}
+    w_1^\top & w_2^\top \\
+\end{array}\right])
+\end{equation}
+From the second row block,  \(w_2^\top (A^\top \otimes I_{n_u}) = \lambda w_2^\top
+\Rightarrow (A \otimes I_{n_u}) w_2 = \lambda w_2\).
+We know that \(\lambda\) is also eigenvalue of \(A\otimes I_{n_u}\), thus is eigenvalue of \(A\).
+Viewing \(w_2 = \vc(W_2)\) for some \(W_2\in\mathbb{C}^{(n_u,n_x)}\), we obtain
+\[
+(A\otimes I_{n_u})\vc(W_2) = \lambda \vc(W_2)
+\;\;\Leftrightarrow\;\;
+W_2(\lambda I - A^\top) = 0.
+\]
+Thus each row of \(W_2\) is a right eigenvector of \(A\) associated with \(\lambda\), i.e. \(W_2 = \alpha \nu_\lambda^\top,\, \alpha \in \mathbb{C}^{(n_u,1)},\ 
+w_2^\top = \nu_\lambda^\top \otimes \alpha^\top\).
+Since \(w_1^\top (I_{n_y}\otimes A) - w_2^\top (C_y^\top \otimes F) = \lambda w_1^\top,\) from (\ref{eqn:proofcor1})
+we obtain \(- w_2^\top (C_y^\top \otimes F) = w_1^\top (I_{n_y}\otimes (\lambda I-A))
+\).
+Let \(w_3 = \beta \otimes \nu_\lambda\), \(\beta\in \mathbb{C}^{(n_y,1)}\). Right-multiplying both sides by \(w_3\) gives
+\[
+w_1^\top (I_{n_y}\otimes (\lambda I-A))(\beta \otimes \nu_\lambda) 
+= w_1^\top (\beta \otimes ((\lambda I-A)\nu_\lambda)) = 0,
+\]
+so the left-hand side also vanishes:
+\[
+- w_2^\top (C_y^\top \otimes F)(\beta \otimes \nu_\lambda) 
+= - (\nu_\lambda^\top C_y^\top \beta)\, (\alpha^\top F \nu_\lambda) = 0.
+\]
+
+% \begin{equation}
+% \begin{split}
+%     RHS =& w_1^\top (I_{n_y}\otimes (\lambda I-A)) (\beta \otimes \nu_\lambda) \\
+%     = &w_1^\top  (\beta\otimes ((\lambda I_{n_x} -A) \nu_\lambda)) =0
+% \end{split}
+% \end{equation}
+% \begin{equation*}
+% \begin{split}
+%     &LHS = -w_2^\top (C_y^\top \otimes F) (\beta \otimes \nu_\lambda) 
+%     = -w_2^\top  (C_y^\top \beta) \otimes (F \nu_\lambda)\\
+%     &= -(\nu_\lambda^\top  \otimes \alpha^\top) (C_y^\top \beta_{k}) \otimes (F \nu_k)=  -(\nu_\lambda^\top  C_y^\top \beta) \otimes (\alpha^\top F \nu_\lambda) \\
+% \end{split}
+% \end{equation*}
+By detectability of \((A,C_y)\), \(\nu_\lambda^\top C_y^\top \neq 0\). There is \(\beta\) such that \(\nu_\lambda^\top C_y^\top \beta = 1\), forcing
+\(\alpha^\top F \nu_\lambda = 0\).
+Therefore, \(w^\top b_0 = (\nu_\lambda^\top \otimes\alpha^\top )\vc(F)=\alpha^\top F\nu_\lambda =0\).
+This suggests that every ordinary eigenvector \(w^\top\) is orthogonal to \(b_0\). It's only possible that a generalized eigenvector \(z^\top\) is not orthogonal.
+
+Let \(z^\top\) be a generalized eigenvector of \(A_v\). From \(A\) being diagonalizable and Lemma \ref{lm::Avindex2}, \(w^\top = z^\top(\lambda I- A_v)\) is an ordinary eigenvector.
+We partition \(z^\top =[z_{1}^\top,z_{2}^\top]\), \(w^\top =[w_{1}^\top,w_{2}^\top]\), and find the matrices they are vectorized from: \(z_1 = \vc(Z_1), z_2 = \vc(Z_2), w_{1} =  \vc(W_1), w_2 = \vc(W_2)\).
+\begin{equation*}\small
+    \left[
+\begin{array}{cc}
+    z_1^T & z_2^T \\
+\end{array}\right]
+\left[
+\begin{array}{cc}
+    I_{n_y}\otimes (\lambda I -A)^2 & \mathbf{0}_{n_y n_x,n_x n_u} \\
+  \Omega_2 & (\lambda I -A^\top)^2\otimes I_{n_u}\\
+\end{array}\right] = \mathbf{0}
+\end{equation*}
+\begin{equation*}\small
+\left[
+\begin{array}{cc}
+    w_1^T & w_2^T \\
+\end{array}\right]=\left[
+\begin{array}{cc}
+    z_1^T & z_2^T \\
+\end{array}\right]
+\left[
+\begin{array}{cc}
+    I_{n_y}\otimes (\lambda I -A) & \mathbf{0}_{n_y n_x,n_x n_u} \\
+   C_y^\top \otimes F & (\lambda I -A^\top)\otimes I_{n_u}\\
+\end{array}\right] 
+\end{equation*}
+where, \(\Omega_2 = C_y^\top \otimes F (\lambda I -A)+(\lambda I -A^\top)C_y^\top\otimes F\).
+In analogy to the proof of Lemma \ref{lm::Avindex2}, we have:
+\begin{equation}\label{eqn:corproof1}
+W_1 = F^\top Z_2 C_y^\top + (\lambda I -A^\top) Z_1;\quad W_2 = \mathbf{0};
+\end{equation}
+\begin{equation}\label{eqn:corproof2}
+    (\lambda I -A^\top) W_1 = \mathbf{0};\quad Z_2(\lambda I -A^\top)= \mathbf{0}.
+\end{equation}
+Because \(A\) has distinct eigenvalues, assume the left and right eigenvectors of \(A\) corresponding to \(\lambda\) are \(\mu_\lambda\) and \(\nu_\lambda\)
+, satisfying \(\mu_\lambda^\top \nu_\lambda = \nu_\lambda^\top \mu_\lambda =1\). (\ref{eqn:corproof2}) is equivalent to that \(W_1 = \mu_\lambda \beta^\top\), \(Z_2 = \alpha \nu_\lambda^\top\) for some fixed \(\alpha \in \mathbb{C}^{n_u}, \beta \in \mathbb{C}^{n_y}\).
+
+Plug into (\ref{eqn:corproof1}), \(F^\top \alpha \nu_\lambda^\top C_y^\top +  (\lambda I -A^\top) Z_1 = \mu_\lambda \beta^\top\).
+Left multiply \(\tau \nu_\lambda^\top\), where \(\tau\) is arbitrary vector in \(\mathbb{C}^{n_y}\), on both sides leads to:
+\begin{equation}
+\tau \nu_\lambda^\top F^\top \alpha \nu_\lambda^\top C_y^\top = \tau \beta^\top
+\end{equation}
+\(\beta^\top =(\nu_\lambda^\top F^\top \alpha)(\nu_\lambda^\top C_y^\top)\) follows from  \(\tau\) can be arbitrary, where \(\nu_\lambda^\top F^\top \alpha\) is a fixed scalar. So \(w^\top = [\vc(W_1)^\top, \vc(W_2)^\top] = [\beta^\top \otimes \mu_\lambda^\top, \mathbf{0}]\). 
+From \(w^\top B_v E_m=\mathbf{0}\),
+\begin{equation*}
+\begin{split}
+     & w^\top B_v E_m = w_1^\top (I_{n_y} \otimes B_u)E_m = (\beta^\top \otimes \mu_\lambda^\top) (I_{n_y} \otimes B_u)E_m \\
+     & = (\nu_\lambda^\top F^\top \alpha) ((\nu_\lambda^\top C_y^\top) \otimes (\mu_\lambda^\top B_u)) E_m = \mathbf{0}.
+\end{split}
+\end{equation*}
+As \(\nu_\lambda^\top F^\top \alpha = \alpha^\top F \nu_\lambda = z_2^\top \vc(F) = z^\top b_0 \neq 0\), we can conclude that
+\((\nu_\lambda^\top C_y^\top)\otimes(\mu_\lambda^\top B_u) E_m =\mathbf{0}.\)
+
+
+% From \(z_2^T((\lambda I -A^\top)^2\otimes I_{n_u}) = \mathbf{0}\) and the diagonalizability of \(A\), \(z_2^\top = \nu_\lambda^\top \otimes \alpha^\top\) as previous arguments.
+% Therefore, 
+% \(w_2^\top = z_2^T ((\lambda I -A^\top)\otimes I_{n_u}) =\mathbf{0}\).
+
+% Thus
+% \begin{equation}
+% \begin{split}
+%     \mathbf{0} &= z_1^\top (I_{n_y}\otimes (\lambda I -A)^2) +z_2^\top (C_y^\top \otimes F) (I_{n_y}\otimes (\lambda I -A))\\
+%     &=(z_1^\top (I_{n_y}\otimes (\lambda I -A))  +z_2^\top (C_y^\top \otimes F))(I_{n_y}\otimes (\lambda I -A))
+% \end{split}
+% \end{equation}
+% Which implies,
+% \begin{equation}
+%    z_1^\top (I_{n_y}\otimes (\lambda I -A))  +z_2^\top (C_y^\top \otimes F) =\beta^\top \otimes \mu_\lambda^\top  
+% \end{equation}
+% where, \(\mu_\lambda\) is the left eigenvectors of \(A\). From \(A\) being diagonalizable, we can assume .  After we right multiply \(\tau\otimes \nu_\lambda\) on both sides of the equation. \(z_1^\top (I_{n_y}\otimes (\lambda I -A))(\tau\otimes \nu_\lambda)\) vanishes, and all we have left is:
+% \begin{equation*}
+% \begin{split}
+%     (\nu_\lambda^\top \otimes \alpha^\top ) (C_y^\top \otimes F) (\tau\otimes \nu_\lambda) & = (\beta^\top \otimes \mu_\lambda^T )(\tau\otimes \nu_\lambda)\\
+%     (\nu_\lambda^\top C_y^\top \tau) (\alpha^\top F \nu_\lambda) &= \beta ^\top \tau
+% \end{split}
+% \end{equation*}
+% Since \(\tau\) is arbitrary vector in \(\mathbb{R}^{n_y}\), \(\beta^\top ={\alpha^\top F \nu_\lambda}(\nu_\lambda^\top C_y^\top) \).
+
+\paragraph{\(\Rightarrow\)}
+Assume \((\nu_\lambda^\top C_y^\top)\otimes(\mu_\lambda^\top B_u) E_m =\mathbf{0}\) for an unstable \(\lambda\). 
+We show that \(b_0\notin \mathcal{X}_{stab}\) by explicitly finding an generalized eigenvector \(z^\top \in\mathcal{X}_{stab}^\perp\) such that \(z^\top b_0 \neq 0\).
+Let
+\[z^\top = 
+\left[
+\begin{array}{cc}
+    z_1^T & z_2^T \\
+\end{array}\right] = 
+\left[
+\begin{array}{cc}
+    \nu_\lambda^\top C_y^\top \otimes \alpha_1^\top & \nu_\lambda^\top \otimes \alpha_2^\top \\
+\end{array}\right]
+\]
+\begin{equation*}
+\begin{split}
+    \alpha_1^\top &= \mu_\lambda^\top (\sigma I -B_u F) (\lambda I -A -B_u F)^{-1}\\
+    \alpha_2^\top & = - \mu_\lambda^\top \sigma I (\lambda I -A -B_u F)^{-1} B_u
+\end{split}
+\end{equation*}
+where \(\sigma\) can be an arbitrary real number. Construct:
+\[
+w^\top = z^\top (\lambda I -A_v) = 
+\left[
+\begin{array}{cc}
+    \nu_\lambda^\top C_y^\top \otimes \sigma \mu_\lambda^\top & \mathbf{0}_{1,n_x n_u} \\
+\end{array}\right]
+\]
+\(w^\top\) is a left eigenvector of \(A_v\) and therefore \(z^\top\) is a generalized eigenvector. Furthermore,
+\(w^\top B_v E_m = (\nu_\lambda^\top C_y^\top \otimes \sigma \mu_\lambda^\top B_u) E_m =\mathbf{0}\).
+This also implies \(z^\top (\lambda I -A_v) B_v E_m =\mathbf{0}\).
+Together with
+\begin{align*}
+& z^\top B_v E_m = ((\nu_\lambda^\top C_y^\top) \otimes (\alpha_1^\top B_u  +\alpha_2^\top)) E_m\\
+& = ((\nu_\lambda^\top C_y^\top) \otimes (-\mu_\lambda^\top B_u F (\lambda I -A -B_u F)^{-1} B_u)) E_m \\
+& = ((\nu_\lambda^\top C_y^\top) \otimes (\mu_\lambda^\top B_u)) E_m\\
+& \quad - ((\nu_\lambda^\top C_y^\top) \otimes (\mu_\lambda^\top(\lambda I -A) (\lambda I -A -B_u F)^{-1} B_u)) E_m = \mathbf{0},
+\end{align*}
+% \begin{equation*}
+% \begin{split}
+%     z^\top B_v E_m & = ((\nu_\lambda^\top C_y^\top) \otimes (\alpha_1^\top B_u  +\alpha_2^\top)) E_m\\
+%     & = ((\nu_\lambda^\top C_y^\top) \otimes (-\mu_\lambda^\top B_u F (\lambda I -A -B_u F)^{-1} B_u)) E_m \\
+%     % & = (\nu_\lambda^\top C_y^\top \otimes (\mu_\lambda^\top (\lambda I -A -B_u F -\lambda I +A) (\lambda I -A -B_u F)^{-1} B_u)) E_m \\
+%     & = ((\nu_\lambda^\top C_y^\top) \otimes (\mu_\lambda^\top B_u)) E_m\\
+%     & - ((\nu_\lambda^\top C_y^\top) \otimes (\mu_\lambda^\top(\lambda I -A) (\lambda I -A -B_u F)^{-1} B_u)) E_m\\
+%     & = \mathbf{0}
+% \end{split}
+% \end{equation*}
+we show that \(z^\top\) is orthogonal to the subspace \(\mathcal{R}_{A_v,B_v E_m}\).
+Because \(z^\top\) is a left generalized eigenvector corresponding to an unstable eigenvalue, \(z^\top\) is orthogonal to the stable subspace \(\mathcal{X}_A^s\). We know that \(z^\top x = 0\) for every \(x \in \mathcal{X}_{stab}\).
+However, from
+\begin{align*}
+    z^\top b_0 & = (\nu_\lambda ^\top\otimes \alpha_2^\top)\vc(F) = \alpha_2^\top F \nu_\lambda\\
+    & =  - \mu_\lambda^\top \sigma I (\lambda I -A -B_u F)^{-1} B_u F \nu_\lambda \\
+    & = \mu_\lambda^\top \sigma I\nu_\lambda - \mu_\lambda^\top (\lambda I -A -B_u F)^{-1}(\lambda I -A) \nu_\lambda = \sigma \neq 0
+\end{align*}
+by the arbitrary selection of \(\sigma\).
+\(b_0\) can't lie in \(\mathcal{X}_{stab}\).
+\end{proof}
+
+\section{Networked system state-space model construction}\label{appsec:nwss}
+Assume the state-space models of the subsystems in the plant are:
+\begin{equation*}\small
+\begin{cases}
+    x_i^+ = 0.8 x_i + u_i \\
+    y_i = x_i ,\quad i \in \{1,3\};\\
+    \eta_{2i} = \eta_{4i} = 1.3 x_i + 0.1 u_i  
+\end{cases};
+\begin{cases}
+    x_i^+ = 0.8 x_i + u_i + \zeta_{i1} + \zeta_{i3}\\
+    y_i = x_i + 0.3 \zeta_{i1} + 0.3 \zeta_{i3},\quad i \in \{2,4\}\\
+    \zeta_{i1} = \frac{1}{z} \eta_{i1};\quad \zeta_{i3} = \frac{1}{z} \eta_{i3}
+\end{cases}
+\end{equation*}
+% \begin{equation*}\small
+% \begin{cases}
+%     x_3^+ &= 0.8 x_3 + w_{31} + u_3 \\
+%     y_3 &= x_3 + w_{32} \\
+%     \eta_{23} & = \eta_{43} = 1.3 x_3 + 0.1 u_3
+% \end{cases};
+% \end{equation*}
+
+% \begin{equation*}\small
+% \begin{cases}
+%     x_4^+ &= 0.8 x_4 + w_{41} + u_4 + \zeta_{41} + \zeta_{43}\\
+%     y_4 &= x_4 + w_{42} + 0.3 \zeta_{41} + 0.3 \zeta_{43}\\
+%     \zeta_{41} & = \frac{1}{z} \eta_{41};\quad \zeta_{43} = \frac{1}{z} \eta_{43}
+% \end{cases}.
+% \end{equation*}
+By absorbing the delays into subsystems \(1\) and \(3\), we obtain their augmented state-space models with state \(\bar{x}_i\) and the \(\bar{\eta}\) signals. The states of \(1\) and \(3\) also influence the dynamics of \(2\) and \(4\). 
+\begin{equation*}\small
+\begin{cases}
+    \bar{x}_i^+ &= \begin{bmatrix} 0.8 & 0 \\ 1.3 & 0 \end{bmatrix} \bar{x}_i 
+    + \begin{bmatrix} 1 \\ 0.1 \end{bmatrix}u_i \\
+    y_i &= \begin{bmatrix} 1 & 0 \end{bmatrix} \bar{x}_i + \begin{bmatrix} 0 & 1 \end{bmatrix} w_i\\
+    \bar{\eta}_{2i} & = \bar{\eta}_{4i} = \begin{bmatrix} 0 & 1 \end{bmatrix} \bar{x}_i 
+\end{cases},\quad i \in \{1,3\};
+\end{equation*}
+\begin{equation*}\small
+\begin{cases}
+    x_i^+ &= 0.8 x_i + u_i + \zeta_{i1} + \zeta_{i3}\\
+    & = 0.8 x_i + u_i + \begin{bmatrix} 0 & 1 \end{bmatrix} \bar{x}_1 + \begin{bmatrix} 0 & 1 \end{bmatrix} \bar{x}_3 \\
+    y_i &= x_i + 0.3 \zeta_{i1} + 0.3 \zeta_{i3}\\
+    & = x_i + \begin{bmatrix} 0 & 0.3 \end{bmatrix} \bar{x}_1 + \begin{bmatrix} 0 & 0.3  \end{bmatrix} \bar{x}_3 \\
+\end{cases},\quad i \in \{2,4\}.
+\end{equation*}
+Network Inputs: \(\zeta_1 = \left[\empty\right],\ \zeta_2 = \begin{bmatrix} \zeta_{21} \\ \zeta_{23}\end{bmatrix},\ \zeta_3 = \left[\empty\right],\ 
+\zeta_4 = \begin{bmatrix} \zeta_{41} \\ \zeta_{43}\end{bmatrix}\).
+Network Outputs: \(\bar{\eta}_1 = \begin{bmatrix} \bar{\eta}_{21} \\ \bar{\eta}_{41}
+\end{bmatrix},\ \bar{\eta}_2 = \left[\empty\right],\ \bar{\eta}_3 = \begin{bmatrix} \bar{\eta}_{23} \\ \bar{\eta}_{43} \end{bmatrix}, \ \bar{\eta}_4 = \left[\empty\right]\).
+
+\[\small
+\begin{bmatrix}
+    \zeta_{1} \\ \zeta_{2} \\ \zeta_{3} \\ \zeta{4}
+\end{bmatrix} = N \begin{bmatrix}
+    \bar{\eta}_{1} \\ \bar{\eta}_{2} \\ \bar{\eta}_{3} \\ \bar{\eta}_{4}
+\end{bmatrix} = 
+\left[
+\begin{array}{c:c:c:c}
+    \empty & \empty & \empty& \empty \\
+    \hdashline
+    I\ \mathbf{0} & \empty & \mathbf{0}\ \mathbf{0} & \empty\\
+    \mathbf{0}\ \mathbf{0} & \empty & I\ \mathbf{0} & \empty\\
+    \hdashline
+    \empty & \empty & \empty& \empty \\
+    \hdashline
+    \mathbf{0}\ I & \empty & \mathbf{0}\ \mathbf{0} & \empty\\
+    \mathbf{0}\ \mathbf{0} & \empty & \mathbf{0}\ I & \empty\\
+\end{array}\right]\begin{bmatrix}
+    \bar{\eta}_{1} \\ \bar{\eta}_{2} \\ \bar{\eta}_{3} \\ \bar{\eta}_{4}
+\end{bmatrix}.
+\]
+The aggregate state-space of the plant is therefore: 
+\begin{equation*}\small
+A = 
+\begin{bmatrix}
+A_{d_1} & 0 & 0 & 0\\
+A_{x} & A_{d_2} & A_{x} & 0\\
+0 & 0 & A_{d_1} & 0\\
+A_{x} & 0 & A_{x} & A_{d_2}
+\end{bmatrix},
+\left[
+\begin{array}{c:c}
+    A_{d_1} & \empty \\
+    \hdashline
+    A_x & A_{d_2}\\
+\end{array}\right]
+= 
+\left[
+\begin{array}{cc:c}
+    0.8 & 0 & \empty \\
+    1.3 & 0 & \empty \\
+    \hdashline
+    0 & 1 & 0.8\\
+\end{array}\right];
+\end{equation*}
+\begin{equation*}\small
+C_y = 
+\begin{bmatrix}
+C_{d_1} & 0 & 0 & 0\\
+C_{x} & C_{d_2} & C_{x} & 0\\
+0 & 0 & C_{d_1} & 0\\
+C_{x} & 0 & C_{x} & C_{d_2}
+\end{bmatrix},
+\left[
+\begin{array}{c:c}
+    C_{d_1} & \empty \\
+    \hdashline
+    C_x & C_{d_2}\\
+\end{array}\right]
+= 
+\left[
+\begin{array}{cc:c}
+    1 & 0 & \empty \\
+    \hdashline
+    0 & 0.3 & 1\\
+\end{array}\right];
+\end{equation*}
+\begin{equation*}\small
+B_u = 
+\begin{bmatrix}
+B_{d_1} & & & \\
+& B_{d_2} & & \\
+& & B_{d_1} &\\
+& & & B_{d_2}
+\end{bmatrix};\ 
+B_{d_1} = \begin{bmatrix}
+1\\
+0
+\end{bmatrix},\ B_{d_2} = 1;\ D_{yu} = \mathbf{0}_{4\times 4}.
+\end{equation*}
+% In this example, we assume each subsystem \(i\) has independent local exogenous noise \(w_i\). Each \(w_i = \left[w_{i1},w_{i2}\right]^\top\) is a 2-d vector. \(w_{i1}\) is the processing noise and \(w_{i2}\) is the measuring noise.
+In the generalized plant, we let:
+\begin{equation*}\small
+B_w = 
+\begin{bmatrix}
+B_{d_1} & & & \\
+& B_{d_2} & & \\
+& & B_{d_1} &\\
+& & & B_{d_2}
+\end{bmatrix},\ 
+B_{d_1} = \begin{bmatrix}
+1 & 0\\
+0 & 0
+\end{bmatrix},\ B_{d_2} = \begin{bmatrix}
+1 & 0\\
+\end{bmatrix};
+\end{equation*}
+% The performance output vector \(z\) is selected as \(z = \left[x_1 + u_1, x_2 + u_2, x_3 + u_3, x_4 + u_4\right]^\top\). 
+\begin{equation*}\small
+C_z = 
+\begin{bmatrix}
+C_{d_1} & & & \\
+& C_{d_2} & & \\
+& & C_{d_1} &\\
+& & & C_{d_2}
+\end{bmatrix},\ 
+C_{d_1} = \begin{bmatrix}
+1 & 0\\
+\end{bmatrix},\ C_{d_2} = 1;
+\end{equation*}
+\begin{equation*}\small
+D_{yw} = I_4 \otimes \begin{bmatrix}
+0 & 1\\
+\end{bmatrix},\ 
+D_{zu} = I_4,\  
+D_{zw} = \mathbf{0}_{4\times 8}
+\end{equation*}
+\section{State-space Kronecker products}\label{appsec::sskron}
+Let \(G_i = \left[
+    \begin{array}{c|c}
+        A_i & B_i\\
+        \hline
+        C_i & D_i \\
+    \end{array}\right] (i=1,2).\)
+The realization of a vectorized state-space model and the realization of the Kronecker product between state-space models (both not necessarily minimal) are
+\begin{equation*}\small
+\begin{split}
+& \vc(G_1) = \left[
+    \begin{array}{c|c}
+        I_{n_u}\otimes A_1 & \vc(B_1)\\
+        \hline
+        I_{n_u}\otimes C_1 & \vc(D_1)\\
+    \end{array}\right]; \\
+\end{split}
+\end{equation*}
+\begin{equation*}\small
+\begin{split}
+& G_1\otimes G_2 = 
+\left[
+\begin{array}{cc|c}
+ I_{n_{u_1}} \otimes A_2  &  \mathbf{0}_{n_{u_1} n_{x_2},n_{x_1} n_{y_2}} & I_{n_{u_1}} \otimes B_2\\
+B_1 \otimes C_2 & A_1\otimes I_{n_{y_2}} & B_1 \otimes D_2 \\
+\hline
+D_1 \otimes C_2 & C_1 \otimes I_{n_{y_2}} & D_1 \otimes D_2 
+\end{array}\right],
+\end{split}
+\end{equation*}
+

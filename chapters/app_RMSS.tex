@@ -1,0 +1,155 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% app_glossary.tex: Glossary Appendix:
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{RMSS Appendices}
+\label{app_glossary}
+\section{System configuration}
+\begin{table}[h]
+    \caption{The setting of system parameters}\label{tab:sys_config}
+    \centering
+    \begin{tabular}{ccc}
+    \hline
+        Properties  & Value &description\\
+    \hline
+        $m_c$ & 2.5 kg& Mass of cart\\
+        $m_p$ & 0.1 kg& Mass of pendulum\\
+        $l$ & 2 m &Length of pendulum\\
+        $\tau$ & 0.05 s&Sampling step time\\
+        \hline
+    \end{tabular}
+\end{table}
+Let $x=[\theta,\dot{\theta},\dot{s}]^T$, the upper settings yield following discrete time state space matrices for plant $P$:
+\begin{equation}
+    \begin{split}
+    &   A = \left[\begin{array}{ccc}
+            1.0064 & 0.0501 & 0\\
+            0.2553 & 1.0064 & 0\\
+            -0.0196 & -0.0005 & 1
+        \end{array}\right];\ B = \left[\begin{array}{c}
+            -0.00025\\
+            -0.01\\
+            0.02
+        \end{array}\right];\\
+    &   C = \left[\begin{array}{ccc}
+            1 & 0 & 0\\
+            0 & 0 & 1\\
+        \end{array}\right];\ D = \left[\begin{array}{c}
+            0\\
+            0
+        \end{array}\right];
+    \end{split}    
+\end{equation}
+
+\section{$H_\infty$ optimal controller design}
+The mean system is varying by different drop out probability $e$. Since $\E\{\xi\}= (1-e)I$. To avoid designing the optimal controller for different mean system, we do some block diagram transformations to a architecture that optimal controller/receiver change linearly w.r.t. $e$ \cite{Jeffthesis}. Use $\tilde{L}$ to denote $z^{-1} L$. 
+
+% \begin{figure}[h]
+%     \centering
+%     \includegraphics[scale=0.5]{Figures/block_diagram_operation.PNG}
+%     \caption{The step by step operations from figure (\ref{fig:CLblock}.a) to figure (\ref{fig:CLblock}.b)}
+%     \label{fig:detailedblocksteps}
+% \end{figure}
+
+
+If there is no packet drop, then $e=0$, $\xi$ is perfectly connected as in figure (\ref{fig:CLblock}.c). Let $\hat{K} = K(I-\tilde{L})^{-1}$, $\hat{L} = L(I-\tilde{L})^{-1}$. It's easy to express $K$ and $L$ in terms of $\hat{K}$ and $\hat{L}$.
+$$
+L =\hat{L} (z^{-1} \hat{L}+I)^{-1} ;\ K = \hat{K} (z^{-1} \hat{L}+I)^{-1} .
+$$
+When there is $e$ probability of packet drop in each channel, see figure (\ref{fig:CLblock}.d). We can accordingly adjust the optimal controller to generate the same closed loop mean system like below,
+
+$$
+\hat{L}_e = \frac{1}{1-e} \hat{L};\ \hat{K}_e = \frac{1}{1-e} \hat{K}.
+$$
+\begin{equation}\label{eqn:transfrom_LK}
+    L =\hat{L}_e (z^{-1} \hat{L}_e+I)^{-1} ;\ K = \hat{K}_e (z^{-1} \hat{L}_e+I)^{-1} .
+\end{equation}
+
+
+
+$[\hat{K},\hat{L}]^T$ is the controller for the system $[P,-z^{-1} I_{2}]$. So we can use $H_\infty$ optimal controller synthesis to obtain this controller. The solution of $H_\infty$ optimal synthesis is guaranteed to be proper and well-posed. From equation (\ref{eqn:transfrom_LK}), we know $L$ and $K$ are proper and well-posed whatever value $e$ takes. 
+
+Then in the closed loop mean system, we add following noise and choose following performance output to complete the $H_\infty$ optimal synthesis, shown in figure (\ref{fig:GPlantForHinfsyn}).
+\begin{figure}[h]
+    \centering
+    \includegraphics[scale=0.45]{figures/RMSSfigure/Generalizedplant1.PNG}
+    \caption{$w$ are the noises, while $q$ are the performance outputs. $W_i$ is the weight matrix for inputs. $W_o$ is the weight matrix for outputs.}
+    \label{fig:GPlantForHinfsyn}
+\end{figure}
+By finely tuning the weight matrix $W_i$ and $W_o$, we can obtain a satisfactory controller.
+With this controller, the $H_\infty$ norm from $w_1$ to $q_1$ in figure(\ref{fig:GPlantForHinfsyn}) is $1.62$. 
+
+\section{State space representation of CL system}
+The state space representation for $[P,-z^{-1}I_2]$ is
+$$
+\bar{A}=\mathrm{diag}(A,\mathbf{0}_{2\times2});\ \bar{B}=\mathrm{diag}(B,I_{2})
+$$
+$$
+\bar{C} = [C,-I_2];\ \bar{D}=[D,\mathbf{0}_{2\times2}]=\mathbf{0}_{2\times3}
+$$
+Now we assume controller and receiver 
+$$
+\left[\begin{array}{c}
+    \hat{K}  \\
+    \hat{L} 
+\end{array}\right]
+=\left[\begin{array}{c;{2pt/2pt}c}
+    A_c & B_c\\ \hdashline[2pt/2pt]
+    C_{c_k} & D_{c_k} \\
+    C_{c_l} & D_{c_l}
+\end{array}\right];\ 
+C_c =\left[\begin{array}{c}
+    C_{c_k}  \\
+     C_{c_l} 
+\end{array}\right];\ 
+D_c =\left[\begin{array}{c}
+    D_{c_k}  \\
+    D_{c_l} 
+\end{array}\right]
+$$
+Let $n_c$ denote the size of $A_c$. We can then construct the state space representation of figure (\ref{fig:CLRMSplant}.b)
+
+$$
+A_{cl} = \left[\begin{array}{cc}
+            \bar{A}+\bar{B}D_c\bar{C} & \bar{B}C_c\\
+            B_c\bar{C} & A_c 
+        \end{array}\right]; \ 
+B_v = \left[\begin{array}{c}
+    \bar{B}D_c  \\
+    B_c
+\end{array}\right];\ 
+B_p = \left[\begin{array}{c}
+    \bar{B}(:,1)  \\
+    \mathbf{0}_{n_c\times1}
+\end{array}\right];
+$$
+$$
+C_y = \left[\begin{array}{cc}
+            \bar{C} & \mathbf{0}_{2\times n_c}\\
+        \end{array}\right]; \ 
+D_{yv} =\mathbf{0}_{2\times 2};\ D_{yp} =\mathbf{0}_{2\times 1};
+$$
+$$
+C_q = \left[\begin{array}{cc}
+            D_{c_k}\bar{C} & C_{c_k}\\
+        \end{array}\right]; \
+D_{qv} =D_{c_k};\ D_{qp} =1.
+$$
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Care has been taken in this thesis to minimize the use of jargon and
+acronyms, but this cannot always be achieved. This appendix defines
+jargon terms in a glossary and contains a table of acronyms and their
+meaning.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Glossary {{{
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Table formatting
+
+% Heading for the first page
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%}}}

@@ -1,0 +1,872 @@
+\chapter{Distributed \(\ell_1\) optimal control}
+\section{Problem formulation and preliminaries}
+Our goal is to find an aggregate output-feedback policy \(K \colon y \mapsto u\) restricted to a structured set of transfer function matrices \(\mathcal{S}\), which reflects the network communication constraints. 
+\begin{opt}[Structured \(\ell_1\) optimal control]\label{Prob::Distributedl1}
+Given a generalized plant and its state-space realization:
+\begin{equation}\label{eqn::genplt_ss}
+    P\colon 
+    \begin{bmatrix} 
+        w \\ u 
+    \end{bmatrix}
+    \mapsto
+    \begin{bmatrix} 
+        z \\ y 
+    \end{bmatrix} = \left[
+    \begin{array}{c:c}
+    P_{11} & P_{12}\\
+    \hdashline
+    P_{21} & P_{22}
+    \end{array}\right] =\left[
+\begin{array}{c|cc}
+    A & B_w & B_u \\
+    \hline
+    C_z & D_{zw} & D_{zu}\\
+    C_y & D_{yw} & D_{yu}
+\end{array}\right],
+\end{equation}
+where \((A,B_u)\) is stabilizable, \((A,C_y)\) is detectable. \(D_{yu}=\mathbf{0}\). Assumption~\ref{ass::statespace} is adopted here for simplicity of exposition.\footnote{In Assumption~\ref{ass::statespace}, (1) ensures that \(P_{21}\) and \(P_{12}\) have full normal row rank and normal column rank, respectively, whereas (2) ensures that they don't have any transmission zeros on the unit circle. (1) and (2) together enable and simplify the spectral factorization of \(P_{21}\) and \(P_{12}\).}
+\begin{assumption}\label{ass::statespace}
+\begin{enumerate}
+    \item Some channels of \(z\) are direct feedthroughs from the control input \(u\), which ensures \(D_{zu}\) is full column rank. \label{ass:termDzufull}
+    \item The exogenous perturbation include measurement noise \(\delta_y\), which ensures \(D_{yw}\) is full row rank. \label{ass:termDywfull}
+    \item \(\left[\begin{array}{cc}
+        A-e^{j\omega}  I & B_w \\
+        C_y & D_{yw}
+    \end{array}\right]\) and \(\left[\begin{array}{cc}
+        A-e^{j\omega}  I & B_u \\
+        C_z & D_{zu}
+    \end{array}\right]\) are respectively full row and column rank for \(\omega\in[0,2\pi)\).
+\end{enumerate}
+\end{assumption}
+Find an internally stabilizing output feedback network distributed controller \(K\in  \mathcal{S}\)  that minimizes the following cost:
+\begin{equation}
+    \mu_1 \coloneqq  \displaystyle\min_{K\in {\cal S}-\text{stabilizing}}\ \|\Phi\|_1, 
+\end{equation}
+where
+\begin{equation}\label{eqn::Phi_K}
+\Phi \coloneqq \lft(P,K) = P_{11}+P_{12} K(I-P_{22}K)^{-1} P_{21}.
+\end{equation}
+\end{opt}
+Although Problem~\ref{Prob::Distributedl1} is challenging since the cost function is nonconvex in the controller $K$ and the set of stabilizing controllers is itself nonconvex, it is well known and widely exploited in control theory that all closed-loop maps achievable by internally stabilizing controllers form an affine space, denoted by $\mathfrak{T}_{\mathrm{fea}}$. 
+$\mathfrak{T}_{\mathrm{fea}}$ admits an implicit representation in terms of linear constraints,
+\begin{equation} 
+    \mathfrak{T}_\mathrm{fea} \coloneqq \{\Phi\vert \mathcal{A}_{\mathrm{fea}} \Phi = b_{\mathrm{fea}}\}.
+\end{equation}
+The operator $\mathcal{A}_{\mathrm{fea}}$ and vector $b_{\mathrm{fea}}$ can be explicitly constructed via the Smith--McMillan decomposition of the plant. The intrinsic non-convexity associated with stabilization can be removed by reformulating the synthesis problem in terms of closed-loop maps.
+
+\subsection{Quadratic Invariance}
+Introducing a generic structural constraint on the controller renders Problem~\ref{Prob::Distributedl1} intractable, since the requirement $K\in\mathcal{S}$ induces a nonconvex constraint on the closed-loop map $\Phi$. To overcome this difficulty, the quadratic invariance (QI) assumption is widely adopted in the literature. We adopt this assumption throughout this work.
+\begin{assumption}[QI assumption]\label{ass::QI}
+\(\mathcal{S}\) is quadratic invariant w.r.t the plant object \(P_{22}\). Mathematically, 
+\[
+K P_{22} K\in \mathcal{S}, \quad \forall K \in \mathcal{S}.
+\]
+\end{assumption}
+The QI assumption ensures that the search for a structured controller remains convex by requiring the closed-loop transfer function \(K(I - P_{22}K)^{-1}\) to lie within the same set \(\mathcal{S}\)\cite{LessardQI}. By Assumption~\ref{ass::statespace}--(\ref{ass:termDzufull},\ref{ass:termDywfull}), we can, without losing generality, assume that the bottom right block of \(\Phi\), i.e. \(\Phi_{22}\), corresponds to the transfer function \(K(I - P_{22}K)^{-1}\).
+
+
+
+ 
+% Formally, we aim to solve the following optimization problem:
+% \begin{opt}[\(\ell_1\) optimal control problem]
+% $$
+% \mu_1 \coloneqq \inf_{K\in \mathcal{S}-\stab}\|\Phi\|_1
+% $$
+% \(\Phi\) is the closed-loop defined by \(\Phi= \mathrm{lft}(P,K) = P_{11} + P_{12} K(I-P_{22}K)^{-1} P_{21}\). 
+% \end{opt}
+
+
+\begin{rem}
+It's well known that the QI condition applies when the plant is also a networked system and the sub-controllers' communications are richer and faster than the sub-plants' dynamical interactions.
+Furthermore, a stabilizing structured controller is guaranteed to be network implementable under that condition if the network realization of the plant is known~\cite{Yuanji2024disH2}. In this paper, we focus on the synthesis of structured stabilizing controllers and refer the reader to the existing literature for details on controller implementation.
+\end{rem}
+
+Reformulating the synthesis in terms of closed-loop maps under the QI condition yields the following primal–dual pair.
+
+\begin{opt}[Primal \(\ell_1\)]\label{Prob::l1min_primal}
+\begin{equation}
+    \mu_1 = \underset{\Phi\in\ell_1}{\inf}\ 
+    \|\Phi\|_1 
+\end{equation}
+subject to
+\begin{equation} \label{eqn::const_strc}
+    \Phi_{22} = \begin{bmatrix}
+        \mathbf{0} &I 
+    \end{bmatrix}\Phi
+    \begin{bmatrix}
+        \mathbf{0} \\ I
+    \end{bmatrix} \in\mathcal{S};
+\end{equation}
+\begin{equation}\label{eqn::const_achCL}
+    \mathcal{A}_{\mathrm{fea}} \Phi = b_{\mathrm{fea}}
+\end{equation}
+\end{opt}
+
+% The dual problem of Problem \ref{Prob::l1min_augsys_primal} and \ref{Prob::l1min_augsys_primal_2} are respectively:
+\begin{opt}[Dual \(\ell_1\)]\label{Prob::l1min_dual}
+\begin{equation}
+    \nu_1 = \underset{x^*, Z, \Lambda}{\sup}\ \langle b_{\mathrm{fea}}, Z \rangle
+\end{equation}
+subject to
+\begin{align} \label{eqn::dual_constr}
+    x^* &= \mathcal{A}_{\mathrm{fea}}^* Z + \begin{bmatrix}
+        \mathbf{0} \\ I
+    \end{bmatrix} \Lambda \begin{bmatrix}
+        \mathbf{0} & I
+    \end{bmatrix};\  \\
+    \Lambda & \in \ell_\infty^{n\times n}\cap \mathcal{S}^\perp;
+    \|x^*\|_\infty \leq 1.\ 
+\end{align}    
+\end{opt}
+From the dual problem, we observe that the structure constraints introduce an additional term in \(x^*\), influenced by \(\Lambda\), which can increase the maximum cost.
+
+
+
+
+
+ 
+
+\subsection{Youla Parameterization}
+
+
+The Youla Parameterization provides an elegant approach to characterize $\mathfrak{T}_{\mathrm{fea}}$ by a change of variables and shifts the Primal Problem~\ref{Prob::l1min_primal} into a model-matching form.
+
+
+
+The formulation of the Youla Parameterization relies on the doubly coprime factorization (DCF) of the plant given by eight transfer function matrices, i.e. \(M_r,\ N_r,\ X_r,\ Y_r,\ M_l,\ N_l,\ X_l,\ Y_l\in\mathcal{RH}_\infty\). 
+\begin{align*}\label{eqn:DCF}
+    & P_{22} = N_r {M_r}^{-1} = {M_l}^{-1}N_l\quad \text{(Factorization)} \\
+    & X_l M_r - Y_l N_r = I; \quad M_l X_r - N_l Y_r = I\ \text{(The Bezout identity)}.
+\end{align*}
+We find the DCF by the standard state-state-space-based approach. In particular, we use the LQR state-feedback gain \(F\) and Kalman gain \(L\) that achieves the spectral factorization of \(P_{12}\) and \(P_{21}\), which are given by a pair of discrete algebraic Riccati equations~\eqref{eqn::DAREH2optcont},~\eqref{eqn::centralizedH2contParas} in Appendix~\ref{appsec:H2cen}.  
+\begin{equation}\label{DCF_r}
+    \left[\begin{array}{cc}
+    M_r & Y_r \\
+    N_r & X_r
+    \end{array}\right]
+    =\left[
+    \begin{array}{c|cc}
+        A_F & B_u & -L \\
+        \hline
+        F & I & \mathbf{0}\\
+        C_y & \mathbf{0} & I
+    \end{array}\right],\ 
+\end{equation}
+\begin{equation}\label{DCF_l}
+    \left[\begin{array}{cc}
+    X_l & -Y_l \\
+    -N_l & M_l
+    \end{array}\right]
+    =\left[
+    \begin{array}{c|cc}
+        A_L & B_u & -L \\
+        \hline
+        -F & I & \mathbf{0}\\
+        -C_y & \mathbf{0} & I
+    \end{array}\right],
+\end{equation}
+where \(A_F = A+B_u F\), \(A_L = A +L C_y\) are Schur matrices. All these transfer function matrices belong to \(\mathcal{RH}_\infty\) thus \(\ell_1\).
+All stabilizing controllers and the closed-loop responses \(\Phi\colon w \mapsto z\) are parameterized by: 
+\begin{equation}\label{eqn::allstabc}
+\begin{split}
+    & K_\stab =  (Y_r - M_r Q) (X_r - N_r Q)^{-1};\ Q \in \mathcal{RH}_\infty;\\
+    & \Phi(Q) = \mathrm{lft}(P,K_\mathrm{stab}) = G_{11} - G_{12} Q G_{21},\\
+\end{split}   
+\end{equation}
+where
+\begin{equation*}
+    G_{11} = \left[\begin{array}{cc|c}
+    A_F & -B_u F & B_w\\
+   \mathbf{0} & A_L & B_w + L D_{yw}\\
+    \hline
+    C_z + D_{zu}F & -D_{zu}F & D_{zw}
+\end{array}\right];\ 
+\end{equation*}
+\begin{equation*}
+G_{12} = \left[
+    \begin{array}{c|c}
+        A_F & B_u \\
+        \hline
+        C_z + D_{zu}F & D_{zu} \\
+    \end{array}\right];\ 
+G_{21} = \left[
+    \begin{array}{c|c}
+        A_L & B_w + L D_{yw}\\
+        \hline
+        C_y & D_{yw} \\
+    \end{array}\right].
+\end{equation*}
+Such selection of \(F,L\) brings us several algebraic benefits:
+\begin{enumerate}
+    \item \(G_{12}^{\sim} G_{12} =\Gamma_b\) and \(G_{21} G_{21}^{\sim} =\Gamma_c\), where \(\Gamma_b ,\Gamma_c\) are all positive definite matrices.
+    \item The unique minimizer \(\arg\min_{Q\in\ell_2}\|\Phi(Q)\|_2 = R_0\), where \(R_0\) is a constant matrix given by
+    \[
+    \begin{split}
+        R_0 = &\Gamma_b^{-1}(B_u^\top X_b A X_c C_y^\top + D_{zu}^\top C_z X_c C_y^\top \\
+        &+ B_u^\top X_2 B_w D_{yw}^\top +D_{zu}^\top D_{zw} D_{yw}^\top) \Gamma_c^{-1}.\\
+    \end{split}
+    \]
+    \item Define \(G_{11}^0 \coloneqq G_{11} -G_{12} R_0 G_{21}\) and according shift \(Q\) with \(-R_0\), \(\Phi = G_{11}^0 - G_{12} Q G_{21}\). \(G_{11}^0\) is the \(\ell_2/\mathcal{H}_2\) optimal closed-loop response without structural constraint on \(K\) and \(G_{12}^\sim G_{11}^0 G_{21}^\sim \in \mathcal{RH}_2^\perp\).
+    \item Minimizing \(\ell_2\) cost is essentially equivalent to minimizing the cost penalty \(J_\mathcal{S} \coloneqq \|\Gamma_b^{\frac{1}{2}} Q \Gamma_c^{\frac{1}{2}}\|_2^2\) caused by any constraints on \(Q\), since
+    \[
+    \|\Phi\|_2^2 = \|G_{11}^0\|_2^2 + \|\Gamma_b^{\frac{1}{2}} Q \Gamma_c^{\frac{1}{2}}\|_2^2, \quad \forall Q\in\ell_2^{n_u\times n_y}.
+    \]
+\end{enumerate}
+After applying the Youla Parameterization, we obtain an equivalent optimization problem with variable \(Q\):
+\begin{opt}\label{Prob::l1minafterpara}
+\begin{equation}
+    \mu_1 = \underset{Q\in\ell_1^{n_u\times n_y}}{\inf}\ \|\Phi(Q)\|_1=\underset{Q\in\ell_1}{\inf} \|G_{11}^0 - G_{12} Q G_{21}\|_1 
+\end{equation}
+subject to
+\begin{equation}\label{eqn:mmstructconstr}
+    \Phi_{22} = (Y_r - M_r (Q + R_0)) M_l\in\mathcal{S}.
+\end{equation}
+\end{opt}
+In the cost function, \(\Phi(Q)\) implicitly characterizes the affine space \(\mathfrak{T}_\mathrm{fea} = \{\Phi \vert \Phi = G_{11}^0 - G_{12} Q G_{21}\}\). Notably, $\mathfrak{T}_{\mathrm{fea}}$ is invariant with respect to the particular choice of Youla parameterization and depends only on the plant. Moreover, 
+The constraint~\eqref{eqn:mmstructconstr} replaces generic condition \(K_\stab = (Y_r - M_r Q) (X_r - N_r Q)^{-1} \in \mathcal{S}\) as a result of Assumption~\ref{ass::QI}.
+
+\subsection{Vectorized response and structure enforcement}
+In our previous work on networked \(\mathcal{H}_2\) optimal control, we established a methodology to characterize the general infinite impulse response (IIR) solutions to the constraint~\eqref{eqn:mmstructconstr}~\cite{Yuanji2024disH2}. Our approach vectorizes the Youla parameter \(Q\) and the closed-loop map \(\Phi_{22}\)'s impulse response and views them as paired input and output sequences of an auxiliary state-space system.
+
+Meanwhile, the structural constraint appearing as a sequence of support constraints \(\{\mathcal{S}_i\}\) on \(\Phi_{22}\)'s responses,
+\[
+\Phi_{22} \in \mathcal{S} \Leftrightarrow \mathrm{supp}(\Phi_{22}[i]) \subset \mathcal{S}_i
+\]
+is transformed into a span of vector space after vectorization,
+\[
+\Phi_{22} \in \mathcal{S} \Leftrightarrow \vc(\Phi_{22}[i]) \in \mathrm{span}(E_i).
+\]
+\(E_i\) is the orthonormal basis of \(\vc(\mathcal{S}_i)\).
+When there are only sparsity and relative order constraints on elements, responses support pattern grows monotonically. We have \(\mathcal{S}_0 \subset\mathcal{S}_1 \hdots \subset \mathcal{S}_m = \mathcal{S}_{m+1} = \hdots\) or \(\mathrm{span}(E_0)\subset\mathrm{span}(E_1)\hdots\subset\mathrm{span}(E_m) = \hdots\).
+
+We compound and restate these preliminary results as Lemma \ref{lm::reducedsys} without proof. 
+
+% Furthermore, sequences \(\eta,q,\phi\) are all in \(\ell_2\). For later use, we succinctly write \eqref{eqn::ss::vecPhitovecQ} as \(q = \mathcal{O}(\phi)\), where \(\mathcal{O} : \left( \mathbb{N} \to \mathbb{R}^{n_u n_y , 1} \right) \to \left( \mathbb{N} \to \mathbb{R}^{n_u n_y , 1} \right)\).
+
+
+
+
+\begin{lemma}\label{lm::reducedsys}
+Let $Q,\Phi_{22}\in\ell_2$ satisfy
+\[
+\Phi_{22} = (Y_r - M_r (Q + R_0)) M_l \in \mathcal{S}.
+\]
+Define the vectorized sequences
+\[
+q[i] \coloneqq \vc(Q[i]), \qquad \theta[i] \coloneqq \vc(\Phi_{22}[i]).
+\]
+Then $(q[i],\theta[i])$ satisfy the following state-space–like linear relations with a zero initial condition (\(\zeta[0] = \mathbf{0}\)):
+\begin{equation}\label{eqn::ss::reducedvec}
+\begin{aligned}
+\zeta[i+1] &= A_r \zeta[i] + B_r E_i u[i] + b\,\delta, \\
+q[i] &= C_r \zeta[i] + D_r E_i u[i] + d_0\,\delta, \\
+\theta[i] & = E_i u[i].
+\end{aligned}
+\end{equation}
+\(\delta\) denotes the unit impulse signal injected at time \(i = 0\).
+The matrices $(A_r,B_r,C_r,D_i,b)$ are obtained via a model reduction of the realization
+\begin{equation}
+\begin{split}
+& \left[\begin{array}{c|c:c}
+    A_v & b_0 & B_v \\
+    \hline
+    C_v & d_0 & D_v
+\end{array}\right]   \\
+& \coloneqq 
+\left[
+\begin{array}{cc|c:c}
+I_{n_y}\otimes A &  \mathbf{0}_{n_y n_x,n_x n_u} & \mathbf{0}_{n_x n_y,1} & I_{n_y} \otimes B_u\\
+-C_y^\top \otimes F & A^\top\otimes I_{n_u} & \vc(F) & C_y^\top \otimes I_{n_u} \\
+\hline
+I_{n_y} \otimes F & L^\top \otimes I_{n_u} & -\vc(R_0) & -I_{n_u n_y} 
+\end{array}\right].
+\end{split}    
+\end{equation}
+
+
+Specifically, let $T_r$ denote an orthonormal basis of the reachable subspace associated with the pair
+\((A_v,\,[B_v E_m,\; b_0])\), and choose $T_l$ such that $T_l T_r = I$. Projecting the full-order realization
+$(A_v,B_v,C_v,D_v)$ onto this reachable subspace yields the reduced-order system
+\[
+A_r = T_l A_v T_r, \;
+B_r = T_l B_v, \;
+C_r = C_v T_r, \;
+D_r = D_v, \;
+b = T_l b_0.
+\]
+\end{lemma}
+\begin{rem}
+This vectorization approach enforces~\eqref{eqn:mmstructconstr} over $\ell_2$. Since $\ell_1 \subset \ell_2$, this temporarily enlarges the search space without loss of optimality for the $\ell_1$ problem.
+\end{rem}
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+\section{Main results}
+The central idea of our approach is to construct a sequence of suboptimal solutions in the \(\ell_2\) space that converges to the \(\ell_1\) optimum. This is achieved by introducing a surrogate cost function that uses the \(\ell_2\) norm as a proxy for the IIR \(\ell_1\) tail. Leveraging our previous result, the resulting tail \(\ell_2\) norm admits a closed-form optimal solution. Importantly, we also show that solving the surrogate problem yields convergent upper and lower bounds on the \(\ell_1\) optimum.
+
+\subsection{Mixed norm and surrogate problems}
+We begin by defining the $\|\cdot\|_{N,c}$ norm, which is an \(\ell_1/\ell_2\) mixed norm and used as a proxy for \(\ell_1\).
+
+\begin{defn}
+Consider the vector space \( X = \ell_2^{m \times n} \), which consists of all \( m \times n \) matrices with square-summable entries. While \( X \) shares the same underlying set of elements as \( \ell_2^{m \times n} \), we introduce a different norm, denoted by \( \|\cdot\|_{N,c} \), defined as:
+\[
+\|x\|_{N,c} \doteq \sqrt{\|\mathbb{P}_N x\|_1^2 + c \|\mathbb{T}_N x\|_2^2}.
+\]
+\end{defn}
+When \(N=0\) and \(c=1\), this norm coincides with the standard \(\ell_2\) norm.
+\begin{prop}[Norm Equivalence]\label{prop:normeq}
+Given any \(N\in \mathbb{N}\) and \(c>0\), \(\|\cdot\|_{N,c}\) is equivalent to \(\|\cdot\|_2\) norm. Mathematically, there is a pair of positive scalars \(c_1\), \(c_2\) such that
+\[
+c_1\|x\|_{2} < \|x\|_{N,c} \leq c_2 \|x\|_{2}, \forall x\in \ell_2^{m\times n}.
+\]
+\end{prop}
+\begin{proof}
+For any \(N\in \mathbb{N}\), \(\mathbb{P}_N x\) is always a finite sequence. All \(\ell_p\) norms on finite-dimensional spaces are equivalent. There are positive \(M_1\) and \(M_2\) such that
+\[
+M_1 \|\mathbb{P}_N x\|_2\leq\|\mathbb{P}_N x\|_1 \leq M_2 \|\mathbb{P}_N x\|_2.
+\]
+Since \(\|x\|_{2}^2 = \|\mathbb{P}_N x\|_2^2 + \|\mathbb{T}_N x\|_2^2\).
+We can find
+\[
+c_1 = \min\{M_1,\sqrt{c}\},\ c_2 = \max\{M_2,\sqrt{c}\}
+\] and conclude the proof.
+\end{proof}
+\begin{prop}
+The normed space \((\ell_2^{m\times n}, \|\cdot\|_{N,c})\)'s dual space is \((\ell_2^{m\times n},\|\cdot\|_{{N,c}^*})\), where
+\[
+\|x\|_{{N,c}^*} \doteq \sqrt{\|\mathbb{P}_N x\|_\infty^2 + \frac{1}{c} \|\mathbb{T}_N x\|_2^2}.
+\]
+\end{prop}
+
+We replace the \(\|\cdot\|_{\ell_1}\) cost in Problems~\ref{Prob::l1min_primal} and~\ref{Prob::l1min_dual} with the \(\|\cdot\|_{N,c}\) cost to formulate the corresponding primal and dual surrogate problems. This replacement temporarily enlarges the search space of \(\Phi\) from \(\ell_1\) to \(\ell_2\).
+\begin{opt}[Primal \(\|\cdot\|_{N,c}\) optimization]\label{Prob::l1Nsteps}
+\begin{equation}
+    \mu_{N,c} =\underset{\Phi\in\ell_2}{\inf} \|\Phi\|_{N,c} 
+\end{equation}
+subject to (\ref{eqn::const_strc}),  (\ref{eqn::const_achCL}).
+\end{opt}
+
+\begin{opt}[Dual \(\|\cdot\|_{N,c}\) optimization]\label{Prob::l1Nsteps_dual}
+\begin{equation}
+    \mu_{N,c} =\underset{x^*, Z, \Lambda\in \ell_2}{\sup} \langle b_{\mathrm{fea}}, Z \rangle
+\end{equation}
+subject to
+\begin{equation}
+    x^* =  \mathcal{A}_{\mathrm{fea}}^* Z + \begin{bmatrix}
+        \mathbf{0} \\ I
+    \end{bmatrix} \Lambda \begin{bmatrix}
+        \mathbf{0} & I
+    \end{bmatrix};\ \|x^*\|_{{N,c}^*} \leq 1;\ \Lambda \in \mathcal{S}^\perp.
+\end{equation}
+\end{opt}
+
+\begin{prop}[Strong duality]
+Suppose that the constraint set defined by \eqref{eqn::const_strc}--\eqref{eqn::const_achCL} is nonempty.
+Then strong duality holds between Problems~\ref{Prob::l1Nsteps} and~\ref{Prob::l1Nsteps_dual}.
+\end{prop}
+\begin{proof}
+$\|\Phi\|_{N,c}$ is a finite, convex, and continuous functional on $\ell_2$.
+By feasibility of \eqref{eqn::const_strc}--\eqref{eqn::const_achCL}, there exists $\Phi_0\in\ell_2$ such that
+$\mathcal{A}_{\mathrm{fea}}\Phi_0 = b_{\mathrm{fea}}$ and $\begin{bmatrix}\mathbf 0 & I\end{bmatrix}\Phi_0 \begin{bmatrix} \mathbf 0 \\ I\end{bmatrix}\in\mathcal S$.
+Hence, the refined Slater condition holds~\cite{Borwein2005convex}.
+By the Fenchel--Rockafellar theorem, strong duality holds and the optimal values of
+Problems~\ref{Prob::l1Nsteps} and~\ref{Prob::l1Nsteps_dual} coincide.
+\end{proof}
+
+
+\subsection{Convergence to \(\ell_1\)}
+\begin{lemma}\label{lm::opt_aux_upbd}
+For any \(c>0\), the optimal value of Problem \ref{Prob::l1Nsteps} is upper-bounded as \(N\) increases.
+\end{lemma}
+\begin{proof}
+Since \(\Phi_{\ell_2}\in\mathcal{RH}_2\), \(\|\Phi_{\ell_2}\|_1\) and \(\|\Phi_{\ell_2}\|_2\) are finite. Therefore,
+\(\mu_{N,c} \leq \|\Phi_{\ell_2}\|_{N,c}^2 \leq \|\Phi_{\ell_2}\|_1^2 +c  \|\Phi_{\ell_2}\|_2^2 = \rm{Constant}.\)
+\end{proof}
+
+From Lemma \ref{lm::opt_aux_upbd} and the convexity of Problem \ref{Prob::l1Nsteps}, we know that Problem \ref{Prob::l1Nsteps} is always well-posed and its cost is upper bounded by the \(\ell_2\) optimal control policy. 
+The following theorem shows the optimal cost of Problem~\ref{Prob::l1Nsteps} converges to the optimal \(\ell_1\) cost as the truncation level \(N\) increases.
+\begin{thm}\label{thm:auxconverge}
+For any fixed \(c>0\), the sequence \(\{\mu_{N,c}\}\) will converge to \(\mu_1\), i.e. the optimal cost of \(\ell_1\) problem.
+\end{thm}
+\begin{proof}
+Assume the optimal \(\ell_1\) solution to Problem \ref{Prob::l1min_primal} is \(\Phi_{\ell_1}\in \ell_1 \subset \ell_2\). By the optimality of \(\mu_{N,c}\) for Problem \ref{Prob::l1Nsteps}, \(\mu_{N,c} \leq \|\Phi_{\ell_1}\|_{N,c}^2\).
+For any \(c>0\),
+\[
+\lim_{N\rightarrow \infty} \|\Phi_{\ell_1}\|_{N,c} = \|\Phi_{\ell_1}\|_1 = \mu_1
+\]
+Therefore,
+\begin{equation}\label{eqn::limsup}
+    \lim_{N\rightarrow \infty}\sup \mu_{N,c} \leq \mu_1.
+\end{equation}
+
+Thus, all the limit points of \(\mu_{N,c}\) will have positive value less than \(\mu_1\). 
+
+We now show that the infimum of subsequences is larger than \(\mu_1\) by observing the dual problem.
+
+% Assume there is a subsequence \(\{\mu_{N_s,c}\}\) with a 
+% limit \(\mu_s = \mu_1 -\epsilon, \epsilon>0\).
+
+% Since \(\|\Phi_{\ell_1}\|_{N,c}\) converges to \(\mu_1\), there is an interger \(M_1\), such that for any \(N>M_1\), \(|\mu_1 -\|\Phi_{\ell_1}\|_{N,c}|<\epsilon\).
+
+Consider Problem \ref{Prob::l1min_dual}. There are finite support feasible dual sequences \(Z,\Lambda\) whose cost \(\mu\) is arbitrarily
+close to \(\mu_1\), say \(\mu_1-\mu < \epsilon_1 < \frac{\epsilon}{2}\). From feasibility, \(x^* = \mathcal{A}_{\mathrm{fea}}^* Z + \begin{bmatrix}\mathbf{0} \\ I\end{bmatrix} \Lambda \begin{bmatrix}\mathbf{0} & I \end{bmatrix} \)
+has \(\|x^*\|_\infty \leq 1 \). Pick a \(\epsilon_2 < \min\{\epsilon/2,\mu\}\). By multiplying the factor \((1-\epsilon_2)\), we construct \(Z_1 = (1-\epsilon_2) Z\) and \(\Lambda_1 =(1-\epsilon_2) \Lambda\) such that
+\[
+x_1^* = \mathcal{A}_{\mathrm{fea}}^* Z_1 + \begin{bmatrix}\mathbf{0} \\ I\end{bmatrix} \Lambda_1 \begin{bmatrix}\mathbf{0} & I \end{bmatrix},
+\]
+where \(\|x_1^*\|_\infty \leq 1- \epsilon_2\) and \(x_1^* \in \ell_2^{n_z\times n_w}\). There's always an positive integer \(M\) such that for any \(N > M\), we have \(\|x_1^*\|_{N,c}\leq 1\), which means \((x_1^*, Z_1, \Lambda_1)\) is feasible for Problem \ref{Prob::l1Nsteps_dual}. 
+\[
+\mu_{N,c} \geq \mu(1-\epsilon_2) \geq \mu -\epsilon/2 = \mu_1 - \epsilon_1 -\epsilon/2 >\mu_1 -\epsilon
+\]
+Thus we have
+\begin{equation} \label{eqn::liminf}
+    \lim_{N\rightarrow \infty}\inf \mu_{N,c} \geq \mu_1.
+\end{equation}
+Together with (\ref{eqn::limsup}), we have \(\lim_{N\rightarrow \infty} \mu_{N,c} =\mu_1\).
+\end{proof}
+
+
+
+
+
+
+\subsection{Nested Convex Optimization}
+
+
+
+We separate the Youla parameter into two parameters:
+\begin{equation}
+    Q_1 =  \mathbb{P}_{N}Q;\ Q_2 = \mathbb{T}_{N}Q;\ Q = \bar{\mathbb{P}}_{N} Q_1 + \bar{\mathbb{T}}_{N} Q_2.
+\end{equation}
+% \begin{prop}
+% \end{prop}
+% \begin{proof}
+% Both \(\mathbb{P}_{N}\Phi\) and \(\mathbb{P}_{N}\Theta\) are \(N\)-step FIR. Since \(Q_2\) contributes only higher-order terms beyond \(N\) steps, it does not affect them.  
+% \end{proof}
+% {\color{red}Definition of inner and outer layer convex optimization problems}
+We observe that \(\mathbb{P}_{N}\Phi\) is solely decided by \(Q_1\).
+Therefore, the Primal Problem~\ref{Prob::l1Nsteps} can be recast as a nested optimization problem about Youla parameters \(Q_1\) and \(Q_2\):
+\begin{opt}[Nested \(\|\cdot\|_{N,c}\) problem]
+\[
+\mu_{N,c}^2 =\underset{Q_1}{\inf} \left(\|\mathbb{P}_{N} \Phi\|_1^2 + c\cdot \underset{Q_2\in \ell_2}{\inf} \|\mathbb{T}_{N} \Phi\|_2^2 \right),
+\]
+subject to~\eqref{eqn:mmstructconstr}.
+\end{opt}
+For a fixed finite-horizon decision variable \(Q_1\), the inner problem optimizes over \(Q_2 \in \ell_2\) and captures the infinite-horizon tail cost. In contrast, the outer problem involves only the finite-horizon component \(Q_1\). The following theorem shows that the inner-layer problem admits a closed-form symbolic solution based on Lemma~\ref{lm::reducedsys}, thereby eliminating the infinite-dimensional optimization and reducing the overall problem to a single-layer finite-horizon program.
+\begin{thm}\label{thm::tailoptimizer}
+Given \(Q_1 = \mathbb{P}_N Q\) satisfy (\ref{eqn::ss::reducedvec}) and \(N \geq m\), the unique \(Q_2\) that minimizes \( \|\mathbb{T}_{N} \Phi\|_2\) and \(\Theta\in \mathcal{S}\) is given as
+\[
+\vc(Q_2[i]) = (C_r + D_r E_m \kappa) (A_r + B_r E_m \kappa)^{i} \xi[N],
+\]
+where \(\xi[N]\) is uniquely decided by state-space~\eqref{eqn::ss::reducedvec}. Define weight matrix \(\Gamma \coloneqq \Gamma_c \otimes \Gamma_b \), let \(B_r^m = B_r E_m, D_m = D_r E_m\). \(\kappa\) can be found in the following DARE:
+\begin{align*}
+    X &= \mathrm{DARE}(A_r, B_r^m, {C_r}^\top \Gamma {C_r}, {D_m}^\top\Gamma D_m,{C_r}^\top \Gamma {D_m},I);\ \\
+    \kappa &= -(D_{m}^\top\Gamma D_m + {B_r^m}^\top X{B_r^m})^{-1} ({B_r^m}^\top X A_r +D_{m}^\top\Gamma C_r).
+\end{align*}
+The optimal \(\ell_2\) cost by this constructed \(Q_2\) is:
+\[
+\min \|\Phi\|_2^2 =  \|G_{11}^0\|_2^2 + \|\vc(Q_1)\|_\Gamma^2 + \zeta[N]^\top X \zeta[N]
+\]
+\end{thm}
+\begin{proof}(Sketch) 
+Because
+\begin{equation}
+    \|\Phi\|_2^2 = \|\mathbb{P}_{N}\Phi\|_2^2 +\|\mathbb{T}_{N}\Phi\|_2^2
+\end{equation}
+As \(Q_1\) has decide the \(\mathbb{P}_{N}\Phi\) already, minimizing \(\|\mathbb{T}_{N}\Phi\|_2\) about \(Q_2\) is equivalent to minimize \(\|\Phi\|_2\). Mathematically, 
+\begin{equation}
+\begin{split}
+    &\inf_{Q_2\in \ell_2} \|\Phi\|_2^2 = \|G_{11}^0\|_2^2 + \inf_{Q_2\in \ell_2}(\|\Gamma_b^{\frac{1}{2}} Q \Gamma_c^{\frac{1}{2}}\|_2^2)  \\
+    & = \|G_{11}^0\|_2^2 + \|\vc(Q_1)\|_\Gamma^2 + \inf_{u} \|\vc(Q_2)\|_\Gamma^2
+    % \sum_{i = 0} ^ {N-1} \vc(Q_1[i])^\top \Gamma \vc(Q_1[i]) \\
+    % & + \inf_{u}( \sum_{i=0}^\infty \vc(Q_2[i])^\top \Gamma \vc(Q_2[i]) )\\
+\end{split}
+\end{equation}
+subject to (\ref{eqn::ss::reducedvec}). 
+
+This is a standard infinite-horizon linear quadratic problem with the solution given by the Riccati Equation. Notably, the optimal \(Q_2\) found is rational and thus a \(\ell_1\) sequence.
+\end{proof}
+
+\begin{rem}
+Because \(N\) will go sufficiently large to approximate the optimal solution, it's natural to consider an \(N \geq m\) by which the network reaches its maximal connectivity.
+\end{rem}
+
+Theorem \ref{thm::tailoptimizer} finds unique explicit inner-layer optimal solution \(Q_2\) and simplifies the \(\|\cdot\|_{N,c}\) minimization problem into a finite-dimensional optimization problem with \(Q_1\) as the variable. 
+
+More importantly, for a given horizon \(N\), the optimal solution \(\Phi_{N,c}\) to Problem~\ref{Prob::l1Nsteps} is a rational sequence with finitely many poles. Consequently, it constitutes a valid suboptimal solution to the original \(\ell_1\) problem, despite the search being conducted over the larger \(\ell_2\) space.
+
+\subsection{Convergent upper and lower bound}
+With the aid of \(\Phi_{N,c}\), we establish tightly converging upper and lower bounds for \(\mu_{1}\).
+For notational convenience, we set \(\mu_{1N} \coloneqq \|\mathbb{P}_N \Phi_{N,c}\|_1\), \(\mu_{2N} \coloneqq \|\mathbb{T}_N \Phi_{N,c}\|_2\)
+For simplicity, \(c\) is omitted from the subscript. As a result, \(\mu_{N,c}^2 = \mu_{1N}^2 + c \mu_{2N}^2\).
+\begin{thm}\label{thm::H2tailto0}
+Given a fixed \(c\), \(\mu_{2N}\) converges to 0 as \(N\) increases.
+\[
+\lim_{N\rightarrow \infty} \mu_{2N} = 0
+\]
+\end{thm}
+\begin{proof}
+For each $N$, let $\Phi_{N,c}$ and $\left(x^*, Z, \Lambda \right)$ denote the optimal primal and dual solutions, respectively. By strong duality, $\Phi_{N,c}$ and $x_{N,c}^*$ satisfy the alignment condition. Let \(\gamma_1^N =\|\mathbb{P}_N x^*\|_\infty\) and \(\gamma_2^N = \frac{1}{\sqrt{c}}\|\mathbb{T}_N x^*\|_2\). The alignment condition implies that:
+\begin{equation}\label{eqn:align}
+\gamma_1^N = \frac{\mu_{1N}}{\mu_{N,c}};\ \gamma_2^N = \frac{\sqrt{c} \mu_{2N}}{\mu_{N,c}}.    
+\end{equation}
+Moreover, \(\mathbb{T}_N \Phi_{N,c}= \mu_{N,c} \mathbb{T}_N x_{N,c}^*\). Since, \(\mu_{N,c}\) is uniformly bounded by Lemma~\ref{lm::opt_aux_upbd}, \(\mu_{2N}\) converges to zero iff \(\gamma_2^N\) converges to zero.
+
+Suppose, by contradiction, that $\gamma_2^N$ does not converge to zero. Then there exists $\delta > 0$ and a subsequence (re-indexed) such that $\gamma_2^N \ge \delta$ for all $N$. 
+
+From the definition of \(\mu_{1N}\), \(\mu_{2N}\) and the alignment condition~\eqref{eqn:align}, we know that \({(\gamma_1^N)}^2 + {(\gamma_2^N)}^2 = 1\).
+Therefore, we have \(\gamma_1^N\leq \sqrt{1 -\delta^2}\) and \(\mu_{1N}\leq \mu_{N,c} \sqrt{1 -\delta^2}\). From Theorem~\ref{thm:auxconverge}, \(\mu_{N,c}\) converges to \(\mu_1\). This implies that \(\mu_{1N}\) is uniformly bounded. On the other side, we can show that
+\[
+\|\mathbb{T}_N \Phi_{N,c}\|_1 \leq \alpha \|\mathbb{T}_N \Phi_{N,c}\|_2 + \beta, \forall N \geq N_m,\exists \alpha, \beta, N_m >0
+\]
+\(\|\mathbb{T}_N \Phi_{N,c}\|_1\) is uniformly bounded. Consequently, \(\|\Phi_{N,c}\|_1 \leq \|\mathbb{P}_{N} \Phi_{N,c}\|_1 + \|\mathbb{T}_{N} \Phi_{N,c}\|_1\) is uniformly bounded. It follows from the Banach-Alouglu Theorem that there is a subsequence, \(\{\Phi_{N_s,c}\}\), that converges weak${}^\star$ to an element \(\Phi^{w^\star}\). 
+
+We will lead to contradictory by showing that \(\Phi^{w^\star}\) is a feasible \(\ell_1\) solution to Problem~\ref{Prob::l1min_primal} and \(\|\Phi^{w^\star}\|_1 \leq \mu_1 \sqrt{1 -\delta^2}\).
+
+Because each $\Phi_{N_s,c}$ satisfies the affine constraints~\eqref{eqn::const_strc}--\eqref{eqn::const_achCL}, and these constraints are weak$^\star$ closed, $\Phi^{w^\star}$ is feasible for the $\ell_1$ problem.
+% Towards the other end, consider the IIR \(\bar{\Phi}_{N_s} \coloneqq \bar{\mathbb{P}}_{N_s} \mathbb{P}_{N_s} \Phi_{N_s,c}\). We have \(\|\bar{\Phi}_{N_s}\|_1 = \|\mathbb{P}_{N_s} \Phi_{N_s,c}\|_1\) converges to \(\mu_1 \sqrt{1 -\delta^2}\). For any \(\epsilon >0\), there exists \(N_0\) such that \(\|\bar{\Phi}_{N_s}\|_1 \leq \mu_1 \sqrt{1 - \delta^2} +\epsilon,\;\forall N_s \geq N_0 \).
+%  Then \(\bar{\Phi}^{w^\star} = \Phi^{w^\star}\) because both \(\{\Phi_{N_s,c}\}\) and \(\{\bar{\Phi}^{N_{sr}}\}\) are weak\(^{\star}\) convergent sequences. 
+Define the IIR sequence $\bar{\Phi}_{N_s} \coloneqq \bar{\mathbb{P}}_{N_s}\mathbb{P}_{N_s}\Phi_{N_s,c}$. Then
+\[
+\|\bar{\Phi}_{N_s}\|_1 = \|\mathbb{P}_{N_s}\Phi_{N_s,c}\|_1 =\mu_{1 N_s} \le \mu_{N,c} \sqrt{1 -\delta^2}
+\]
+Since $\mu_{N,c}\to\mu_1$, for any $\epsilon>0$ there exists $N_0$ such that
+\[
+\|\bar{\Phi}_{N_s}\|_1 \le (\mu_1+\epsilon)\sqrt{1-\delta^2}, \qquad \forall\, N_s\ge N_0.
+\]
+Hence, $\{\bar{\Phi}_{N_s}\}$ is uniformly bounded in $\ell_1$, and by the Banach--Alaoglu theorem there exists a subsequence, denoted $\{\bar{\Phi}_{N_{sr}}\}$, that converges weak$^\star$ to some $\bar{\Phi}^{w^\star}$.
+
+Moreover, since \(\|\Phi_{N_{sr},c}-\bar{\Phi}_{N_{sr}}\|_1 \to 0\), the sequences $\{\Phi_{N_{sr},c}\}$ and $\{\bar{\Phi}_{N_{sr}}\}$ share the same weak$^\star$ limit. Consequently, \(\bar{\Phi}^{w^\star} = \Phi^{w^\star}\).
+
+Since \(\epsilon\) can be arbitrarily small, \(\|\Phi^{w^\star}\|_1 \leq \mu_1 \sqrt{1 -\delta^2}\), which contradicts the optimality of \(\mu_1\). Therefore, $\mu_{2N}\to 0$ as $N\to\infty$.
+\end{proof}
+
+Theorem~\ref{thm::H2tailto0} immediately yields the following tight upper and lower bounds for \(\mu_1\).
+\begin{cor}\label{cor:UB}
+Let \(\bar{\mu}_N = \|\Phi_{N,c}\|_1\), then \(\bar{\mu}_N\geq\mu_1\) and 
+\[
+    \lim_{N\rightarrow \infty} \bar{\mu}_N = \mu_1.
+\]
+\end{cor}
+% We make a slight modification to the lower bound in \cite{Elia1998qpl1} to achieve a tighter bound.
+\begin{cor}\label{cor:LB}
+For any fixed \(c>0\), construct:
+\[
+\underline{\mu}_N = \frac{\mu_{N,c}^2}{\max\{\mu_{1N},c \mu_{2N}\}}, 
+\]    
+then \(\underline{\mu}_N\leq\mu_1\) and \(\lim_{N\rightarrow \infty} \underline{\mu}_N = \mu_1\).
+\end{cor}
+\begin{proof}
+Corollary~\ref{cor:UB} is immediate by Theorem~\ref{thm:auxconverge},\ref{thm::H2tailto0}.
+
+For Corollary~\ref{cor:LB}, we adopt the definitions of \(\gamma_1^N\) and \(\gamma_2^N\) introduced in the proof of Theorem~\ref{thm::H2tailto0}.
+% Assume \(x^*,Z,\Lambda\) are the dual variables optimize Problem \ref{Prob::l1Nsteps_dual}, let \(\gamma_1^N =\|\mathbb{P}_N x^*\|_\infty\) and \(\gamma_2^N = \frac{1}{\sqrt{c}}\|\mathbb{T}_N x^*\|_2\). From the alignment conditions, it follows that
+% \[
+% \gamma_1^N = \frac{\mu_{1N}}{\mu_{N,c}};\ \gamma_2^N = \frac{\mu_{2N}}{\mu_{N,c}}.
+% \]
+Given that \(\|\mathbb{T}_N x^*\|_\infty \leq \|\mathbb{T}_N x^*\|_2\), it follows that 
+\[
+\begin{split}
+\|x^*\|_\infty & = \max \{\|\mathbb{P}_N x^*\|_\infty,\|\mathbb{T}_N x^*\|_\infty\} \\
+& \leq \max \{\|\mathbb{P}_N x^*\|_\infty,\|\mathbb{T}_N x^*\|_2\} = \max \{\gamma_1^N,\sqrt{c} \gamma_2^N\}.  
+\end{split}
+\]
+Define \(\beta \coloneqq \max\{\gamma_1^N, \sqrt{c} \gamma_2^N\}\). Let \(y^* = x^*/\beta\) and shrink \(Z,\Lambda\) accordingly, then \(\|y^*\|_\infty\le 1\). \(y^*\) is feasible for Problem \ref{Prob::l1min_dual} and produce a lower bound of \(\mu_1\) as
+\begin{equation}
+\begin{split}
+    \underline{\mu}_N &= \langle b_\mathrm{fea}, Z/\beta \rangle = \mu_{N,c}/\beta= \frac{\mu_{N,c}}{\max\{\gamma_1^N,\sqrt{c}\gamma_2^N\}}\\
+    & = \frac{\mu_{N,c}^2}{\max\{\mu_{1N},c \mu_{2N}\}} \leq \mu_1.
+\end{split}
+\end{equation}
+By Theorem~\ref{thm:auxconverge} and \ref{thm::H2tailto0}, \(\mu_{1N} \to \mu_1\) and \(\mu_{2N}\to 0\) as \(N\) increases, which immediately gives \(\underline{\mu}_N\to\mu_1\) and completes the proof. 
+\end{proof}
+
+
+
+\subsection{Synthesis methodology}
+The truncated $\ell_2$-norm of $\Phi$ is given by
+\begin{align*}
+    \|\mathbb{P}_N \Phi\|_2^2 & = \sum_{i=0}^{N-1}\mathrm{trace}(\Phi[i]^\top \Phi[i]) = \sum_{i=0}^{N-1}\vc(\Phi[i])^\top \vc(\Phi[i]) \\
+    & = \bar{\phi}_N^\top \bar{\phi}_N = \|H_N - U_N \bar{q}_v\|_2^2\\
+\end{align*}
+Here, $\bar{q}_v = \ver\left[q[i]\right]_{i \in \mathcal{F}_N}$ is the vertical concatenation of the vectorized impulse response of $Q$. The stacked vector of the impulse responses of $\mathbb{P}_N \Phi$ is
+\begin{equation}\label{eqn:phiN_q}
+    \bar{\phi}_N = \ver[\vc(\Phi[i])]_{i \in \mathcal{F}_N} = H_N - U_N \bar{q}_v    
+\end{equation}
+\[
+H_N =
+\begin{bmatrix}
+\vc(G_{11}^0[0]) \\ \vdots \\ \vc(G_{11}^0[N-1])
+\end{bmatrix},\quad
+U_N =
+\begin{bmatrix}
+U[0] & & \\
+\vdots & \ddots & \\
+U[N-1] & \hdots & U[0]
+\end{bmatrix},
+\]
+where $U[k] = \sum_{i=0}^{k} (G_{21}[i])^\top \otimes G_{12}[k-i]$.
+
+Theorem~\ref{thm::tailoptimizer} shows that
+\begin{equation*}
+\begin{split}
+\underset{\Phi\in\mathcal{S}}{\inf} & \|\mathbb{T}_N \Phi\|_2^2  = \underset{\Phi\in\mathcal{S}}{\inf} \|\Phi\|_2^2 - \|\mathbb{P}_N \Phi\|_2^2 \\
+& = \|\vc(Q_1)\|_\Gamma^2 + \| \zeta[N]\|_X^2 + \|G_{11}^0\|_2^2 - \|H_N - U_N \bar{q}_v\|_2^2\\
+& = \bar{q}_v^\top (I_N \otimes \Gamma) \bar{q}_v + \|\zeta[N]\|_X^2 + \|G_{11}^0\|_2^2 - \|H_N - U_N \bar{q}_v\|_2^2\\
+& = \|\begin{bmatrix} \bar{q}_v \\ 1 \end{bmatrix} \|_{\Pi_N}^2 + \|\zeta[N]\|_X^2
+\end{split}
+\end{equation*}
+where,
+\[
+\Pi_N \coloneqq \begin{bmatrix}
+I_N \otimes \Gamma - U_N^\top U_N & U_N^\top H_N\\
+H_N^\top U_N & \|G_{11}^{0}\|_2^2 - H_N^\top H_N
+\end{bmatrix}.
+\]
+% The term \(\| \zeta[N]\|_X^2\) is the cost penalty produced by \(Q_2\) to ensure \(\Phi_{22} \in \mathcal{S}\).
+
+
+
+We now combine the preceding developments into a quadratic programming problem that solves Problem~\ref{Prob::l1Nsteps}. 
+\begin{opt}[QP synthesis formulation]\label{Prob::l1NFir_SDP}
+\begin{equation}
+\begin{split}
+    & \underset{\{u\}_0^{N-1}}{\min}\ \|\Phi\|_{N,c}^2 =  \underbrace{\|\bar{\phi}_N\|_1^2}_{\mu_{1N}^2} + c \cdot \underbrace{\left(\|\begin{bmatrix}
+    \bar{q}_v \\ 1
+    \end{bmatrix} \|_{\Pi_N}^2 + \|\zeta[N]\|_X^2\right)}_{\mu_{2N}^2}\\
+    % & \quad + c\cdot\begin{bmatrix}
+    % \bar{q}_v^\top & 1
+    % \end{bmatrix} \Pi_N \begin{bmatrix}
+    % \bar{q}_v \\ 1
+    % \end{bmatrix} 
+    % + c\cdot \zeta[N]^\top X \zeta[N]
+\end{split}
+\end{equation}
+subject to \eqref{eqn::ss::reducedvec} (\(\forall i\in\mathcal{F}_N\)) and \eqref{eqn:phiN_q}.
+\end{opt}
+Problem~\ref{Prob::l1NFir_SDP} finds an IIR exact solution to Problem~\ref{Prob::l1Nsteps} and a sub-optimal solution to Problem~\ref{Prob::l1min_primal}. The sequence of solutions weak$^\star$ converges to optimal \(\Phi_1^\circ\) as the truncation horizon $N$ tends to infinity. Refer to Appendix~\ref{appsec:syntech} for detailed implementation.
+
+\subsection{Discussion and comparison}
+
+The system-level synthesis enables the complete design of closed-loop responses by overparameterizing the achievable closed-loop maps \(\Phi\) with four variables \(R,M,N,L\)~\cite{wang2019SLS}. The implementation of system-level synthesis (SLS) is given by:
+\begin{opt}[System-level synthesis]\label{Prob:SLSsyn}
+\[
+\min_{R,M,N,L} \|\Phi\|_1
+\]
+subject to
+\[
+\Phi = \begin{bmatrix}
+    C_z & D_{zu}
+\end{bmatrix}
+\begin{bmatrix}
+    R & N\\
+    M & L\\
+\end{bmatrix}
+\begin{bmatrix}
+    B_w \\ D_{yw}
+\end{bmatrix} + D_{zu};\; L\in \mathcal{S};
+\]
+\begin{equation}\label{eqn:SLSstabl}
+\begin{bmatrix}
+    z I - A & B_u
+\end{bmatrix}
+\begin{bmatrix}
+    R & N\\
+    M & L\\
+\end{bmatrix} =
+\begin{bmatrix}
+    I & \mathbf{0}
+\end{bmatrix};    
+\end{equation}
+\begin{equation}\label{eqn:SLSstabr}
+\begin{bmatrix}
+    R & N\\
+    M & L\\
+\end{bmatrix} \begin{bmatrix}
+    z I - A \\ C_y
+\end{bmatrix}=
+\begin{bmatrix}
+    I \\ \mathbf{0}
+\end{bmatrix};   
+\end{equation}
+\[
+R \in \mathbb{R}^{n_x \times n_x} \times \mathcal{F}_N;\;
+M \in \mathbb{R}^{n_x \times n_y} \times \mathcal{F}_N;\;
+\]
+\[
+N \in \mathbb{R}^{n_u \times n_x} \times \mathcal{F}_N;\;
+L \in \mathbb{R}^{n_u \times n_y} \times \mathcal{F}_N.
+\]
+\end{opt}
+As a result, these transfer functions must conform to some constraints~\eqref{eqn:SLSstabl} and \eqref{eqn:SLSstabr}, which essentially guarantee the stabilization of the plant.
+Violations of these constraints can lead to instability. 
+In practice, structured SLS constraints are commonly enforced by restricting the system responses to FIR operators with a prescribed horizon.
+\footnote{Specifically, the system responses $(R,M,N,L)$ are typically constrained to be FIR, where $N$ serves as a truncation horizon to ensure computational tractability.}
+
+However, stabilization constraints do not guarantee the existence of FIR solutions in general, and the approximate satisfaction of the stabilization conditions remains an open problem.
+\footnote{%
+It is shown in~\cite{wang2019SLS} that the exact stabilization constraints in SLS may fail to admit FIR solutions. To address this issue, a norm-bounded tolerance on constraint violations was introduced in~\cite{Matni2017SLS}, enabling approximate stabilization guarantees. This relaxation was developed only for the state-feedback case. For output-feedback problems, where state estimation and control are coupled, the appropriate tolerance structure and associated guarantees remain unknown.
+}
+In contrast, our approach resolves this issue by finding IIR solutions for generic plant configurations.
+
+\section{Numerical Examples}
+\subsection{Controllable and observable plant}
+We consider Example~\ref{ex:3node} with the following state-space matrices for the plant:
+\begin{equation*}
+A = 
+\begin{bmatrix}
+0  &  0.3  & 0 &  -0.4  &  0 &  0 \\
+-0.1  &  0.7  &  0.1  & -0.5 &  0 &  0 \\
+0 & -0.7 &  0.4 & 0.6  & 0  & 0 \\
+-0.4 & 1.7  & 0.6  & -1.6&  0   &  0 \\
+0  & 0  & -0.1 &  -1.4 &  -0.2  &  0.9 \\
+0  & 0 & -2.0  & -0.8  &  0.3  &  1.1 \\
+\end{bmatrix};
+\end{equation*}
+\begin{equation*}  
+B_w = 
+\begin{bmatrix}
+\begin{bmatrix}
+0.6 & 0.6 \\
+0.2 & 0.6\\
+1 & -1\\
+0 & -1\\
+0.3 & 0.5\\
+0 & -0.5\\
+\end{bmatrix} & \mathbf{0}_{6\times 3}
+\end{bmatrix};\  B_u = \begin{bmatrix}
+    1 & 0 & 0 \\
+    0.4 & 0 & 0\\
+    0 & 1 & 0\\
+    0 & 0.4 & 0\\
+    0 & 0 & 1 \\
+    0 & 0 & 0.4
+\end{bmatrix};
+\end{equation*}
+
+\begin{equation*}
+    C_z = \begin{bmatrix}
+        \begin{bmatrix}
+    0.1&0.4&0.1&0.4&0.1&0.4 \\
+    0.3&0&0.5&0&0.6&0 \\
+\end{bmatrix} \\
+\mathbf{0}_{3\times 6}
+\end{bmatrix};\
+\end{equation*}
+\begin{equation*}
+C_y = \begin{bmatrix}
+    0.2 & 1 & 0 & -1 & 0 & 0 \\
+    0 & 0 & 0.2 & -1 & 0 & 0\\
+    0 & 0 & 0 & 1 & 0.2 & -1
+    \end{bmatrix}; 
+\end{equation*}
+\begin{equation}
+    D_{zu}^\top  = D_{yw} = \begin{bmatrix}
+        \mathbf{0}_{3\times 2} & I_3
+    \end{bmatrix};\     
+    D_{zw} = \mathbf{0}_{5\times 5};\ D_{yu} = \mathbf{0}_{3\times 3}.
+\end{equation}
+The partition of states, inputs, and outputs are 
+\[
+\mathcal{P}_x =[2;2;2], \mathcal{P}_y = \mathcal{P}_u =[1;1;1].
+\]
+\begin{figure}[hb]
+    \centering
+    \includegraphics[width= 0.6\linewidth]{figures/DisCtrlfigure/_3nodeEx_L1result.png}
+    \caption{Convergence of surrogate problems for different \(c\) values. Colors denote \(c\); \(\triangle\) marks \(\bar{\mu}_N\) provided by Corollary~\ref{cor:UB}, and \(\nabla\) marks \(\underline{\mu}_N\) provided by Corollary~\ref{cor:LB}. The black line with a circle mark is the sub-optimal solution found by SLS.}
+    \label{fig:Exl1soln}
+\end{figure}
+We'd like to find a controller \(K\in\mathcal{S}\), consistent with the graph in Fig. \ref{fig:3nodesys},
+\[
+\mathcal{S}= \begin{bmatrix}
+    \mathcal{R}_p & \frac{1}{z} \mathcal{R}_p & 0 \\
+    \frac{1}{z} \mathcal{R}_p & \mathcal{R}_p & 0\\
+    \frac{1}{z^2} \mathcal{R}_p & \frac{1}{z}\mathcal{R}_p & \mathcal{R}_p\\
+\end{bmatrix}. 
+\]
+that minimizes the CL \(\ell_1\) norm. We solve the QP Problem \ref{Prob::l1NFir_SDP} with different \(c = \{4,20,50\}\) and a sequence of \(N\), varying from \(4\) to \(28\). 
+The optimal value, together with the UB and LB, is plotted in Figure \ref{fig:Exl1soln}. Eventually, all curves converge into the optimal distributed \(\ell_1\) cost \(21.025\).
+With a larger \(c\) value, we put a higher penalty on the tail \(\ell_2\) norm. It leads to a faster convergence of UB and LB.
+
+
+The controllability and observability of the plant guarantees that FIR solutions exist when \(N\) is large enough. In this example, \(N = 4\) is the threshold. Because an FIR solution exists, SLS exhibits fast convergence. 
+Similarly, the case \(c=20\) attains a comparable convergence rate, as the large tail penalty suppresses the \(\ell_2\) tail, effectively enforcing near-FIR behavior. 
+
+However, the SLS approach does not provide a converging lower bound and therefore cannot offer an explicit optimality guarantee. In contrast, our method yields both suboptimal upper and lower bounds to quantify the performance regret.
+
+\subsection{Stabilizable and detectable plant}
+We slightly change the state-space matrices \(A,B,C\) in the last example, creating one stable uncontrollable pole at \(-0.8\) and another stable unobservable pole at \(0.6\). As a result, the constraints~\eqref{eqn:SLSstabl} and \eqref{eqn:SLSstabr} don't have FIR solutions. To the best of our knowledge, there is no reliable amendment to SLS when both observability and controllability are lacking. We're unable to apply SLS approach in this example.
+\begin{equation*}
+A = 
+\begin{bmatrix}
+0  &  0.3  & 0 &  0  &  0 &  0 \\
+-0.1  &  0.7  &  0.1  & -0.5 &  0 &  0 \\
+0 & -0.7 &  0.4 & 0.6  & 0  & 0 \\
+-0.4 & 1.7  & 0.6  & -1.6 &  0   &  0 \\
+0  & 0  & 0 &  0 &  -0.8  &  0 \\
+0  & 0 & -2  & -0.8  &  0.3  &  1.2 \\
+\end{bmatrix};
+\end{equation*}
+\begin{equation*}  
+B_w = 
+\begin{bmatrix}
+\begin{bmatrix}
+0.8 & -2 \\
+0.2 & 0\\
+1 & -1\\
+0 & -1\\
+0.7 & 1\\
+0 & -0.8\\
+\end{bmatrix} & \mathbf{0}_{6\times 3}
+\end{bmatrix};\  B_u = \begin{bmatrix}
+    0.8 & 0 & 0 \\
+    0 & 0 & 0\\
+    0 & 0.3 & 0\\
+    0 & 0.4 & 0\\
+    0 & 0 & 0 \\
+    0 & 0 & 0.4
+\end{bmatrix};
+\end{equation*}
+
+\begin{equation*}
+    C_z = \begin{bmatrix}
+        \begin{bmatrix}
+    0.1 & 0 & 0.1 & 0.4 & -1.2 & 0.4 \\
+    0.8 & 0 & 0.9 & 0 & -0.6 & 0 \\
+\end{bmatrix} \\
+\mathbf{0}_{3\times 6}
+\end{bmatrix};\
+\end{equation*}
+\begin{equation*}
+C_y = \begin{bmatrix}
+    0.84 & -0.42 & 0 & 0 & 0 & 0 \\
+    0 & 0.45 & 0 & 0.3 & 0 & 0\\
+    0 & 0 & -0.49 & 0.32 & 0.2 & 0.12
+    \end{bmatrix}; 
+\end{equation*}
+\(D\) terms, partitions and controller structure remain the same. 
+Our approach still effectively solves the problem because it finds IIR solutions.
+\begin{figure}[h]
+    \centering
+    \includegraphics[width= 0.6\linewidth]{figures/DisCtrlfigure/_3nodeEx_unco_L1result.png}
+    \caption{The result of the uncontrollable and unobservable plant.}
+    \label{fig:Exl1soln}
+\end{figure}
+\section{Conclusion}
+
+This paper presented an approximation approach to find the distributed \(\ell_1\) output feedback controller under QI assumption. Unlike prior work that relied on in-structure parameterization, our method began with a standard non-structured parameterization and only required a spectral factorization of the plant.
+We introduced a mixed \(\ell_1/\ell_2\) norm with arbitrary truncation level, showed that its minimization was jointly convex, developed a two-stage solution procedure and cast the mixed norm problem into a quadratic programming problem. 
+It can approximate with a tunable parameter \(c\) and provides converging upper and lower bound of the optimal cost. Future work involves adapting the methodolgy to mixed objective distributed control.
