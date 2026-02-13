@@ -1,0 +1,190 @@
+\chapter{Preliminaries and Notations}
+\label{prelim}
+We provide most of the notations used throughout this thesis in this chapter.
+
+\section{Sets, Fields, and Vector spaces}
+The set of natural number \(\{0,1,2,\hdots\}\) is denoted by \(\mathbb{N}\). The sets of real numbers and complex numbers are denoted by \(\mathbb{R}\) and \(\mathbb{C}\). Vectors and matrices over these fields are denoted by superscripts, e.g., $\mathbb{R}^{n}$, $\mathbb{R}^{m\times n}$, and $\mathbb{C}^{m\times n}$.
+Given a complex-valued \(m\times n\) matrix \(W\), \(W^\hermconj\) denotes its hermitian conjugate while \(W^\top\) denotes its transpose.
+The set of real symmetric and complex Hermitian matrices of dimension $m\times m$ is denoted by $\mathbb{S}^{m}$. For a Hermitian matrix $W \in \mathbb{S}^{m}$, the notation $W > 0$ denotes positive definiteness, and $W \geq 0$ denotes positive semidefiniteness.
+
+We denote vertical stacking by \(\ver[x_i]_{i\in\mathcal{I}}\) and block-diagonal concatenation by \(\diag[x_i]_{i\in\mathcal{I}}\), where \(\mathcal{I}\) is the index set. The subscript \(i\in\mathcal{I}\) is omitted when no ambiguity arises. 
+We use \(\succeq\) to denote the element-wise compare between matrices and vectors, \(A \succeq B\) iff \(a_{ij} \geq b_{ij},\;\forall (i,j)\).
+
+We will mainly analyze discrete-time linear systems in this thesis. The following sets are essential to discrete-time analysis. Let \(\mathbb{D}\coloneqq \{z\in\mathbb{C}:|z|<1\}\) be the open unit circle on \(\mathbb{C}\), and \(\bar{\mathbb{D}}\) be its closure. Let \(\mathcal{C}\) be the counterclockwise path on the unit circle.
+
+\section{Linear Systems and Transfer Function Spaces}
+
+A linear system is a mapping between vector spaces that satisfies superposition.
+
+\begin{defn}[Linear system]
+Let $\mathcal U$ and $\mathcal Y$ be vector spaces. A system
+\[
+G: \mathcal U \to \mathcal Y
+\]
+is said to be linear if for all $u_1,u_2 \in \mathcal U$ and all scalars
+$\alpha,\beta$,
+\[
+G(\alpha u_1 + \beta u_2)
+= \alpha G(u_1) + \beta G(u_2).
+\]
+\end{defn}
+In particular, a discrete-time dynamical system can be represented as a quadruple \((A,B,C,D)\) in state-space form.
+\begin{subequations}\label{eq:main}
+\begin{align}
+G : x[k + 1] &= A x[k] + B u[k], \label{eq:main:a} \\
+y[k]     &= C x[k] + D u[k]. \label{eq:main:b}
+\end{align}
+\end{subequations}
+The unique matrix-valued transfer function corresponding to the system is given by
+\[
+G(z) = D + C (z I -A)^{-1} B.
+\]
+The number of rows equals the number of output channels, and the number of columns equals the number of input channels.
+
+\begin{defn} [Rational proper transfer function matrix]
+Let $G(z)$ be an $m\times n$ transfer function matrix.  
+We say that $G(z)$ is a rational proper transfer function matrix if each entry
+$G_{ij}(z)$ is a rational function of $z$ and satisfies
+\[
+\lim_{z\to\infty} G_{ij}(z) < \infty, \quad \forall\, i=1,\ldots,m,\; j=1,\ldots,n.
+\]
+The set of all $m\times n$ rational proper transfer function matrices is denoted by
+$\mathcal{R}_p^{\,m\times n}$. Superscripts are used to specify the dimensions of transfer function matrices when they enhance clarity and readability.
+\end{defn}
+\begin{rem}
+Given a system's state-space realization \((A,B,C,D)\), \(G(z) \in \mathcal{R}_p\) if and only if \(A\) is a finite-dimensional matrix.
+\end{rem}
+Based on the transfer function matrix (TFM) value on the unit circle, we can introduce two useful classes of TFMs.
+\begin{defn} \cite{Zhou1996RobustControl} 
+\(\mathcal{L}_\infty(\mathcal{C})\) space is the Banach space of matrix-valued functions that are essentially bounded on \(\mathcal{C}\), with a norm defined as \(
+\|G\|_{\infty} \doteq \mathrm{ess} \sup_{\omega \in[0,2\pi)} \bar{\sigma}(G(e^{j\omega}))\).
+\(\mathcal{H}_\infty\) is the subspace of \(\mathcal{L}_\infty(\mathcal{C})\) that are analytic on \(\mathbb{C} \backslash \bar{\mathbb{D}}\). \(\mathcal{RH}_\infty\) is the real rational subspace of \(\mathcal{H}_\infty\), which contains all rational proper stable transfer functions.
+\end{defn}
+  
+\begin{defn}
+\(\mathcal{L}_2(\mathcal{C})\) space is the Hilbert space of matrix-valued function on \(\mathcal{C}\) and consists of all functions \(G\) with the following integral finite, i.e.
+\begin{equation*}
+    \frac{1}{2\pi}\int_0^{2\pi}\mathrm{trace}[G^\hermconj (e^{j\omega}) G(e^{j\omega})]d\omega < \infty, 
+\end{equation*}
+with an inner product \(\langle \cdot, \cdot \rangle\) defined as:
+\begin{equation*}
+    \langle F, G \rangle \coloneqq \frac{1}{2\pi}\int_0^{2\pi}\mathrm{trace}[F^\hermconj (e^{j\omega}) G(e^{j\omega})]d\omega.
+\end{equation*}
+As usual, define the Hardy space \(\mathcal{H}_2\) as the subspace of \(\mathcal{L}_2(\mathcal{C})\) that are analytic on \(\mathbb{C} \backslash \bar{\mathbb{D}}\). Define the corresponding \(\|\cdot\|_{\mathcal{H}_2}\) as:
+\begin{equation}\label{eqn::H2defn}
+    \|G\|_{\mathcal{H}_2} \coloneqq \sqrt{\sup_{r>1}\frac{1}{2\pi}\int_0^{2\pi}\mathrm{trace}[G^\hermconj(r e^{j\omega})G(r e^{j\omega})]d\omega}
+    = \sqrt{\frac{1}{2\pi}\int_0^{2\pi}\mathrm{trace}[G^\hermconj(e^{j\omega})G(e^{j\omega})]d\omega}.
+\end{equation}
+The second equality holds from the Maximum Modulus Theorem \cite{Zhou1996RobustControl}. We use \(\mathcal{RH}_2\) to denote the real (coefficient) rational subspace of \(\mathcal{H}_2\).
+\end{defn}
+% In analogy, we can define \(\mathcal{L}_\infty(\mathcal{C})\), \(\mathcal{H}_\infty\) and \(\mathcal{RH}_\infty\).
+\begin{rem}
+\(\mathcal{RH}_\infty = \mathcal{RH}_2\) in the discrete-time context, since both are equivalent to having a finite number of poles and all in \(\mathbb{D}\).     
+\end{rem}
+
+Throughout this thesis, regular capital letters denote matrices, transfer function matrices, or their impulse response sequences when unambiguous; when clarification is needed, a hat \(\hat{\cdot}\) is used to distinguish a transfer function (matrix) from its impulse response sequence.
+
+\section{System interconnections}
+We use \(\mathcal{F}_l/\mathcal{F}_u\) to denote the lower/upper linear fractional transformation between two systems. The feedback interconnection between two systems with compatible dimensions is a special form of \(\mathcal{F}_l\):
+\[
+H = \mathrm{feedback}(H^1,H^2) \coloneqq \mathcal{F}_l(\begin{bmatrix}
+    I \\
+    I
+\end{bmatrix} H^1 
+\begin{bmatrix}
+    I & I
+\end{bmatrix}, H^2).
+\]
+
+
+\section{Time-Domain Signals and Operator Representations}
+A linear-time-invariant (LTI) system (not necessarily finite-dimensional) can be equivalently characterized by its unilateral infinite impulse responses in the time domain. The impulse responses of discrete-time systems produce a matrix sequence defined on \(\mathbb{N}\).
+
+
+\(\ell_2^{m\times n}[\mathbb{Z}]\) denotes the Hilbert space of sequences of \(m\times n\) complex-valued matrices, with inner product defined as
+\[
+\langle H,G\rangle = \sum_{k=-\infty}^{\infty} \mathrm{trace}(G^\hermconj[k]H[k]).
+\]
+
+
+
+The \(\ell_2^{m\times n}[\mathbb{Z}]\) space can be decomposed as the direct sum of two spaces of sequences \(\ell_2^{m\times n}[\mathbb{N}] \oplus \ell_2^{m\times n}[\mathbb{Z}^-]\).
+The unilateral z-transform of \(G\in \ell_2^{m\times n}[\mathbb{N}]\) is
+\[
+\hat{G}(z) = \sum_{k=0}^\infty G[k] z^{-k}.
+\]
+Since we will mostly focus on the positive axis unilateral matrix sequences, we abbreviate \(\ell_2^{m\times n}[\mathbb{N}]\) as \(\ell_2^{m\times n}\). 
+Given any transfer function matrix (TFM) \(\hat{G}:\mathbb{C}\mapsto \mathbb{C}^{m\times n}\), the inverse Z-transform is
+\[
+\mathcal{Z}^{-1}:G[n] = \frac{1}{2\pi j} \oint_\mathcal{C} \hat{G}(z)z^{n-1} dz, 
+\]
+For any \(\hat{G}\in\mathcal{H}_2^{m\times n}\), its inverse Z-transform gives a sequence \(\{G\}\in\ell_2^{m\times n}\).
+Furthermore, given a weight matrix \(W \in \mathbb{S}^{m} \ge 0\), for a matrix \(M \in \mathbb{C}^{m \times n}\) we define
+\(\|M\|_W^2 \coloneqq \mathrm{trace}(M^\hermconj W M)\). More generally, for a sequence \(\{G\}\in\ell_2^{m\times n}\), the \(W\)-weighted \(\ell_2\) norm is defined as
+\[
+\|G\|_W^2 \coloneqq \sum_{i=0}^{\infty} \mathrm{trace}(G[i]^\hermconj W G[i]).
+\]
+Especially, the trace operator can be omitted when \(G\) is a sequence of vectors.
+
+% We may drop the superscripts later when no ambiguity arises. 
+
+
+% {\color{red}Throughout this paper, \(\hat{G}\) denotes a transfer function, while the regular capital letter \(G = \mathcal{Z}^{-1}(\hat{G})\) denotes its associated impulse response sequence.}
+
+% {\color{red}Generating IIR from state-space models.}
+
+\begin{defn}
+Given an LTI MIMO (\(m\times n\)) transfer function matrix \(\hat{G}\), its \(\ell_1\) norm is defined as
+\begin{equation}
+    \|\hat{G}\|_1 \triangleq \|G\|_1 =  \underset{1\leq i\leq m}{\max} \sum_{j=1}^n \sum_{t=0}^\infty |G_{ij}[t]|,
+\end{equation}
+Furthermore, \(\ell_1^{m\times n}\) defines the set of all \(m\times n\) matrix sequences \(G\) such that \(\|G\|_1 < \infty\). \(\hat{G}\) is said to be in \(\ell_1^{m\times n}\) if its impulse sequence \(G\) is in \(\ell_1^{m\times n}\).
+\end{defn}
+\begin{rem}
+Given any \(\hat{G}\in \mathcal{RH}_\infty^{m\times n}\), its impulse response \(G = \mathcal{Z}^{-1}(\hat{G}) \in \ell_1^{m\times n}\).
+\end{rem}
+\begin{rem}
+The $\ell_1$ norm of a linear operator $\hat{G}$ can be interpreted as the induced peak-to-peak norm:
+\begin{equation}
+    \|\hat{G}\|_{1} \;=\; \sup_{\|w\|_{\infty} \leq 1} \;\|\hat{G}w\|_{\infty}.
+\end{equation}
+\end{rem}
+% For any Banach space \(X\) and its non-empty closed convex subspace \(C\), we use \(\mathbb{P}_C x\) to denote the projection of \(x\in X\) onto \(C\).
+
+
+We also introduce the following truncation operators on the time domain responses for preparation.
+Let \(\ell^{m\times n}\) be the all sequences of \(m \times n\) matrices, \(x\in\ell^{m\times n}\).
+For any fixed integer \(N\in \mathbb{N}\), \(\mathcal{H}_N \coloneqq \{0,1,\hdots,N-1\}\), \(\mathbb{P}_N:\ell^{m\times n} \mapsto \mathbb{R}^{m\times n}\times \mathcal{H}_N\) denotes the \(N\)-horizon truncation operator:
+\[
+\mathbb{P}_N x = 
+\left[x[0],x[1],\hdots,x[N-1]\right].
+\]
+\(\mathbb{T}_N:\ell^{m\times n} \mapsto \ell^{m\times n}\) denotes the tail operator:
+\[
+\mathbb{T}_N x = 
+\left[x[N],x[N+1],\hdots\right].
+\]
+
+We let \(y\in \mathbb{R}^{m\times n} \times \mathcal{H}_N\) be an arbitrary \(N\) steps sequence. Define the following operator that pads an infinite zeros at the end and extends \(y\) into an infinite sequence, 
+
+\(\bar{\mathbb{P}}_N: \mathbb{R}^{m\times n} \times \mathcal{H}_N \mapsto \ell^{m\times n}\)
+\[
+\bar{\mathbb{P}}_N y = 
+\left[y[0],\hdots,y[N-1],\mathbf{0},\hdots\right].
+\]
+\(\bar{\mathbb{T}}_N:\ell^{m\times n} \mapsto \ell^{m\times n}\) denotes the operator adding \(N\) zeros at the beginning:
+\[
+\bar{\mathbb{T}}_N x = 
+\left[\mathbf{0},\hdots,\mathbf{0},x[0],x[1],\hdots\right].
+\]
+\begin{prop}
+We have some properties of these operators:
+\[
+\bar{\mathbb{P}}_N\mathbb{P}_N x +\bar{\mathbb{T}}_N\mathbb{T}_N x =x;\quad \mathbb{T}_N \bar{\mathbb{T}}_N x = x;\quad \bar{\mathbb{T}}_N (\mathcal{Z}^{-1} \hat{x}) = \mathcal{Z}^{-1}(\frac{1}{z^N} \hat{x}). 
+\]
+  
+\end{prop}
+
+% The dual of a Banach space \(\cal{X}\) is denoted by \(\mathcal{X}^*\). Given \(\mathcal{A}\) a bounded linear operator from \(\cal{X}\) to \(\mathcal{Y}\). \(\mathcal{A}^*\colon \mathcal{Y}^* \mapsto \mathcal{X}^*\) denotes its adjoint.
+
+\section{Graph-Theoretic Notation for Networked Systems}

@@ -31,14 +31,34 @@
 % thesis.
 
 % \end{itemize}
-\section{Introduction}
-With the advent of networks in modern days~\cite{ge2017OverviewNCS}, the system to be controlled usually comprises many subsystems spanning a vast physical expanse. Designing a controller composed of multiple communicating sub-controllers, known as a network-distributed controller, is a pertinent topic in control theory. 
+\section{Centralized control and network distributed control}
+In systems and control, centralized control has long served as a benchmark paradigm for regulating systems of varying complexity, owing to its optimality in performance and streamlined design procedures. However, its dependence on a single, powerful central controller introduces a vulnerability to single-point failures, which poses a fundamental risk to system resilience, especially for large-scale systems in which multiple subsystems spanning a vast spatial scale are coupled.
 
-Although the objectives of distributed control vary across different contexts, people have devoted substantial effort to establishing the fundamental theory of optimal distributed control for linear time-invariant (LTI) networked systems.
+To mitigate this vulnerability, decision-making is often decentralized across multiple agents. However, in the absence of proper coordination mechanisms, such decentralization can neglect coupling dynamics among subsystems, potentially leading to instability and, more generally, to significant degradation of global performance.
+
+The fundamental challenge lies in the limited information available to individual system components under decentralized architectures. When subsystems are coupled through dynamics or shared performance objectives, purely local information is generally insufficient to ensure stability or achieve satisfactory system-level performance. This motivates the introduction of information exchange to enable coordination without reverting to fully centralized control.
+
+With the advent and rapid development of communication technologies, modern networks enable fast and reliable information exchange among physically distributed subsystems~\cite{ge2017OverviewNCS}. This capability has stimulated extensive research on network-distributed controller design, in which information sharing is exploited to improve control performance in large-scale systems with localized decision-making. The paradigm of distributed control has been widely applied across disciplines, including collaborative multi-robot systems,  distributed computing, distributed transportation networks, distributed electrical power systems, smart grids, and remote surgery.
+
+\section{Challenges in network distributed control}
+
+While communication enhances system resilience and coordination capabilities, it also introduces significant challenges in controller design. Designers must explicitly account for communication constraints, such as limited bandwidth, transmission delays, quantization, and the associated computational burden. Moreover, during validation and implementation, additional analysis is required to assess robustness against adverse network effects, including packet dropouts, channel fading, and communication noise.
+
+
+% Such systems may consist of multiple subsystems that are coupled not only through their physical dynamics, but also through shared performance objectives or cost functions.
+
+\section{Linear-time-invariant(LTI) distributed networked systems}
+
+The objectives of distributed control and respective approaches vary across different application contexts.
+
+people have devoted substantial effort to establishing the fundamental theory of optimal distributed control for linear time-invariant (LTI) networked systems.
+
 The goal shifts to finding a stabilizing feedback controller that optimizes closed-loop performance within specific structures, reflecting the communication limitations imposed by the network topology. These structures usually include delays and sparsities in the controller's aggregate transfer function matrices.
 
 Searching for stabilizing controllers with an arbitrary structure is not a convex problem in general~\cite{Tsitsiklis1985NP_decentralized}. Optimal controllers for an LTI plant in some structures can even be non-linear~\cite{ Witsenhausen1968ACI}. While the Youla parametrization enables us to search over stabilizing controllers convexly through closed-loop (CL) maps \cite{YoulaPar} when there is no structure, the structural constraints on the controllers may be projected into nonconvex constraints on the Youla Parameter, as their convexity is not preserved under linear fractional transformation (LFT).
 
+
+\section{Optimal network distributed control}
 
 Following the Youla parameterization approach, Voulgaris is the first to notice the usefulness of constructing a doubly coprime factorization (DCF) consistent with the desired structure, which enables a direct search for the Youla parameter \(Q\) within the same structured set \cite{Voulgaris2001convexity}. Other works identify several particular structures where consistently structured DCFs are accessible and establish convex control synthesis methods for such structures~\cite{Voulgaris2000nested, XinQ2004Nested, Bamieh2005CvxSI}. Later,~\cite{SanjayLQIsufficient} introduces the notion of Quadratic Invariance (QI) to unify all the structures for which one can search for the controllers convexly~\cite{LessardQI}. As part of their contribution, they establish the theoretical foundation for parameterizing all in-structure stabilizing controllers using a stable, structured, and stabilizing initial controller. However, obtaining such an initial controller is generally nontrivial.
 
@@ -55,8 +75,17 @@ A class of recent methods, e.g., SLP~\cite{SLSparametrization, wang2019SLS}, IOP
 
 The Youla operator state-space (YOSS) framework provides an alternative, over-parameterizing representation for all stabilizing controllers with a predefined structure~\cite{naghnaeian2019youla}. This approach introduces the notion of a generalized Luenberger observer with internal dynamics designed for networked systems. The paper establishes a distributed analogue of the Separation Principle, showing that distributed state estimation can be carried out independently and then used together with “state-like” controllers to obtain the set of all output feedback stabilizing controllers with structure. A key advantage of this approach is that the estimator and state-like feedback controller satisfy relaxed infinite-dimensional "inequalities", which admit finite-dimensional feasible solutions.
 
+\section{Robustness of distributed control}
+
+In modern system control theory, robust control is central to both theory and practice. 
+Robust control analysis and synthesis problems have focused on the uncertainty in the system model, including unmodeled dynamics and real parametric uncertainty, which are unknown yet deterministic\cite{Zhou1996RobustControl, UncertainSS, QuadraticStab, LMIforH_infty,packard_mainloop}.
+
+Networked systems have drawn attention to stochastic systems and processes \cite{IntroStoc, MSstability, FreqMSS}. In particular, stochastic stability problems emerging from the interactions among (linear) time-invariant systems induced by communication links. 
+\cite{Meansquarenorm} has first proposed a robust control framework for MIMO LTI systems subject to IID random gains.  A random gain is represented by its mean value (corresponding to the nominal parameter value) and a zero-mean stochastic perturbation $\Delta$  of bounded variance. \cite{Meansquarenorm} derives a necessary and sufficient condition for Mean Square Stability (MSS), showing that MSS can be equivalently thought of as robust mean stability. The framework has been extended to various network control settings \cite{padmasola2006tradeoffs, Padma06ACC,Jeff11, Matt14, Matt14CDC, MattACC15, Matt2017thesis} which are relevant in this paper. In particular, \cite{Ma2015} is the first to show that MS performance is equivalent to an augmented MSS problem in the same vain of the analogous robust performance problems for deterministic uncertainty, and \cite{Matt2017thesis} show that the optimal MS performance synthesis is convex for a large class of systems. 
 
 
+
+However, these traditional robust stability analyses can't capture problems such as communication intermittency and multiplicative noise well, because these uncertainties are fundamentally stochastic processes in real time. Regarding these problems, the notion of Mean Square (MS) stability is more effective and therefore greatly enlarges the scope of robust stability\cite{IntroStoc}\cite{MSstability}\cite{FreqMSS}\cite{Meansquarenorm}. \cite{MSstability} and \cite{FreqMSS} found state space and frequency domain necessary and sufficient conditions for MS stability. Recently, some researchers have observed similarities between robust stability and stochastic stability and have designed MS stabilizing controllers for stochastic systems using robust control methods~\cite{RobustControl_Mulnoise}.  
 
 
 
@@ -83,131 +112,3 @@ Unlike recent approaches that over-parameterize stabilizing controllers, we take
 \end{enumerate}
 
 
-\section{Mathematical Notations}
-We focus on the discrete-time problems in this paper. Let \(\mathbb{D}\coloneqq \{z\in\mathbb{C}:|z|<1\}\), and \(\bar{\mathbb{D}}\) be its closure. 
-\(\mathcal{C}\) is the counter-clock-wise path on the unit circle.  
-\begin{defn}
-\cite{Zhou1996RobustControl} \(\mathcal{L}_2(\mathcal{C})\) space is the Hilbert space of matrix-valued function on \(\mathcal{C}\) and consists of all functions \(G\) with the following integral finite, i.e.
-\begin{equation*}
-    \frac{1}{2\pi}\int_0^{2\pi}\mathrm{trace}[G^\hermconj (e^{j\omega}) G(e^{j\omega})]d\omega < \infty, 
-\end{equation*}
-with an inner product \(\langle \cdot, \cdot \rangle\) defined as:
-\begin{equation*}
-    \langle F, G \rangle \coloneqq \frac{1}{2\pi}\int_0^{2\pi}\mathrm{trace}[F^\hermconj (e^{j\omega}) G(e^{j\omega})]d\omega.
-\end{equation*}
-As usual, define the Hardy space \(\mathcal{H}_2\) as the subspace of \(\mathcal{L}_2(\mathcal{C})\) that are analytic on \(\mathbb{C} \backslash \bar{\mathbb{D}}\). Define the corresponding \(\|\cdot\|_{\mathcal{H}_2}\) as:
-\begin{equation}\label{eqn::H2defn}
-    \|G\|_{\mathcal{H}_2} \coloneqq \sqrt{\sup_{r>1}\frac{1}{2\pi}\int_0^{2\pi}\mathrm{trace}[G^\hermconj(r e^{j\omega})G(r e^{j\omega})]d\omega}
-    = \sqrt{\frac{1}{2\pi}\int_0^{2\pi}\mathrm{trace}[G^\hermconj(e^{j\omega})G(e^{j\omega})]d\omega}.
-\end{equation}
-The second equality holds from the Maximum Modulus Theorem \cite{ZhouRobustControl}. We use \(\mathcal{RH}_2\) to denote the real (coefficient) rational subspace of \(\mathcal{H}_2\), which contains all rational proper stable transfer functions.
-\end{defn}
-% In analogy, we can define \(\mathcal{L}_\infty(\mathcal{C})\), \(\mathcal{H}_\infty\) and \(\mathcal{RH}_\infty\).
-\begin{defn}
-\(\mathcal{L}_\infty(\mathcal{C})\) space is the Banach space of matrix-valued functions that are essentially bounded on \(\mathcal{C}\), with a norm defined as \(
-\|G\|_{\infty} \doteq \mathrm{ess} \sup_{\omega \in[0,2\pi)} \bar{\sigma}(G(e^{j\omega}))\).
-\(\mathcal{H}_\infty\) is the subspace of \(\mathcal{L}_\infty(\mathcal{C})\) that are analytic on \(\mathbb{C} \backslash \bar{\mathbb{D}}\). \(\mathcal{RH}_\infty\) is the real rational subspace of \(\mathcal{H}_\infty\).
-\end{defn}
-
-\(\mathcal{RH}_\infty = \mathcal{RH}_2\) for discrete time. We let \(\mathcal{R}_p\) represent the set of all rational proper transfer functions in the \(z\)-domain. Superscripts are used to specify the dimensions of transfer function matrices when they enhance clarity and readability.
-
-We denote vertical stacking by \(\ver[x_i]_{i\in\mathcal{I}}\) and block-diagonal concatenation by \(\diag[x_i]_{i\in\mathcal{I}}\), where \(\mathcal{I}\) is the index set. The subscript \(i\in\mathcal{I}\) is omitted when no ambiguity arises. 
-We use \(\succeq\) to denote the element-wise compare between matrices and vectors, \(A \succeq B\) iff \(a_{ij} \geq b_{ij},\;\forall (i,j)\).
-We use \(\mathcal{F}_l/\mathcal{F}_u\) to denote the lower/upper linear fractional transformation between two systems. The feedback interconnection between two systems with compatible dimensions is a special form of \(\mathcal{F}_l\):
-\[
-H = \mathrm{feedback}(H^1,H^2) \coloneqq \mathcal{F}_l(\begin{bmatrix}
-    I \\
-    I
-\end{bmatrix} H^1 
-\begin{bmatrix}
-    I & I
-\end{bmatrix}, H^2).
-\]
-
-In this paper, we focus on discrete-time problems. Let \(\mathbb{D}\coloneqq \{z\in\mathbb{C}:|z|<1\}\), and \(\bar{\mathbb{D}}\) be its closure. 
-\(\mathcal{C}\) is the counter-clock-wise path on the unit circle. In the time domain, the impulse responses of discrete-time systems produce a matrix sequence defined on \(\mathbb{N} = \{0,1,2,\hdots\}\).
-
-Given a complex-valued \(m\times n\) matrix \(A\), \(A^\hermconj\) denotes its hermitian conjugate.
-\(\ell_2^{m\times n}[\mathbb{Z}]\) denotes the Hilbert space of sequences of \(m\times n\) complex-valued matrices, with inner product defined as
-\[
-\langle H,G\rangle = \sum_{k=-\infty}^{\infty} \mathrm{trace}(G^\hermconj[k]H[k]).
-\]
-The \(\ell_2^{m\times n}[\mathbb{Z}]\) space can be decomposed as the direct sum of two spaces of sequences \(\ell_2^{m\times n}[\mathbb{N}] \oplus \ell_2^{m\times n}[\mathbb{Z}^-]\).
-The unilateral z-transform of \(G\in \ell_2^{m\times n}[\mathbb{N}]\) is
-\[
-\hat{G}(z) = \sum_{k=0}^\infty G[k] z^{-k}.
-\]
-Since we will mostly focus on the positive axis unilateral matrix sequences, we abbreviate \(\ell_2^{m\times n}[\mathbb{N}]\) as \(\ell_2^{m\times n}\). 
-Given any transfer function matrix (TFM) \(\hat{G}:\mathbb{C}\mapsto \mathbb{C}^{m\times n}\), the inverse Z-transform is
-\[
-\mathcal{Z}^{-1}:G[n] = \frac{1}{2\pi j} \oint_\mathcal{C} \hat{G}(z)z^{n-1} dz, 
-\]
-We define \(\mathcal{H}_2^{m\times n}\) as the set of all these matrix-value functions that are analytic on \(\mathbb{C}\backslash\mathbb{D}\). \(\mathbb{D}=\{z:|z|<1\}\). 
-For any \(\hat{G}\in\mathcal{H}_2^{m\times n}\), its inverse Z-transform gives a sequence \(\{G\}\in\ell_2^{m\times n}\).
-We may drop out the superscripts later when no ambiguity arises. 
-
-
-We use \(\mathcal{R}_p\) to denote the set of all rational proper transfer functions in the \(z\)-domain and \(\mathcal{RH}_\infty\) to denote the set of all rational proper stable transfer functions. \(\mathcal{RH}_\infty = \mathcal{RH}_2\) in the discrete-time context, since both are equivalent to having a finite number of poles and all in \(\mathbb{D}\). 
-% {\color{red}Throughout this paper, \(\hat{G}\) denotes a transfer function, while the regular capital letter \(G = \mathcal{Z}^{-1}(\hat{G})\) denotes its associated impulse response sequence.}
-Throughout this paper, regular capital letters denote matrices, transfer function matrices, or their impulse response sequences when unambiguous; when clarification is needed, a hat \(\hat{\cdot}\) is used to distinguish a transfer function (matrix) from its impulse response sequence.
-% {\color{red}Generating IIR from state-space models.}
-
-\begin{defn}
-Given an LTI MIMO (\(m\times n\)) transfer function \(\hat{G}\), its \(\ell_1\) norm is defined as
-\begin{equation}
-    \|\hat{G}\|_1 \triangleq \|G\|_1 =  \underset{1\leq i\leq m}{\max} \sum_{j=1}^n \sum_{t=0}^\infty |G_{ij}[t]|,
-\end{equation}
-Furthermore, \(\ell_1^{m\times n}\) defines the set of all \(m\times n\) matrix sequences \(G\) such that \(\|G\|_1 < \infty\). \(\hat{G}\) is said to be in \(\ell_1^{m\times n}\) if its impulse sequence \(G\) is in \(\ell_1^{m\times n}\).
-\end{defn}
-\begin{rem}
-Given any \(\hat{G}\in \mathcal{RH}_\infty^{m\times n} (= \mathcal{RH}_2^{m\times n})\), its impulse response \(G = \mathcal{Z}^{-1}(\hat{G}) \in \ell_1^{m\times n}\).
-\end{rem}
-\begin{rem}
-The $\ell_1$ norm of a linear operator $\hat{G}$ can be interpreted as the induced peak-to-peak norm:
-\begin{equation}
-    \|\hat{G}\|_{1} \;=\; \sup_{\|w\|_{\infty} \leq 1} \;\|\hat{G}w\|_{\infty}.
-\end{equation}
-\end{rem}
-% For any Banach space \(X\) and its non-empty closed convex subspace \(C\), we use \(\mathbb{P}_C x\) to denote the projection of \(x\in X\) onto \(C\).
-Given a weight matrix \(W \in \mathbb{S}^{n} \succ 0\), for a vector \(z \in \mathbb{R}^n\) we define
-\(\|z\|_W^2 \coloneqq z^\top W z\). More generally, for a sequence \(z \in \ell_2^{n}\), the weighted \(\ell_2\) norm is defined as
-\[
-\|z\|_W^2 \coloneqq \sum_{i=0}^{\infty} z[i]^\top W z[i].
-\]
-
-
-Since \(\ell_1\) problems are more relevant to the time domain responses, we introduce the following truncation operators for preparation. Let \(\ell^{m\times n}\) be the all sequences of \(m \times n\) matrices, \(x\in\ell^{m\times n}\).
-For any fixed integer \(N\in \mathbb{N}\), \(\mathcal{F}_N \coloneqq \{0,1,\hdots,N-1\}\), \(\mathbb{P}_N:\ell^{m\times n} \mapsto \mathbb{R}^{m\times n}\times \mathcal{F}_N\) denotes the \(N\) level truncation operator:
-\[
-\mathbb{P}_N x = 
-\left[x[0],x[1],\hdots,x[N-1]\right].
-\]
-\(\mathbb{T}_N:\ell^{m\times n} \mapsto \ell^{m\times n}\) denotes the tail operator:
-\[
-\mathbb{T}_N x = 
-\left[x[N],x[N+1],\hdots\right].
-\]
-
-We let \(y\in \mathbb{R}^{m\times n} \times \mathcal{F}_N\) be an arbitrary \(N\) steps sequence. Define the following operator that pads an infinite zeros at the end and extends \(y\) into an infinite sequence, 
-
-\(\bar{\mathbb{P}}_N: \mathbb{R}^{m\times n} \times \mathcal{F}_N \mapsto \ell^{m\times n}\)
-\[
-\bar{\mathbb{P}}_N y = 
-\left[y[0],\hdots,y[N-1],\mathbf{0},\hdots\right].
-\]
-\(\bar{\mathbb{T}}_N:\ell^{m\times n} \mapsto \ell^{m\times n}\) denotes the operator adding \(N\) zeros at the beginning:
-\[
-\bar{\mathbb{T}}_N x = 
-\left[\mathbf{0},\hdots,\mathbf{0},x[0],x[1],\hdots\right].
-\]
-\begin{prop}
-We have some properties of these operators:
-\[
-\bar{\mathbb{P}}_N\mathbb{P}_N x +\bar{\mathbb{T}}_N\mathbb{T}_N x =x;\quad \mathbb{T}_N \bar{\mathbb{T}}_N x = x;\ 
-\]
-\[
-\bar{\mathbb{T}}_N (\mathcal{Z}^{-1} \hat{x}) = \mathcal{Z}^{-1}(\frac{1}{z^N} \hat{x}).
-\]    
-\end{prop}
-
-The dual of a Banach space \(\cal{X}\) is denoted by \(\mathcal{X}^*\). Given \(\mathcal{A}\) a bounded linear operator from \(\cal{X}\) to \(\mathcal{Y}\). \(\mathcal{A}^*\colon \mathcal{Y}^* \mapsto \mathcal{X}^*\) denotes its adjoint.

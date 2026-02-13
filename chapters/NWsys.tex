@@ -1,17 +1,17 @@
 \chapter{Networked Systems}
 \label{chap:networksys}
-\section{Networked Systems}\label{sec:nwsys}
 
 
 
-We will define the networked system in this section. The definition applies to both the networked plant and the networked controller. 
+
+We will define the networked dynamical system in this section. The definition applies to both the networked plant and the networked controller. 
 % We may later use subscripts \(p\) or \(c\) to respectively indicate the plant or the controller.
 
 
 
 % We will introduce the networked system and the distributed control problem. After that, we synthesize the task into a centralized optimal control problem that fits within the generalized plant framework with an extra constraint that heuristically handles the network structure.
 
-\subsection{Systems interacting over a directed graph}
+\section{Systems interacting over a directed graph}
 
 
 
@@ -30,7 +30,7 @@ A networked system consists of multiple dynamical subsystems interacting over a 
 0 & \text{Otherwise}.
 \end{cases}.
 \]
-\(\mathcal{W} = [w_{ij}] \in \mathbb{Z}_{\ge 0}^{n\times n} \) assigns nonnegative integer weights representing communication delays on edges. 
+\(\mathcal{W} = [w_{ij}] \in \mathbb{N}^{n\times n} \) assigns nonnegative integer weights representing communication delays on edges. 
 
 There is a dynamical subsystem $H_i$ at each vertex \(i \in \mathcal{V}\), 
 \begin{equation}\label{eqn::subsysmaps}
@@ -115,7 +115,7 @@ Given a directed graph \(\mathcal{G}\), non-negative integer-valued \(n\)-tuples
 % \end{lemma}
 
 
-\subsection{State-space representation of networked systems}
+\section{State-space representation of networked systems}
 For simplicity of exposition, herein we make the following assumption without loss of generality, and without affecting the effectiveness of our method:
 \begin{assumption}
 \(w_{ij} = 1,\ \forall a_{ji} = 1.
@@ -220,18 +220,13 @@ Let \(x = \ver[\bar{x}_i],\ \mu = \ver[\mu_i],\ \nu = \ver[\nu_i]\).
 The aggregate state-space representation of the networked system is:
 \begin{equation*}
 \begin{split}
-    & x[t + 1] = A x[t] + B_\mu \mu[t] \\
-    &= (\diag[A^i] + \diag[B_\zeta^i] \cdot \bar{N}_{\cal G} \cdot \diag[C_\eta^i]) x[t] + \diag[B_\mu^i] \mu[t];
+    & x[t + 1] = A x[t] + B_\mu \mu[t] = (\diag[A^i] + \diag[B_\zeta^i] \cdot \bar{N}_{\cal G} \cdot \diag[C_\eta^i]) x[t] + \diag[B_\mu^i] \mu[t]; \\
+    &\nu[t]  = C_\nu x[t] + D_{\nu\mu} \mu[t] = (\diag[C_\nu^i] + \diag[D_{\nu\zeta}^i] \cdot \bar{N}_{\cal G} \cdot \diag[C_\eta^i]) x[t] + \diag[D_{\nu\mu}^i] \mu[t].
 \end{split}
 \end{equation*}
-\begin{equation*}
-\begin{split}
-    & \nu[t]  = C_\nu x[t] + D_{\nu\mu} \mu[t] \\
-    & = (\diag[C_\nu^i] + \diag[D_{\nu\zeta}^i] \cdot \bar{N}_{\cal G} \cdot \diag[C_\eta^i]) x[t] + \diag[D_{\nu\mu}^i] \mu[t].
-\end{split}
-\end{equation*}
-% Define the aggregate state-space matrices for the networked system: \(= \diag[A^i] + \diag[B_\zeta^i] \cdot \bar{N}_{\cal G} \cdot \diag[C_\eta^i]\), \(B_u = \diag[B_u^i]\), \(C_y = \diag[C_y^i] + \diag[D_{y\zeta}^i] \cdot \bar{N}_{\cal G} \cdot \diag[C_\eta^i]\), and \(D_{yu} = \diag[D_{yu}^i]\).
 \(A\) and \(C_\nu\) exhibit block sparsity that follows the structure of \(\mathcal{A}\), i.e. \(A_{ij}\) and \(C_\nu^{ij}\) are nonzero blocks if \(a_{ij} = 1\). \(B_\mu\) and \(D_{\nu\mu}\) are block diagonal matrices.
+% Define the aggregate state-space matrices for the networked system: \(= \diag[A^i] + \diag[B_\zeta^i] \cdot \bar{N}_{\cal G} \cdot \diag[C_\eta^i]\), \(B_u = \diag[B_u^i]\), \(C_y = \diag[C_y^i] + \diag[D_{y\zeta}^i] \cdot \bar{N}_{\cal G} \cdot \diag[C_\eta^i]\), and \(D_{yu} = \diag[D_{yu}^i]\).
+
 We define block-sparse matrices to compactly represent these matrix sparsity structures.
 \begin{defn}\label{defn::strmat}
 Given an \(n\times n\) binary matrix \(J\) and n-tuples \(\mathcal{P}_o\) and  \(\mathcal{P}_i\), \(S(J,\mathcal{P}_o,\mathcal{P}_i)\) 
@@ -302,7 +297,7 @@ C_y=\begin{bmatrix}
 
 
 
-\subsection{Interconnection between networked systems}
+\section{Interconnection between networked systems}
 Interconnection between networked systems is an important concept to be understood for designing networked controllers. 
 
 \begin{lemma}[Networked systems interconnection]\label{lm:nwsint}
@@ -385,7 +380,7 @@ As a result, the closed-loop system is a networked system on \(\mathcal{G} =(\ma
 % \end{equation}
 
 
-\subsection{Structures of Transfer Functions of Networked Systems}
+\section{Structures of Transfer Functions of Networked Systems}
 The transfer function matrix (TFM) of network systems in \(\mathfrak{S}(\mathcal{G}, \mathcal{P}_o, \mathcal{P}_i)\) manifests some structures introduced by the network topology. There are mainly two types of structures in the TFMs. The block sparsity reflects the lack of paths between vertices. The block-wise strictly properness reflects communication delays between sub-systems.
 
 When interconnected within a network, one subsystem can influence another directly through an immediate edge or indirectly via transitive pathways.
@@ -409,7 +404,7 @@ l_{j \rightarrow i}
 
 \begin{defn}[Graph structured TFMs] 
 \label{def:weak_strcuture}~\cite{naghnaeian2019youla}
-Let $\mathcal{G}=\left( {\mathcal V}, \mathcal{A}\right) $ be a directed graph and let \(\bar{\mathcal G}\mathcal{=}\left({\mathcal V}, {\bar{\mathcal A}}, {\bar{\mathcal W}}\right)\) be its transitive closure. Let $\mathcal{P}_r= \left( r_{1}, r_{2}, ..., r_{n}\right) \in \mathbb{Z}^{n}$ and $\mathcal{P}_c = \left( c_{1}, c_{2}, ..., c_{n}\right) \in \mathbb{Z}^{n}$ be two non-negative integer valued \(n\)-tuples. Then, the set of rational TFMs conforming to the graph \(\mathcal{G}\) structure is defined by
+Let $\mathcal{G}=\left( {\mathcal V}, \mathcal{A}\right) $ be a directed graph and let \(\bar{\mathcal G}\mathcal{=}\left({\mathcal V}, {\bar{\mathcal A}}, {\bar{\mathcal W}}\right)\) be its transitive closure. Let $\mathcal{P}_r= \left( r_{1}, r_{2}, ..., r_{n}\right) \in \mathbb{N}^{n}$ and $\mathcal{P}_c = \left( c_{1}, c_{2}, ..., c_{n}\right) \in \mathbb{N}^{n}$ be two non-negative integer valued \(n\)-tuples. Then, the set of rational TFMs conforming to the graph \(\mathcal{G}\) structure is defined by
 \begin{equation*}\small
 \mathfrak{T}(\mathcal{G},\mathcal{P}_r,\mathcal{P}_c)
  = \left\{H \left\vert H = 
@@ -498,7 +493,7 @@ Furthermore, $ T_1 T_2 \in \mathfrak{T}\left( \mathcal{G}, \mathcal{P}_{r_1}, \m
 \end{cor}
 Corollary \ref{cor:cls} presents a central property of the TFMs conforming to a network graph. Essentially, it means that the sum and product of TFMs of networked systems on the same graph with compatible partitions are still TFMs of a networked system on that graph. Corollary \ref{cor:cls} can be understood as the TFM interpretation of Lemma \ref{lm:nwsint}.
 
-\subsection{Comparison of different synthesis methods} \label{subsec::MethodsCompare}
+\section{Comparison of different synthesis methods} \label{subsec::MethodsCompare}
 
 
 Here, we outline how existing methods can address the proposed Problem \ref{Prob::networkoptcontrol}.
@@ -553,11 +548,11 @@ The set of \(\bf{R},\bf{M},\bf{N},\bf{L}\) satisfying System Level constraints (
 \begin{figure}[h]
     \centering
     \includegraphics[scale=0.7]{figures/LiteratureFigure/SLSblkdiagram.png}
-    \caption{The picture comes from \cite{SLSparametrization}, showing the output feedback controller structure in System Level synthesis. \(\tilde{R}^+= z(I-zR), \tilde{M}=zM, \tilde{N}= -zN\)}
+    \caption[SLS Implementation Diagram]{The picture is adapted from~\cite{SLSparametrization}, showing the output feedback controller structure in System Level synthesis. \(\tilde{R}^+= z(I-zR), \tilde{M}=zM, \tilde{N}= -zN\)}
     \label{fig:SLSstructure}
 \end{figure}
 
-The affine constraints (\ref{eqn::SLCstruct},\ref{eqn::SLCleft},\ref{eqn::SLCright}) are cumbersome in infinite horizon time response. One approach is to approximately solve the sub-optimal controller parameterized by \(\bf{R},\bf{M},\bf{N},\bf{L}\) in an FIR subspace. Accuracy is improved by increasing the truncation level. However, this approximation method lacks a guarantee of convergence speed, and as a consequence, it leads to controller order inflation. Besides, as pointed out in \cite{naghnaeian2019youla}, forcing the CL system responses to be FIR could require huge control input and harm robustness.
+The affine constraints (\ref{eqn::SLCstruct},\ref{eqn::SLCleft},\ref{eqn::SLCright}) are cumbersome in infinite horizon time response. One approach is to approximately solve the sub-optimal controller parameterized by \(\bf{R},\bf{M},\bf{N},\bf{L}\) in an FIR subspace. Accuracy improves with increasing the truncation level. However, this approximation method lacks a guarantee of a convergence rate and consequently leads to controller order inflation. Besides, as pointed out in~\cite{naghnaeian2019youla}, forcing the CL system responses to be FIR could require huge control input and harm robustness.
 \subsubsection{Input-Output Synthesis}
 \begin{equation}
     \underset{\bf{X},\bf{Y},\bf{W},\bf{Z}\in \mathcal{RH}_\infty}{\mathrm{minimize}} 
@@ -603,7 +598,7 @@ For the \(\mathcal{H}_2\)-norm minimization, their solution is approximated by F
 \begin{figure}[h]
     \centering
     \includegraphics[scale=0.6]{figures/LiteratureFigure/YOSSarchitecture.png}
-    \caption{The implementation of Observer-based controller\cite{naghnaeian2019youla}. The generalized observer is found to estimate the states. The estimated states \(\hat{x}\) and output \(y\) are fed into the state-like controller to make control decisions.
+    \caption[YOSS Implementation Diagram]{The implementation of Observer-based controller\cite{naghnaeian2019youla}. The generalized observer is found to estimate the states. The estimated states \(\hat{x}\) and output \(y\) are fed into the state-like controller to make control decisions.
     \(
     u = K_1\hat{x} +K_2 y
     \)}
@@ -705,7 +700,7 @@ subject to
 \begin{figure}[h]
     \centering
     \includegraphics[scale=0.7]{figures/LiteratureFigure/GulnihalDiagram.png}
-    \caption{An equivalent block diagram of feedback interconnection of a plant and its internally stabilizing controller. Only \(\bar{P}_{22}\) is shown here, which doesn't affect the essence of the methodology. The picture comes from \cite{ThesisGulnihal}}
+    \caption[Augmented System Youla Diagram]{An equivalent block diagram of the feedback interconnection of a plant and its internally stabilizing controller. Only \(\bar{P}_{22}\) is shown here, which doesn't affect the essence of the methodology. The picture comes from \cite{Gulnihal2018thesis}}
     \label{fig:Gulnihalarchitecture}
 \end{figure}
 Given \(\bar{Q}\), the controller can be retrieved by
@@ -814,7 +809,7 @@ K =  (Y_r - M_r Q) (X_r -N_r Q)^{-1},\ Z=(Y_r -M_r Q)M_l \in \mathcal{S}
 \end{equation}
 \end{thm}
 \begin{rem}
-If the Youla Parameterization is initialized with the \(\mathcal{H}_2\) controller, obtained through the process in Appendix \ref{appsec::optimalH2}, Problem \ref{Prob::H2minafterpara} can be further simplified as:
+If the Youla Parameterization is initialized with the \(\mathcal{H}_2\) controller, obtained through the process in Appendix~\ref{appsec::optH2}, Problem~\ref{Prob::H2minafterpara} can be further simplified as:
 \begin{opt}\label{Prob::H2min_infHorQuad}
 \begin{equation}
     \underset{Q\in \mathcal{RH}_\infty}{\mathrm{minimize}} \|\Gamma_b^{\frac{1}{2}}Q \Gamma_c^{\frac{1}{2}}\|_2 

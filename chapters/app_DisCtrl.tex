@@ -2,7 +2,7 @@
 
 \section{Spectral Factorization and Optimal \(\mathcal{H}_2\) control}\label{appsec::optH2}
 \subsection{State-space representation of the model-matching TFMs}
-\begin{equation*}\small
+\begin{equation*}
     G_{11} = \left[\begin{array}{cc|c}
     A_F & -B_u F & B_w\\
    \mathbf{0}_{n_x,n_x} & A_L & B_w + L D_{yw}\\
@@ -10,7 +10,7 @@
     C_z + D_{zu}F & -D_{zu}F & D_{zw}
 \end{array}\right];
 \end{equation*}
-\begin{equation*}\small
+\begin{equation*}
 G_{12} = \left[
     \begin{array}{c|c}
         A_F & B_u \\
@@ -36,13 +36,13 @@ X_c = &\mathrm{DARE}(A_c^\top,C_y^\top, B_w {D_{yw}^\perp}^\top {D_{yw}^\perp} B
 \end{split}
 \end{equation}
 Define:
-\begin{equation} \label{eqn::centralizedH2contParas}\small
+\begin{equation} \label{eqn::centralizedH2contParas}
 \begin{split}
     \Gamma_b &=I +B_u^\top X_b B_u,\ F = -{\Gamma_b}^{-1}(B_u^\top X_b A + D_{zu}^\top C_{z});\\
     \Gamma_c & = I +C_y X_c C_y^\top,\ L = -(A^\top X_c C_y + B_w D_{yw}^\top) {\Gamma_c}^{-1}.\\
 \end{split}
 \end{equation}
-\begin{equation}\label{eqn:YP_R0}\small
+\begin{equation}\label{eqn:YP_R0}
 \begin{split}
     R_0 = &\Gamma_b^{-1}(B_u^\top X_b A X_c C_y^\top + D_{zu}^\top C_z X_c C_y^\top \\
     &+ B_u^\top X_2 B_w D_{yw}^\top +D_{zu}^\top D_{zw} D_{yw}^\top) \Gamma_c^{-1}.
@@ -70,12 +70,12 @@ Denote \(\bar{Q} = Q - R_0\). Rewrite the \(\mathcal{H}_2\) norm into the inner 
 from \((G_{12}^{\sim} G_{11}^0 G_{21}^{\sim}) \in \mathcal{RH}_2^\perp\) and \(\bar{Q}\in \mathcal{RH}_2\). Using the properties \(
 G_{12}^{\sim} G_{12} =\Gamma_b, \ G_{21} G_{21}^{\sim} =\Gamma_c\),
 the quadratic term:
-\begin{equation*}\small
+\begin{equation*}
     \langle G_{12} \bar{Q} G_{21}, G_{12} \bar{Q} G_{21}\rangle = \langle G_{12}^{\sim} G_{12}\bar{Q}G_{21} G_{21}^{\sim},\bar{Q}\rangle 
     = \|\Gamma_b^{\frac{1}{2}}\bar{Q} \Gamma_c^{\frac{1}{2}}\|_{\mathcal{H}_2}^2.
 \end{equation*}
 Putting together all the terms, we show that: 
-\[\small
+\[
 \|G_{11} - G_{12} Q G_{21}\|_{\mathcal{H}_2}^2= \|G_{11}^0\|_{\mathcal{H}_2}^2 + \|\Gamma_b^{\frac{1}{2}}(Q-R_0) \Gamma_c^{\frac{1}{2}}\|_{\mathcal{H}_2}^2.
 \]
 \end{proof}
@@ -140,7 +140,7 @@ Since \(A_v +B_v C_v\) is Schur, \((A_v, C_v)\) is detectable. The detectability
 \begin{proof}
 \(T_r\) is \(A_v\) left-invariant by construction. Therefore, \(T_l^\perp A T_r =\mathbf{0}\). 
 Since \(T_r\) is the orthonormal basis of the reachable subspace of \((A_v,[B_v E_m,b_0])\), \(B_v E_i\) and \(b_0\) are covered by \(T_r\) and thus orthogonal to \(T_l^\perp\). Therefore, \(T_l^\perp B_v E_i =\mathbf{0}\), \(T_l^\perp b_0=\mathbf{0}\).
-\begin{equation*}\small
+\begin{equation*}
 \begin{split}
 &\left[
 \begin{array}{c}
@@ -186,14 +186,14 @@ Since \(T_r\) is the orthonormal basis of the reachable subspace of \((A_v,[B_v 
 \end{split}
 \end{equation*}
 In this state iteration, we can show that \(T_l^\perp \eta[i] = \mathbf{0}\) by induction from \(\eta[0] = \mathbf{0}\). Let \(\xi[i] = T_l \eta[i]\), we have that \(\xi[0] =\mathbf{0}\) and
-\begin{equation*}\small
+\begin{equation*}
 \begin{split}
 \xi[i+1] & = A_r \xi[i] + T_l A_v T_r^\perp T_l^\perp \eta[i] + B_r^i u[i] + b_r\delta \\
 & = A_r \xi[i] + B_r^i u[i] + b_r\delta
 \end{split}
 \end{equation*}
 The output at each step is
-\begin{equation*}\small
+\begin{equation*}
 \begin{split}
 y[i] &= C_v \eta[i] + D_v E_i u[i] = C_v \left[
 \begin{array}{cc}
@@ -288,7 +288,7 @@ Therefore, every Jordan block of \(A_v\) has size at most \(2\).
 
 % % This implies that the nilpotent index of any eigenvalue \(\lambda\) of \(A_v\) is at most 2.
 % We partition \(z^T =[z_{1}^\top,z_{2}^\top]\) and denote the matrices they are vectorized from as \(z_1 = \vc(Z_1)\), \(z_2 = \vc(Z_2)\). 
-% \begin{equation}\label{eqn::prflm::Avindex2}\small
+% \begin{equation}\label{eqn::prflm::Avindex2}
 %     \left[
 % \begin{array}{cc}
 %     z_1^T & z_2^T \\
@@ -300,7 +300,7 @@ Therefore, every Jordan block of \(A_v\) has size at most \(2\).
 % \end{array}\right] = \mathbf{0}
 % \end{equation}
 % where we define:
-% \[\small
+% \[
 % \begin{split}
 % \Omega_n & \doteq \sum\limits_{j = 0}^{n-1}\left((\lambda I -A^\top)^{n-1-j} \otimes I_{n_u}) (C_y^\top \otimes F)(I_{n_y}\otimes (\lambda I -A)^j\right) \\
 % &= \sum\limits_{j = 0}^{n-1}\left((\lambda I -A^\top)^{n-1-j} C_y^\top \otimes F (\lambda I -A)^j\right).
@@ -379,7 +379,7 @@ w^\top
 Let \(w_\lambda^\top= \left[\begin{array}{cc}
     w_1^\top & w_2^\top\\
 \end{array}\right]\), \(w_1\in\mathbb{C}^{n_y n_x}\), \(w_2\in\mathbb{C}^{n_u n_x}\).
-\begin{equation}\label{eqn:proofcor1}\small
+\begin{equation}\label{eqn:proofcor1}
 \left[
 \begin{array}{cc}
     w_1^\top & w_2^\top \\
@@ -438,7 +438,7 @@ This suggests that every ordinary eigenvector \(w^\top\) is orthogonal to \(b_0\
 
 Let \(z^\top\) be a generalized eigenvector of \(A_v\). From \(A\) being diagonalizable and Lemma \ref{lm::Avindex2}, \(w^\top = z^\top(\lambda I- A_v)\) is an ordinary eigenvector.
 We partition \(z^\top =[z_{1}^\top,z_{2}^\top]\), \(w^\top =[w_{1}^\top,w_{2}^\top]\), and find the matrices they are vectorized from: \(z_1 = \vc(Z_1), z_2 = \vc(Z_2), w_{1} =  \vc(W_1), w_2 = \vc(W_2)\).
-\begin{equation*}\small
+\begin{equation*}
     \left[
 \begin{array}{cc}
     z_1^T & z_2^T \\
@@ -449,7 +449,7 @@ We partition \(z^\top =[z_{1}^\top,z_{2}^\top]\), \(w^\top =[w_{1}^\top,w_{2}^\t
   \Omega_2 & (\lambda I -A^\top)^2\otimes I_{n_u}\\
 \end{array}\right] = \mathbf{0}
 \end{equation*}
-\begin{equation*}\small
+\begin{equation*}
 \left[
 \begin{array}{cc}
     w_1^T & w_2^T \\
@@ -577,7 +577,7 @@ by the arbitrary selection of \(\sigma\).
 
 \section{Networked system state-space model construction}\label{appsec:nwss}
 Assume the state-space models of the subsystems in the plant are:
-\begin{equation*}\small
+\begin{equation*}
 \begin{cases}
     x_i^+ = 0.8 x_i + u_i \\
     y_i = x_i ,\quad i \in \{1,3\};\\
@@ -589,7 +589,7 @@ Assume the state-space models of the subsystems in the plant are:
     \zeta_{i1} = \frac{1}{z} \eta_{i1};\quad \zeta_{i3} = \frac{1}{z} \eta_{i3}
 \end{cases}
 \end{equation*}
-% \begin{equation*}\small
+% \begin{equation*}
 % \begin{cases}
 %     x_3^+ &= 0.8 x_3 + w_{31} + u_3 \\
 %     y_3 &= x_3 + w_{32} \\
@@ -597,7 +597,7 @@ Assume the state-space models of the subsystems in the plant are:
 % \end{cases};
 % \end{equation*}
 
-% \begin{equation*}\small
+% \begin{equation*}
 % \begin{cases}
 %     x_4^+ &= 0.8 x_4 + w_{41} + u_4 + \zeta_{41} + \zeta_{43}\\
 %     y_4 &= x_4 + w_{42} + 0.3 \zeta_{41} + 0.3 \zeta_{43}\\
@@ -605,7 +605,7 @@ Assume the state-space models of the subsystems in the plant are:
 % \end{cases}.
 % \end{equation*}
 By absorbing the delays into subsystems \(1\) and \(3\), we obtain their augmented state-space models with state \(\bar{x}_i\) and the \(\bar{\eta}\) signals. The states of \(1\) and \(3\) also influence the dynamics of \(2\) and \(4\). 
-\begin{equation*}\small
+\begin{equation*}
 \begin{cases}
     \bar{x}_i^+ &= \begin{bmatrix} 0.8 & 0 \\ 1.3 & 0 \end{bmatrix} \bar{x}_i 
     + \begin{bmatrix} 1 \\ 0.1 \end{bmatrix}u_i \\
@@ -613,7 +613,7 @@ By absorbing the delays into subsystems \(1\) and \(3\), we obtain their augment
     \bar{\eta}_{2i} & = \bar{\eta}_{4i} = \begin{bmatrix} 0 & 1 \end{bmatrix} \bar{x}_i 
 \end{cases},\quad i \in \{1,3\};
 \end{equation*}
-\begin{equation*}\small
+\begin{equation*}
 \begin{cases}
     x_i^+ &= 0.8 x_i + u_i + \zeta_{i1} + \zeta_{i3}\\
     & = 0.8 x_i + u_i + \begin{bmatrix} 0 & 1 \end{bmatrix} \bar{x}_1 + \begin{bmatrix} 0 & 1 \end{bmatrix} \bar{x}_3 \\
@@ -626,7 +626,7 @@ Network Inputs: \(\zeta_1 = \left[\empty\right],\ \zeta_2 = \begin{bmatrix} \zet
 Network Outputs: \(\bar{\eta}_1 = \begin{bmatrix} \bar{\eta}_{21} \\ \bar{\eta}_{41}
 \end{bmatrix},\ \bar{\eta}_2 = \left[\empty\right],\ \bar{\eta}_3 = \begin{bmatrix} \bar{\eta}_{23} \\ \bar{\eta}_{43} \end{bmatrix}, \ \bar{\eta}_4 = \left[\empty\right]\).
 
-\[\small
+\[
 \begin{bmatrix}
     \zeta_{1} \\ \zeta_{2} \\ \zeta_{3} \\ \zeta{4}
 \end{bmatrix} = N \begin{bmatrix}
@@ -648,7 +648,7 @@ Network Outputs: \(\bar{\eta}_1 = \begin{bmatrix} \bar{\eta}_{21} \\ \bar{\eta}_
 \end{bmatrix}.
 \]
 The aggregate state-space of the plant is therefore: 
-\begin{equation*}\small
+\begin{equation*}
 A = 
 \begin{bmatrix}
 A_{d_1} & 0 & 0 & 0\\
@@ -671,7 +671,7 @@ A_{x} & 0 & A_{x} & A_{d_2}
     0 & 1 & 0.8\\
 \end{array}\right];
 \end{equation*}
-\begin{equation*}\small
+\begin{equation*}
 C_y = 
 \begin{bmatrix}
 C_{d_1} & 0 & 0 & 0\\
@@ -693,7 +693,7 @@ C_{x} & 0 & C_{x} & C_{d_2}
     0 & 0.3 & 1\\
 \end{array}\right];
 \end{equation*}
-\begin{equation*}\small
+\begin{equation*}
 B_u = 
 \begin{bmatrix}
 B_{d_1} & & & \\
@@ -708,7 +708,7 @@ B_{d_1} = \begin{bmatrix}
 \end{equation*}
 % In this example, we assume each subsystem \(i\) has independent local exogenous noise \(w_i\). Each \(w_i = \left[w_{i1},w_{i2}\right]^\top\) is a 2-d vector. \(w_{i1}\) is the processing noise and \(w_{i2}\) is the measuring noise.
 In the generalized plant, we let:
-\begin{equation*}\small
+\begin{equation*}
 B_w = 
 \begin{bmatrix}
 B_{d_1} & & & \\
@@ -724,7 +724,7 @@ B_{d_1} = \begin{bmatrix}
 \end{bmatrix};
 \end{equation*}
 % The performance output vector \(z\) is selected as \(z = \left[x_1 + u_1, x_2 + u_2, x_3 + u_3, x_4 + u_4\right]^\top\). 
-\begin{equation*}\small
+\begin{equation*}
 C_z = 
 \begin{bmatrix}
 C_{d_1} & & & \\
@@ -736,7 +736,7 @@ C_{d_1} = \begin{bmatrix}
 1 & 0\\
 \end{bmatrix},\ C_{d_2} = 1;
 \end{equation*}
-\begin{equation*}\small
+\begin{equation*}
 D_{yw} = I_4 \otimes \begin{bmatrix}
 0 & 1\\
 \end{bmatrix},\ 
@@ -751,7 +751,7 @@ Let \(G_i = \left[
         C_i & D_i \\
     \end{array}\right] (i=1,2).\)
 The realization of a vectorized state-space model and the realization of the Kronecker product between state-space models (both not necessarily minimal) are
-\begin{equation*}\small
+\begin{equation*}
 \begin{split}
 & \vc(G_1) = \left[
     \begin{array}{c|c}
@@ -761,7 +761,7 @@ The realization of a vectorized state-space model and the realization of the Kro
     \end{array}\right]; \\
 \end{split}
 \end{equation*}
-\begin{equation*}\small
+\begin{equation*}
 \begin{split}
 & G_1\otimes G_2 = 
 \left[

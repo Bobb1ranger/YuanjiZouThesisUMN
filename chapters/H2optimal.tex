@@ -86,8 +86,8 @@ The above problem is still non-convex for two reasons: 1) \(\Phi_{zw}\) is a non
 The Youla-Kucera Parameterization is a well-established framework for resolving the non-convexity of both the linear fractional transformation and the stabilizing controller set by parametrizing all proper internally stabilizing controllers and recasting the objective function into a convex model-matching form with a stable variable \(Q\), often referred to as the Youla parameter~\cite{YoulaPar}.
 \begin{figure}[ht]
     \centering
-    \includegraphics[width=0.55\linewidth]{figures/DisCtrlfigure/YoulaParablkdiagram.png}
-    \caption{The block diagram of Youla parameterization. \(
+    \includegraphics[width=0.5\linewidth]{figures/DisCtrlfigure/YoulaParablkdiagram.png}
+    \caption[Youla parameterization block diagram]{The block diagram of Youla parameterization. \(
     K_\mathrm{stab} = \lft(J_{YP},Q) = (Y_r - M_r Q) (X_r - N_r Q)^{-1}\). \(J_{YP}\) can be considered as an initial stabilizing controller. Setting \(Q = \mathbf{0}\) recovers the observer-based controller. A non-zero \(Q\) maps the output estimation error \(e = y - C_y \hat{x}\) to an additional input \(v\) that modifies the feedback behavior.}
     \label{fig:Youlapar}
 \end{figure}
@@ -150,10 +150,8 @@ J_{YP} & = \begin{bmatrix}
 \end{equation}
 The resulting CL \(\Phi_{zw}\) is given by:
 \begin{equation}
-\begin{split}
-\Phi_{zw} & = \lft(P,K_\mathrm{stab}) = \lft(P,\lft(J_{YP},Q))\\
-&= \lft(\lft(P,J_{YP}),Q) = G_{11} -G_{12} Q G_{21}.    
-\end{split}
+\Phi_{zw} = \lft(P,K_\mathrm{stab}) = \lft(P,\lft(J_{YP},Q))\\
+= \lft(\lft(P,J_{YP}),Q) = G_{11} -G_{12} Q G_{21}.    
 \end{equation}
 \(G_{11} = P_{11} + P_{12} Y_r M_l P_{21}\), \(G_{12} = P_{12} M_r\) and \(G_{21} = M_l P_{21}\) are all stable TFMs, see Appendix~\ref{appsec::optH2} for more information. After the change of variable in Youla Parameterization, Problem~\ref{Prob::networkoptcontrol} becomes the following optimization about Youla parameter \(Q\):
 \begin{equation}\label{eqn::YoulaNonQI}
@@ -249,7 +247,7 @@ K_{\mathrm{dis}} = \begin{bmatrix}
 % If Assumption~\ref{ass::samegraph} holds and \(K_\mathrm{stab}\in \mathcal{S}\) internally stabilizes \(P_{22}\), there is \(K_\mathrm{dis}\in {\cal K}_N\) such that \(K_\mathrm{dis}\) internally stabilizes \(P_{22}\) and \(\mathrm{tf}(K_\mathrm{dis}) = K_\mathrm{stab}\).
 % \end{thm}
 % \begin{proof}[Sketch of proof] Suppose \(K_{\mathrm{stab}}\) is an internal stabilizing controller for \(P_{22}\). Construct an augmented plant \(\bar{P}_{22} \in \mathfrak{S}(\mathcal{G}^p, \mathcal{P}_x + \mathcal{P}_y, \mathcal{P}_x+ \mathcal{P}_u)\) which is a stable networked system itself and is also stabilized by \(\bar{K}\), where
-% \begin{equation*}\small
+% \begin{equation*}
 %     \bar{P}_{22} = \left[\begin{array}{c|cc}
 %         \mathbf{0}_{n_x,n_x} & I_{n_x} & B_u \\
 %         \hline
@@ -271,7 +269,7 @@ K_{\mathrm{dis}} = \begin{bmatrix}
 % \end{equation}
 % \(\bar{K}_{\mathrm{dis}} \in \mathfrak{S}(\mathcal{G}^c, \mathcal{P}_x + \mathcal{P}_u, \mathcal{P}_x+ \mathcal{P}_y)\) is a networked system on \(\mathcal{G}^c\).
 % \(\bar{K}_{\mathrm{dis}}\) internally stabilizes \(\bar{P}_{22}\) and \(\mathrm{tf}(\bar{K}_{\mathrm{dis}}) = \bar{K}\). Put
-% \[\small
+% \[
 % K_{\mathrm{dis}} = \begin{bmatrix}
 %     \mathbf{0}_{n_u,n_x} & I_{n_u}
 % \end{bmatrix} \bar{K}_{\mathrm{dis}}
@@ -339,7 +337,7 @@ Problem~\ref{Prob::H2min_infHorQuad} suggests that the structured \(\mathcal{H}_
 
 
 \subsection{Time domain interpretation}
-We transform Problem~\ref{Prob::H2min_infHorQuad} into time-domain interpretation for two following reasons:
+We transform Problem~\ref{Prob::H2min_infHorQuad} into a time-domain interpretation for following two reasons:
 \begin{enumerate}
     \item Since spectral factorization expresses the \(\mathcal{H}_2\) cost as a matrix-weighted norm of the Youla parameter \(Q\), it is natural to invoke Parseval’s theorem to convert the frequency-domain \(\mathcal{H}_2\) norm into an \(\ell_2\)-norm of the unilateral time-domain impulse response of \(Q\).
     \item The structural constraints including sparsity and element-wise relative orders are easier to impose on \(\Phi\)'s unilateral impulse response. 
@@ -363,7 +361,7 @@ The structural constraints can be enforced by a time-dependent support pattern o
 \end{array}\right. .
 \end{equation}
 For illustration, we take Example~\ref{exp::3nodesys} again and assume all the subsystems are SISO without losing generality, namely \(\mathcal{P}_u=\mathcal{P}_y =[1,1,1]\). The time-domain responses of \(\Phi\) are:
-\begin{equation*}\small
+\begin{equation*}
 \Phi[0] \in \left[
 \begin{array}{ccc}
 \mathbb{R} & 0 & 0\\
@@ -448,7 +446,7 @@ Furthermore, sequences \(\eta,q,\phi\) are all in \(\ell_2\). For later use, we 
 \end{thm}
 See Appendix~\ref{sec:app_vecssana} for the proof.
 \begin{rem}\label{rem::rationalsoln1} \((A_v,B_v)\) is stabilizable and \((A_v,C_v)\) is detectable because \(A_v+B_v C_v\) is Schur from construction:
-\begin{equation}\small
+\begin{equation}
     A_v+B_v C_v =  \left[
     \begin{array}{cc}
     I_{n_y}\otimes A_F &  L^\top\otimes B_u \\
@@ -832,7 +830,7 @@ For instance, consider a plant \(P_{22}\) with partitions \(\mathcal{P}_x = [2,2
     1 & 0 \\
 \end{bmatrix}\).
 The state-space realization of \(P_{22}\) is:
-\begin{equation}\small
+\begin{equation}
     P_{22}= \left[\begin{array}{c|c}
         A & B_u \\
         \hline
@@ -851,7 +849,7 @@ The state-space realization of \(P_{22}\) is:
 \end{equation}
 From the controllability and observability test, \((A, B_u, C_y)\) is controllable and observable if given full controller connectivity.
 To check the feasibility of structured stabilization from \(K \in \mathfrak{T}(\mathcal{G},\mathcal{P}_u,\mathcal{P}_y)\), find the strongly connected components:
-\begin{equation*}\small
+\begin{equation*}
     P_{{22}}^1
     =
     \left[\begin{array}{cc|c}
@@ -872,7 +870,7 @@ To check the feasibility of structured stabilization from \(K \in \mathfrak{T}(\
 \(P_{{22}}^1\) is not detectable and \(P_{{22}}^2\) is not stabilizable. As a result, there is no \(K \in \mathfrak{T}(\mathcal{G},\mathcal{P}_u,\mathcal{P}_y)\) stabilizes.
 
 In our test, the orthonormal basis \(E_m\) is
-\begin{equation}\small
+\begin{equation}
     E_m = \mathrm{basis} (\vc(\left[\begin{array}{cc}
         \mathbb{R} & 0 \\
         \mathbb{R} & \mathbb{R}
@@ -904,7 +902,7 @@ Unlike the locally detectable and stabilizable condition in \cite{Lessard2012str
 \subsection{Solution and optimal controller recovery}
 When \(b_0\) lies in the stabilizable subspace of \((A_v,B_v E_m)\), \((A_r, B_r^m)\) is stabilizable by Theorem~\ref{thm::vecconstraintsoln}.
 Problem~\ref{Prob::H2min_ssqp} is a standard infinite-horizon LQR problem. The optimal solution can be explicitly obtained by solving a discrete algebraic Riccati equation (DARE)~\eqref{eqn:vecDARE} for the time-invariant stage for (\(i \geq m\)) and a backward recursion in~\eqref{eqn::backrec} for the time-varying stage from \(i = m - 1\) to \(i = 0\).
-\begin{equation}\label{eqn:vecDARE}\small
+\begin{equation}\label{eqn:vecDARE}
 \begin{split}
     X_m &= \mathrm{DARE}(A_r, B_r^m, {C_r}^\top \Gamma {C_r}, {D_m}^\top\Gamma D_m,{C_r}^\top \Gamma {D_m},I);\\
     \Theta_m & = {D_{m}}^\top\Gamma D_m + {B_r^m}^\top X_{m}{B_r^m}; \\
@@ -924,7 +922,7 @@ u[j] = \left\{
 \end{array}\right.,
 \]
 where \(\{X_i\},\{\kappa_i\}\) are matrix sequences recursively defined as:
-\begin{equation}\label{eqn::backrec}\small
+\begin{equation}\label{eqn::backrec}
 \begin{split}
     \Theta_i &= {D_{i}}^\top\Gamma D_i + {B_r^i}^\top X_{i+1}{B_r^i}; \\
     \kappa_i &= -\Theta_i^{-1} ({B_r^i}^\top X_{i+1} A_r +{D_{i}}^\top\Gamma C_r); \\
@@ -962,7 +960,7 @@ u^*[0] = -\Theta_0^{-1} ({B_r^0}^\top X_{1} b_r -{D_{0}}^\top\Gamma \vc(R_0))
 % {\color{blue}In this infinite-horizon setting, it is standard to assume that the optimal cost-to-go is a quadratic function of the current state, which leads to a discrete algebraic Riccati equation (DARE) for the time-invariant stage and a backward recursion defined on \(i = m-1\hdots,1\) for the time-varying stage derived from the Bellman equation. Solving the DARE and the recursion provides a finite-dimensional, explicit expression for the optimal solution.}
 
 We iteratively recover optimal input sequence \(\{u^*\}\), state sequence \(\{\zeta^*\}\) and output sequence \(\{q^*\}\) from \(u^*[0]\).
-\begin{equation}\label{eqn::YPrecovery1}\small
+\begin{equation}\label{eqn::YPrecovery1}
 \begin{split}
     &\zeta^*[1] = B_r^0 u^*[0] + b;\ q^*[0] = D_0 u^*[0];\ \\
     &
@@ -1011,7 +1009,7 @@ In Example \ref{exp::3nodesys} proposed in section II, we let the partition of s
 \end{bmatrix}.
 \]
 We evaluate the generalized plant with:
-\begin{equation*}\small
+\begin{equation*}
 A = \left[
 \begin{array}{cc:cc:cc}
 0  &  3.3  & 0 &  -0.4  &  0 &  0 \\
@@ -1025,7 +1023,7 @@ A = \left[
 \end{array}
 \right]
 \end{equation*}
-\begin{equation*}\small  
+\begin{equation*}  
 B_w = 
 \begin{bmatrix}
 0.6 & -0.6 & -0.5\\
@@ -1047,14 +1045,14 @@ B_w =
 \right]
 \end{equation*}
 
-\begin{equation*}\small
+\begin{equation*}
     C_z = \begin{bmatrix}
     0.1 & 0.4 & 0.1& 0.4& 0.1& 0.4 \\
     0.3 & 0 & 0.5& 1 & 0.6 & 2 \\
     -1 & -0.1 & 0.2 & -0.5 & 0.3 & 1
 \end{bmatrix};\
 \end{equation*}
-\begin{equation*}\small
+\begin{equation*}
 C_y = \left[
 \begin{array}{cc:cc:cc}
     0.2 & 1 & 0 & -1 & 0 & 0 \\
@@ -1065,7 +1063,7 @@ C_y = \left[
     \end{array}
 \right]
 \end{equation*}
-\begin{equation}\small
+\begin{equation}
     D_{zu}^\top  = D_{yw} = \begin{bmatrix}
         I_3
     \end{bmatrix};\     
@@ -1109,7 +1107,7 @@ We find that the controller order grows linearly with the number of FIR steps. T
 The state-space representation of the networked plant is provided in Appendix~\ref{appsec:nwss}, along with a detailed walkthrough of its construction from the dynamics of individual sub-plants.
 % We walk through the construction of the networked plant in Appendix~\ref{appsec:nwss}.
 Rather than searching for controllers in the full space \(\mathfrak{T}(\mathcal{G}^c,\mathcal{P}_{u},\mathcal{P}_y)\),  we further restrict attention to the subset:
-\[\small  
+\[  
 \mathcal{S} = \begin{bmatrix}
 0 & \frac{1}{z}\mathcal{R}_p & 0 & \frac{1}{z}\mathcal{R}_p\\
 0 & 0 & 0 & 0\\
@@ -1120,7 +1118,7 @@ Rather than searching for controllers in the full space \(\mathfrak{T}(\mathcal{
 While \(\mathfrak{T}(\mathcal{G}^c,\mathcal{P}_{u},\mathcal{P}_y)\) is not quadratically invariant (QI) with respect to \(P_{22}\), the subset \(\mathcal{S}\) is QI and therefore allows a convex search for stabilizing controllers.
 The structure suggests that the networked controller uses only the sensors at nodes \(2\) and \(4\) and the actuators at nodes \(1\) and \(3\), with a unit processing delay from sensing to actuation.
 The optimal controller found in \(\mathcal{S}\) is the following:
-% \[\small
+% \[
 % K_\mathrm{opt} = 
 % \begin{bmatrix}
 % 0 & K_{12} & 0 & K_{14}\\
@@ -1129,7 +1127,7 @@ The optimal controller found in \(\mathcal{S}\) is the following:
 % 0 & 0 & 0 & 0\\
 % \end{bmatrix}
 % \]
-\[\small
+\[
 K_\mathrm{opt} = 
 [K_{ij}] = 
 \begin{cases}
@@ -1137,7 +1135,7 @@ K_\mathrm{opt} =
 0& \text{, Otherwise}
 \end{cases}.
 \]
-% \[\small
+% \[
 % K_{\chi} = \frac{-0.31887 z (z-0.6332)}{(z+0.9738) (z^2 + 0.4429z + 1.201)}.
 % \]
 
@@ -1151,7 +1149,7 @@ The minimal realization of \(K\) has a pair of complex-conjugate poles, each wit
 \end{prop}
 \begin{proof}
 Firstly, we denote \(\mathcal{S}^{o} = \mathfrak{T}(\mathcal{G}^c,\mathcal{P}_{u},\mathcal{P}_y)\), which is the set of network distributed systems on the graph \(\mathcal{G}^c(\mathcal{V},\mathcal{A}^c)\):
-\[\small
+\[
 \mathcal{S}^{o} = 
 \begin{bmatrix}
 \mathcal{R}_p & \frac{1}{z}\mathcal{R}_p & 0 & \frac{1}{z}\mathcal{R}_p\\
@@ -1169,7 +1167,7 @@ Firstly, we denote \(\mathcal{S}^{o} = \mathfrak{T}(\mathcal{G}^c,\mathcal{P}_{u
 \]
 Every \(K \in \mathcal{S}\) belongs to \(\mathcal{S}^{o}\). It suffices to show that \(K_\mathrm{opt}\) can't be built on \(\mathcal{G}^c\). 
 \(\mathcal{G}^c\) implies the following structured state-space matrices:
-\begin{equation*}\small
+\begin{equation*}
     A_c =\begin{bmatrix}
         A_c^{1} & A_c^{12} & \mathbf{0} & A_c^{14} \\
         \mathbf{0} & A_c^{2}& \mathbf{0} & \mathbf{0}\\
@@ -1183,7 +1181,7 @@ Every \(K \in \mathcal{S}\) belongs to \(\mathcal{S}^{o}\). It suffices to show 
         \mathbf{0} & \mathbf{0} & \mathbf{0} & C_c^{4}\\
     \end{bmatrix};
 \end{equation*}
-\begin{equation}\label{eqn::4nodereal}\small
+\begin{equation}\label{eqn::4nodereal}
     B_c = \diag[B_{c}^i]; \quad D_{c} = \diag[D_{c}^i].
 \end{equation}
 
