@@ -599,8 +599,7 @@ By Theorem~\ref{thm:auxconverge} and \ref{thm::H2tailto0}, \(\mu_{1N} \to \mu_1\
 \subsection{Synthesis methodology}
 The truncated $\ell_2$-norm of $\Phi$ is given by
 \begin{align*}
-    \|\mathbb{P}_N \Phi\|_2^2 & = \sum_{i=0}^{N-1}\mathrm{trace}(\Phi[i]^\top \Phi[i]) = \sum_{i=0}^{N-1}\vc(\Phi[i])^\top \vc(\Phi[i]) \\
-    & = \bar{\phi}_N^\top \bar{\phi}_N = \|H_N - U_N \bar{q}_v\|_2^2\\
+    \|\mathbb{P}_N \Phi\|_2^2 & = \sum_{i=0}^{N-1}\mathrm{trace}(\Phi[i]^\top \Phi[i]) = \sum_{i=0}^{N-1}\vc(\Phi[i])^\top \vc(\Phi[i]) = \bar{\phi}_N^\top \bar{\phi}_N = \|H_N - U_N \bar{q}_v\|_2^2\\
 \end{align*}
 Here, $\bar{q}_v = \ver\left[q[i]\right]_{i \in \mathcal{F}_N}$ is the vertical concatenation of the vectorized impulse response of $Q$. The stacked vector of the impulse responses of $\mathbb{P}_N \Phi$ is
 \begin{equation}\label{eqn:phiN_q}
@@ -677,7 +676,7 @@ subject to
 \end{bmatrix}
 \begin{bmatrix}
     B_w \\ D_{yw}
-\end{bmatrix} + D_{zu};\; L\in \mathcal{S};
+\end{bmatrix} + D_{zu};
 \]
 \begin{equation}\label{eqn:SLSstabl}
 \begin{bmatrix}
@@ -708,7 +707,7 @@ M \in \mathbb{R}^{n_x \times n_y} \times \mathcal{F}_N;\;
 \]
 \[
 N \in \mathbb{R}^{n_u \times n_x} \times \mathcal{F}_N;\;
-L \in \mathbb{R}^{n_u \times n_y} \times \mathcal{F}_N.
+L \in \mathbb{R}^{n_u \times n_y} \times \mathcal{F}_N \cap \mathcal{S}.
 \]
 \end{opt}
 As a result, these transfer functions must conform to some constraints~\eqref{eqn:SLSstabl} and \eqref{eqn:SLSstabr}, which essentially guarantee the stabilization of the plant.

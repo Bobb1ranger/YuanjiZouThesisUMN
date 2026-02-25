@@ -1,5 +1,26 @@
 \chapter{Distributed \(\mathcal{H}_2\) control}
 
+\section{Gist of the Chapter}
+\section{State-of-the-art on distributed \(\mathcal{H}_2\) optimal control}
+
+Searching for stabilizing controllers with an arbitrary structure is not a convex problem in general~\cite{Tsitsiklis1985NP_decentralized}. Optimal controllers for an LTI plant in some structures can even be non-linear~\cite{ Witsenhausen1968ACI}. While the Youla parametrization enables us to search over stabilizing controllers convexly through closed-loop (CL) maps \cite{YoulaPar} when there is no structure, the structural constraints on the controllers may be projected into nonconvex constraints on the Youla Parameter, as their convexity is not preserved under linear fractional transformation (LFT).
+
+Following the Youla parameterization approach, Voulgaris is the first to notice the usefulness of constructing a doubly coprime factorization (DCF) consistent with the desired structure, which enables a direct search for the Youla parameter \(Q\) within the same structured set \cite{Voulgaris2001convexity}. Other works identify several particular structures where consistently structured DCFs are accessible and establish convex control synthesis methods for such structures~\cite{Voulgaris2000nested, XinQ2004Nested, Bamieh2005CvxSI}. Later,~\cite{SanjayLQIsufficient} introduces the notion of Quadratic Invariance (QI) to unify all the structures for which one can search for the controllers convexly~\cite{LessardQI}. As part of their contribution, they establish the theoretical foundation for parameterizing all in-structure stabilizing controllers using a stable, structured, and stabilizing initial controller. However, obtaining such an initial controller is generally nontrivial.
+
+
+To address this limitation, \cite{SabauVectorization} seeks to establish the classical Youla parameterization without relying on structured DCFs. In return, they introduce an affine constraint rather than a direct structural constraint as the price for eschewing structured DCFs:
+\begin{equation}\label{eqn:strcst_0}
+    H - U Q V \in \mathcal{S}.
+\end{equation}
+This constraint does not necessarily admit finite-impulse-response (FIR) solutions for the Youla parameter, which poses a major obstacle to its use in the controller synthesis, where FIR approximation is the standard practice for solving convex model-matching problems. Nevertheless, Lamperski and Doyle show that the constraint admits FIR solutions when the structural restrictions vanish after finitely many steps, which corresponds to strongly connected networks. They exploit this property to solve the optimal distributed \(\mathcal{H}_2\) control problem via a finite-dimensional convex optimization formulation \cite{Lamperski2015H2}.
+
+
+A class of recent methods, e.g., SLP~\cite{SLSparametrization, wang2019SLS}, IOP~\cite{Furieri2019IOP}, and mixed parameterizations~\cite{Zheng2022SLP_IOP}, abandon the Youla parameterization approach. These methods over-parametrize the search spaces (not just $Q$) and enforce stabilization implicitly through infinite-dimensional equality constraints, which unfortunately are not guaranteed to have finite-dimensional feasible solutions. \cite{Matni2017SLStol} later addresses the tolerance of equality constraint violations in the SLP method. Overall, their synthesis formulation is sophisticated and leads to order inflation in the controller order. Fundamentally, these new parametrizations are equivalent to the Youla Parameterization~\cite{Zheng2021Equi_SLP_IOP, Tseng2021Equi_Par}.
+
+
+The Youla operator state-space (YOSS) framework provides an alternative, over-parameterizing representation for all stabilizing controllers with a predefined structure~\cite{naghnaeian2019youla}. This approach introduces the notion of a generalized Luenberger observer with internal dynamics designed for networked systems. The paper establishes a distributed analogue of the Separation Principle, showing that distributed state estimation can be carried out independently and then used with “state-like” controllers to obtain the set of all output-feedback stabilizing controllers with a given structure. A key advantage of this approach is that the estimator and state-like feedback controller satisfy relaxed infinite-dimensional "inequalities", which admit finite-dimensional feasible solutions.
+
+
 \section{Problem Formulation}\label{sec:ProbForm}
 We formulate the networked optimal control problem following the generalized plant framework, requiring the plant \(P_{22}\) to be a networked system on the graph $\mathcal{G}^p=(\mathcal{V},\mathcal{A}^p)$.
 \begin{opt}[Networked optimal control]\label{Prob::DistributedH2}
@@ -992,6 +1013,138 @@ Finally, we find the optimal controller in \(\mathcal{S}\) with:
 \end{equation}
 Algorithm~\ref{alg::optcontroller} provides a structured stabilizing controller TFM. One can follow Theorem~\ref{thm:samegraphReal} to construct the networked implementation of \(K_\mathrm{str, opt}\) when Assumption~\ref{ass::samegraph} is satisfied.
 
+\section{A simplified solution for full-state-feedback problems}
+
+In the special case of state-feedback, the plant is changed into
+\begin{equation}
+    P = \left[
+    \begin{array}{c|cc}
+        A & B_w & B_u \\
+        \hline
+        C_z & D_{zw} & D_{zu}\\
+        I & \mathbf{0} & \mathbf{0}
+    \end{array}\right]
+\end{equation}
+
+\(F,L\) are still chosen to ensure \(A_F,A_L\) are Schur. 
+\begin{equation*}
+G_{12} = \left[
+    \begin{array}{c|c}
+        A_F & B_u \\
+        \hline
+        C_z + D_{zu}F & D_{zu} \\
+    \end{array}\right];\ 
+G_{21} = \left[
+    \begin{array}{c|c}
+        A_L & B_w\\
+        \hline
+        I & \mathbf{0} \\
+    \end{array}\right]
+\end{equation*}
+\begin{equation}
+    G_{11} = \left[\begin{array}{cc|c}
+    A_F & -B_u F & B_w\\
+   \mathbf{0}_{n_x,n_x} & A_L & B_w\\
+    \hline
+    C_z + D_{zu}F & -D_{zu}F & D_{zw}
+\end{array}\right]
+\end{equation}
+
+\begin{equation*}
+\begin{split}
+& G_{11} = \begin{bmatrix}
+    C_z+D_{zu} F & -D_{zu} F
+\end{bmatrix} \\
+& \begin{bmatrix}
+    (zI-A_F)^{-1} & -(zI-A_F)^{-1} B_u F (zI-A_L)^{-1} \\
+    \mathbf{0} &  (zI-A_L)^{-1}
+\end{bmatrix}
+\begin{bmatrix}
+    B_w \\
+    B_w
+\end{bmatrix} \\
+& = D_{zw} +C_z(zI-A_F)^{-1} B_w  + D_{zu} F(zI-A_F)^{-1} B_w \\
+& - C_z (zI-A_F)^{-1} B_u F (zI-A_L)^{-1} B_w \\ 
+& - D_{zu} F (zI-A_F)^{-1} B_u F (zI-A_L)^{-1} B_w - D_{zu} F (zI-A_L)^{-1} B_w \\
+& = D_{zw} + C_z(zI-A_F)^{-1} B_w  + D_{zu} F(zI-A_F)^{-1} B_w \\
+& - C_z (zI-A_F)^{-1} B_u F (zI-A_L)^{-1} B_w \\ 
+& - D_{zu} F (zI-A_F)^{-1} (zI -A) (zI-A_L)^{-1} B_w \\ 
+& = D_{zw} + C_z(zI-A_F)^{-1} (I - B_u F (zI-A_L)^{-1}) B_w \\
+& + D_{zu} F (zI-A_F)^{-1} (I - (zI -A) (zI-A_L)^{-1}) B_w \\
+& = D_{zw} + C_z(zI-A_F)^{-1} (zI - A - B_u F - L) (zI-A_L)^{-1} B_w \\
+& - D_{zu} F (zI-A_F)^{-1} L (zI-A_L)^{-1} B_w \\
+& = D_{zw} + C_z (zI-A_L)^{-1} B_w  \\
+& - (C_z + D_{zu} F) (zI-A_F)^{-1} L (zI-A_L)^{-1} B_w
+\end{split} 
+\end{equation*}
+\begin{equation*}
+\begin{split}
+& G_{12} = (C_z + D_{zu} F) (zI-A_F)^{-1} B_u + D_{zu} \\
+& G_{21} = (zI-A_L)^{-1} B_w
+\end{split} 
+\end{equation*}
+We now put \(F\) be the LQR feedback gain for \(P_{12}\) such that \(G_{12}^\sim G_{12} = P_{12}^{\sim} P_{12} = \Gamma_b\). For any stabilizing \(L\) we pick, we notice:
+\begin{equation*}
+\begin{split}
+H_0 = G_{11} + G_{12} F G_{21} = (C_z + D_{zu} F) (zI-A_F)^{-1} B_w + D_{zw}
+\end{split} 
+\end{equation*}
+which achieves the optimal \(\mathcal{H}_2\) performance in standard state-feedback problems. Besides, putting \(L\) equal to \(-A\) bring us huge benefits that \(G_{21} = \frac{1}{z} B_w\) becomes a delayed gain block. By a shift of Youla parameter we should formulate the following optimazation problem, 
+\begin{opt}\label{Prob::H2minSF}
+\begin{equation}
+\begin{split}
+    \underset{Q\in\mathcal{RH}_\infty}{\mathrm{minimize}}\ &\|G_{11} - G_{12} Q G_{21}\|_2^2 \\ 
+    & = \|H_0\|_2^2 + \|U (Q + F) B_w\|_2^2 \\
+    & = \|H_0\|_2^2 + \|\Gamma_b^{1/2} (Q + F) B_w\|_2^2
+\end{split}
+\end{equation}
+subject to
+\begin{equation}
+    \Phi=(Y_r - M_r Q)\in\mathfrak{T}(\mathcal{G}_c,P_u,P_y)
+\end{equation}
+\end{opt}
+\begin{equation}
+\begin{split}
+    X[i+1] &=A X[i] + B_u \Phi[i] - A \delta,\\
+    Q[i] &= F X[i] - \Phi[i]
+\end{split}
+\end{equation}
+{\color{blue}
+\begin{equation}
+\begin{split}
+    \underset{Q\in\mathcal{RH}_\infty}{\mathrm{minimize}}\ &\|\Gamma_b^{1/2}FB_w + \Gamma_b^{1/2}Q B_w\|_2^2 
+\end{split}
+\end{equation}
+subject to
+\begin{equation}
+    Q=M_r^{-1}Y_y-M_r^{-1}\Phi;, \Phi\in\mathfrak{T}(\mathcal{G}_c,P_u,P_y)
+\end{equation}
+Note that \(\mathcal{P}_y = \mathcal{P}_x\) in the state-feedback setting.
+
+
+$$
+\min \|T\Phi B_w\|^2
+$$
+subject to 
+The dynamics associated with $T$
+\begin{equation}
+T=     \left[
+    \begin{array}{c|cc}
+        A & -A & B_u \\
+        \hline
+        -\Gamma_b^{1/2}F & \Gamma_b^{1/2}F & \Gamma_b^{1/2}D_{zu}
+    \end{array}\right]
+\end{equation}
+\begin{equation}
+\begin{split}
+    X[i+1] &=A X[i] + B_u \Phi[i] - A \delta,\\
+    T[i] &=-\Gamma_b^{1/2}F X[i] +\Gamma_b^{1/2}D_{zu}\Phi[i]+\Gamma_b^{1/2}F \delta
+\end{split}
+\end{equation}
+}
+
+
+
 \section{Numerical Examples}\label{sec:Exp}
 
 
@@ -1000,7 +1153,7 @@ In Example~\ref{exp::3nodesys}, we provide an illustrative solution and compare 
 In Example~\ref{exp:4nodediamond}, we use our approach to find optimal controller \(K_\mathrm{opt}\) in \(\mathcal{S}\), where \(\mathcal{S}\) is QI w.r.t the plant but not fitting in Assumption~\ref{ass::samegraph}. We prove that \(K_\mathrm{opt}\) is not realizable on its graph.
 
 \subsection{3-agent distributed control problem}
-In Example \ref{exp::3nodesys} proposed in section II, we let the partition of states, inputs, outputs be \(\mathcal{P}_x =[2;2;2], \mathcal{P}_y = \mathcal{P}_u =[1;1;1]\). Per the controller graph, we want to find optimal controller in the structure set:
+In Example~\ref{exp::3nodesys} proposed in section II, we let the partition of states, inputs, outputs be \(\mathcal{P}_x =[2;2;2], \mathcal{P}_y = \mathcal{P}_u =[1;1;1]\). Per the controller graph, we want to find optimal controller in the structure set:
 \[
 \mathcal{S}= \begin{bmatrix}
     \mathcal{R}_p & \frac{1}{z} \mathcal{R}_p & 0 \\
@@ -1088,7 +1241,7 @@ For this plant, the centralized \(\mathcal{H}_2\) gives a norm \(\|G_{11}^0\|_2 
 \begin{figure}[ht]
     \centering
     \includegraphics[width=0.85\linewidth]{figures/DisCtrlfigure/SLSCostvsFIRsteps_3nodeV2.png}
-    \caption{The top subplot plots the optimal \(\mathcal{H}_2\) norm obtained by SLS approach, while the bottom subplot plots the value \((\|\cdot\|^2 - \mu_{\mathrm{dis}, \mathcal{H}_2})\) on a logarithm scale.}
+    \caption[Our exact optimal solution and the suboptimal SLS solutions]{The top subplot plots the optimal \(\mathcal{H}_2\) norm obtained by SLS approach, while the bottom subplot plots the value \((\|\cdot\|^2 - \mu_{\mathrm{dis}, \mathcal{H}_2})\) on a logarithm scale.}
     \label{fig:SLScostvsFIR}
 \end{figure}
 % \begin{figure}[ht]
@@ -1098,7 +1251,7 @@ For this plant, the centralized \(\mathcal{H}_2\) gives a norm \(\|G_{11}^0\|_2 
 %     \label{fig:SLSRuntmevsFIR}
 % \end{figure}
 
-In comparison, the SLS approach approximates the optimal controller by designing closed-loop dynamics with varying FIR truncation levels, ranging from 10 to 60 with an interval of 5. In this case, FIR solutions exist for the SLS method since \((A,B_u)\) is controllable and \((A,C_y)\) is observable~\cite{SLSparametrization}.
+In comparison, the SLS approach approximates the optimal controller by designing closed-loop dynamics with FIR truncation levels ranging from 10 to 60 in increments of 5. In this case, FIR solutions exist for the SLS method since \((A,B_u)\) is controllable and \((A,C_y)\) is observable~\cite{SLSparametrization}.
 As the FIR horizon increases, the achieved cost gradually converges toward the optimal value.
 
 We find that the controller order grows linearly with the number of FIR steps. The computational time for convex optimization also grows with the number of steps. With 60 steps of FIR, the optimization problem takes \(2.29s\) to solve and gives a controller with 546 states, but the cost is still suboptimal. This trend indicates that while longer FIR horizons improve accuracy, the approximation can never produce the exact optimal closed-loop behavior.

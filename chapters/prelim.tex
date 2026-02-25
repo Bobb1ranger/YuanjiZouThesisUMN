@@ -39,7 +39,7 @@ The unique matrix-valued transfer function corresponding to the system is given 
 \[
 G(z) = D + C (z I -A)^{-1} B.
 \]
-The number of rows equals the number of output channels, and the number of columns equals the number of input channels.
+The number of rows is the number of output channels, and the number of columns is the number of input channels.
 
 \begin{defn} [Rational proper transfer function matrix]
 Let $G(z)$ be an $m\times n$ transfer function matrix.  
@@ -85,7 +85,29 @@ The second equality holds from the Maximum Modulus Theorem \cite{Zhou1996RobustC
 Throughout this thesis, regular capital letters denote matrices, transfer function matrices, or their impulse response sequences when unambiguous; when clarification is needed, a hat \(\hat{\cdot}\) is used to distinguish a transfer function (matrix) from its impulse response sequence.
 
 \section{System interconnections}
-We use \(\mathcal{F}_l/\mathcal{F}_u\) to denote the lower/upper linear fractional transformation between two systems. The feedback interconnection between two systems with compatible dimensions is a special form of \(\mathcal{F}_l\):
+We use \(\mathcal{F}_l/\mathcal{F}_u\) to denote the lower/upper linear fractional transformation (LFT) between two linear systems. 
+\begin{defn}
+Let \(G\) be a proper transfer function matrix partitioned as
+\[
+G(z) = \begin{bmatrix}
+    G_{11}(z) & G_{12}(z) \\
+    G_{21}(z) & G_{22}(z)
+\end{bmatrix} \in \mathcal{R}_p^{(m_1 + m_2)\times (n_1 +n_2)},
+\]
+and let \(Q_l(z) \in \mathcal{R}_p^{n_2 \times m_2}\) and \(Q_u(z) \in \mathcal{R}_p^{n_1 \times m_1}\) be two other transfer function matrix. Then we can formally define a lower LFT with respect to \(Q_l\) as:
+\[
+\mathcal{F}_l(G,Q_l) \doteq G_{11} + G_{12} Q_l (I - G_{22} Q_l)^{-1} G_{21}
+\]
+provided that \(I - G_{22}(\infty) Q_l(\infty)\) is non-singular.
+
+In analogy, we can define an upper LFT with respect to \(Q_u\) as:
+\[
+\mathcal{F}_u(G,Q_u) \doteq G_{22} + G_{21} (I - Q_u G_{11})^{-1} Q_u G_{12}
+\]
+provided that \(I - Q_u(\infty) G_{11}(\infty) \) is non-singular.
+\end{defn}
+
+Notably, the feedback interconnection between two systems with compatible dimensions is a special form of \(\mathcal{F}_l\):
 \[
 H = \mathrm{feedback}(H^1,H^2) \coloneqq \mathcal{F}_l(\begin{bmatrix}
     I \\

@@ -49,51 +49,45 @@ While communication enhances system resilience and coordination capabilities, it
 
 \section{Linear-time-invariant(LTI) distributed networked systems}
 
-The objectives of distributed control and respective approaches vary across different application contexts.
+While the objectives of distributed control and their respective approaches vary across application contexts, researchers have devoted substantial effort to establishing the fundamental theory of optimal distributed control for linear time-invariant (LTI) networked systems.
 
-people have devoted substantial effort to establishing the fundamental theory of optimal distributed control for linear time-invariant (LTI) networked systems.
 
-The goal shifts to finding a stabilizing feedback controller that optimizes closed-loop performance within specific structures, reflecting the communication limitations imposed by the network topology. These structures usually include delays and sparsities in the controller's aggregate transfer function matrices.
 
-Searching for stabilizing controllers with an arbitrary structure is not a convex problem in general~\cite{Tsitsiklis1985NP_decentralized}. Optimal controllers for an LTI plant in some structures can even be non-linear~\cite{ Witsenhausen1968ACI}. While the Youla parametrization enables us to search over stabilizing controllers convexly through closed-loop (CL) maps \cite{YoulaPar} when there is no structure, the structural constraints on the controllers may be projected into nonconvex constraints on the Youla Parameter, as their convexity is not preserved under linear fractional transformation (LFT).
+
 
 
 \section{Optimal network distributed control}
 
-Following the Youla parameterization approach, Voulgaris is the first to notice the usefulness of constructing a doubly coprime factorization (DCF) consistent with the desired structure, which enables a direct search for the Youla parameter \(Q\) within the same structured set \cite{Voulgaris2001convexity}. Other works identify several particular structures where consistently structured DCFs are accessible and establish convex control synthesis methods for such structures~\cite{Voulgaris2000nested, XinQ2004Nested, Bamieh2005CvxSI}. Later,~\cite{SanjayLQIsufficient} introduces the notion of Quadratic Invariance (QI) to unify all the structures for which one can search for the controllers convexly~\cite{LessardQI}. As part of their contribution, they establish the theoretical foundation for parameterizing all in-structure stabilizing controllers using a stable, structured, and stabilizing initial controller. However, obtaining such an initial controller is generally nontrivial.
-
-
-To address this limitation, \cite{SabauVectorization} seeks to establish the classical Youla parameterization without relying on structured DCFs. In return, they introduce an affine constraint rather than a direct structural constraint as the price for eschewing structured DCFs:
-\begin{equation}\label{eqn:strcst_0}
-    H - U Q V \in \mathcal{S}.
-\end{equation}
-This constraint does not necessarily admit finite-impulse-response (FIR) solutions for the Youla parameter, which poses a major obstacle to its use in the controller synthesis, where FIR approximation is the standard practice for solving convex model-matching problems. Nevertheless, Lamperski and Doyle show that the constraint admits FIR solutions when the structural restrictions vanish after finitely many steps, which corresponds to strongly connected networks. They exploit this property to solve the optimal distributed \(\mathcal{H}_2\) control problem via a finite-dimensional convex optimization formulation \cite{Lamperski2015H2}.
-
-
-A class of recent methods, e.g., SLP~\cite{SLSparametrization, wang2019SLS}, IOP~\cite{Furieri2019IOP}, and mixed parameterizations~\cite{Zheng2022SLP_IOP}, abandon the Youla parameterization approach. These methods over-parametrize the search spaces (not just $Q$) and enforce stabilization implicitly through infinite-dimensional equality constraints, which unfortunately are not guaranteed to have finite-dimensional feasible solutions. \cite{Matni2017SLStol} later addresses the tolerance of equality constraint violations in the SLP method. Overall, their synthesis formulation is sophisticated and leads to order inflation in the controller order. Fundamentally, these new parametrizations are equivalent to the Youla Parameterization~\cite{Zheng2021Equi_SLP_IOP, Tseng2021Equi_Par}.
-
-
-The Youla operator state-space (YOSS) framework provides an alternative, over-parameterizing representation for all stabilizing controllers with a predefined structure~\cite{naghnaeian2019youla}. This approach introduces the notion of a generalized Luenberger observer with internal dynamics designed for networked systems. The paper establishes a distributed analogue of the Separation Principle, showing that distributed state estimation can be carried out independently and then used together with “state-like” controllers to obtain the set of all output feedback stabilizing controllers with structure. A key advantage of this approach is that the estimator and state-like feedback controller satisfy relaxed infinite-dimensional "inequalities", which admit finite-dimensional feasible solutions.
+The goal shifts to finding a stabilizing feedback controller that optimizes closed-loop performance within specific structures, reflecting the communication limitations imposed by the network topology. These structures usually include delays and sparsities in the controller's aggregate transfer function matrices.
 
 \section{Robustness of distributed control}
 
-In modern system control theory, robust control is central to both theory and practice. 
-Robust control analysis and synthesis problems have focused on the uncertainty in the system model, including unmodeled dynamics and real parametric uncertainty, which are unknown yet deterministic\cite{Zhou1996RobustControl, UncertainSS, QuadraticStab, LMIforH_infty,packard_mainloop}.
-
-Networked systems have drawn attention to stochastic systems and processes \cite{IntroStoc, MSstability, FreqMSS}. In particular, stochastic stability problems emerging from the interactions among (linear) time-invariant systems induced by communication links. 
-\cite{Meansquarenorm} has first proposed a robust control framework for MIMO LTI systems subject to IID random gains.  A random gain is represented by its mean value (corresponding to the nominal parameter value) and a zero-mean stochastic perturbation $\Delta$  of bounded variance. \cite{Meansquarenorm} derives a necessary and sufficient condition for Mean Square Stability (MSS), showing that MSS can be equivalently thought of as robust mean stability. The framework has been extended to various network control settings \cite{padmasola2006tradeoffs, Padma06ACC,Jeff11, Matt14, Matt14CDC, MattACC15, Matt2017thesis} which are relevant in this paper. In particular, \cite{Ma2015} is the first to show that MS performance is equivalent to an augmented MSS problem in the same vain of the analogous robust performance problems for deterministic uncertainty, and \cite{Matt2017thesis} show that the optimal MS performance synthesis is convex for a large class of systems. 
+ 
+\cite{Meansquarenorm} has first proposed a robust control framework for MIMO LTI systems subject to IID random gains. A random gain is represented by its mean value (corresponding to the nominal parameter value) and a zero-mean stochastic perturbation $\Delta$ of bounded variance. \cite{Meansquarenorm} derives a necessary and sufficient condition for Mean Square Stability (MSS), showing that MSS can be equivalently thought of as robust mean stability. The framework has been extended to various network control settings \cite{padmasola2006tradeoffs, Padma06ACC, Jeff11, Matt2014cvxMScontrol, Matt2014cvxMScontrol_act, MattACC15, Matt2017thesis} which are relevant in this paper. In particular, \cite{Ma2015} is the first to show that MS performance is equivalent to an augmented MSS problem in the same vain of the analogous robust performance problems for deterministic uncertainty, and \cite{Matt2017thesis} show that the optimal MS performance synthesis is convex for a large class of systems. 
 
 
 
-However, these traditional robust stability analyses can't capture problems such as communication intermittency and multiplicative noise well, because these uncertainties are fundamentally stochastic processes in real time. Regarding these problems, the notion of Mean Square (MS) stability is more effective and therefore greatly enlarges the scope of robust stability\cite{IntroStoc}\cite{MSstability}\cite{FreqMSS}\cite{Meansquarenorm}. \cite{MSstability} and \cite{FreqMSS} found state space and frequency domain necessary and sufficient conditions for MS stability. Recently, some researchers have observed similarities between robust stability and stochastic stability and have designed MS stabilizing controllers for stochastic systems using robust control methods~\cite{RobustControl_Mulnoise}.  
-
-
+\cite{Willems1971FreqMSS, Willems1973MSstability} found state space and frequency domain necessary and sufficient conditions for MS stability. Recently, some researchers have observed similarities between robust stability and stochastic stability and have designed MS stabilizing controllers for stochastic systems using robust control methods~\cite{RobustControl_Mulnoise}.  
 
 
 % A norm minimization problem subject to an equation constraint is obtained. The violation is penalized in the total cost to enforce the structure and stabilization constraints.
 
+\subsection{Example}
 
+Consider a two-agent distributed system:
 
+\[
+\begin{bmatrix}
+    x_1[k + 1] \\ x_2[k + 1] 
+\end{bmatrix} =
+A \begin{bmatrix}
+    x_1[k] \\ x_2[k] 
+\end{bmatrix}
++ B_w \begin{bmatrix}
+    w_1[k] \\ w_2[k] 
+\end{bmatrix}
+\]
+On step \(k\) at agent 1, the most recent information of \(x_1[k]\) and history states are fully available, while the delayed information of state \(x_2[k - 1]\) and history states are available. The core problem is how to establish the MMSE estimator \(\hat{x}_2[k]\) at agent 1.
 
 
 \subsection{Contribution}
