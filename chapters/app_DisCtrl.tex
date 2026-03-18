@@ -43,10 +43,7 @@ Define:
 \end{split}
 \end{equation}
 \begin{equation}\label{eqn:YP_R0}
-\begin{split}
-    R_0 = &\Gamma_b^{-1}(B_u^\top X_b A X_c C_y^\top + D_{zu}^\top C_z X_c C_y^\top \\
-    &+ B_u^\top X_2 B_w D_{yw}^\top +D_{zu}^\top D_{zw} D_{yw}^\top) \Gamma_c^{-1}.
-\end{split}
+    R_0 = \Gamma_b^{-1}(B_u^\top X_b A X_c C_y^\top + D_{zu}^\top C_z X_c C_y^\top + B_u^\top X_2 B_w D_{yw}^\top +D_{zu}^\top D_{zw} D_{yw}^\top) \Gamma_c^{-1}.
 \end{equation}
 
 \begin{lemma}
@@ -109,7 +106,7 @@ The realization of \({M_r}^{-1} Y_r\), \({M_r}^{-1}\) and \({M_l}^{-1}\) are:
 
 As vectorization preserves the original additive and multiplicative relationship between rational functions, we can reshape the entire algebraic constraint into a vector.
 \begin{equation}\label{eqn::QPhirelation}
-    \vc(Q) = \vc(M_r^{-1}Y_r)-{M_l}^{-\top} \otimes {M_r}^{-1} \vc(\Phi)\\
+    \vc(Q) = \vc(M_r^{-1}Y_r)-{M_l}^{-\top} \otimes {M_r}^{-1} \vc(\Phi).
 \end{equation}
 Using the realization in Appendix~\ref{appsec::sskron},
 \[
@@ -127,7 +124,6 @@ Using the realization in Appendix~\ref{appsec::sskron},
 \end{array}\right].
 \]
 \(A_v,B_v,C_v,D_v,b_0\) are given in~\eqref{eqn::ss::vecmat}. Multiplying unit impulse \(\delta\) on both sides, we find that the unilateral impulse responses \(q[i] =\vc(Q[i])\) and \(\phi[i] =\vc(\Phi[i])\) match the output and input of state-space~\eqref{eqn::ss::vecPhitovecQ}. 
-
 Since \(A_v +B_v C_v\) is Schur, \((A_v, C_v)\) is detectable. The detectability ensures the state sequence \(\eta\in\ell_2\) by \(q,\phi \in\ell_2\).
 \end{proof}
 
@@ -519,22 +515,19 @@ As \(\nu_\lambda^\top F^\top \alpha = \alpha^\top F \nu_\lambda = z_2^\top \vc(F
 Assume \((\nu_\lambda^\top C_y^\top)\otimes(\mu_\lambda^\top B_u) E_m =\mathbf{0}\) for an unstable \(\lambda\). 
 We show that \(b_0\notin \mathcal{X}_{stab}\) by explicitly finding an generalized eigenvector \(z^\top \in\mathcal{X}_{stab}^\perp\) such that \(z^\top b_0 \neq 0\).
 Let
-\[z^\top = 
-\left[
-\begin{array}{cc}
-    z_1^T & z_2^T \\
-\end{array}\right] = 
-\left[
-\begin{array}{cc}
-    \nu_\lambda^\top C_y^\top \otimes \alpha_1^\top & \nu_\lambda^\top \otimes \alpha_2^\top \\
-\end{array}\right]
-\]
-\begin{equation*}
-\begin{split}
-    \alpha_1^\top &= \mu_\lambda^\top (\sigma I -B_u F) (\lambda I -A -B_u F)^{-1}\\
-    \alpha_2^\top & = - \mu_\lambda^\top \sigma I (\lambda I -A -B_u F)^{-1} B_u
-\end{split}
-\end{equation*}
+\begin{align*}
+    z^\top & = 
+    \left[
+    \begin{array}{cc}
+        z_1^T & z_2^T \\
+    \end{array}\right] = 
+    \left[
+    \begin{array}{cc}
+        \nu_\lambda^\top C_y^\top \otimes \alpha_1^\top & \nu_\lambda^\top \otimes \alpha_2^\top \\
+    \end{array}\right] \\
+    \alpha_1^\top & = \mu_\lambda^\top (\sigma I -B_u F) (\lambda I -A -B_u F)^{-1}\\
+    \alpha_2^\top & = - \mu_\lambda^\top \sigma I (\lambda I -A -B_u F)^{-1} B_u    
+\end{align*}
 where \(\sigma\) can be an arbitrary real number. Construct:
 \[
 w^\top = z^\top (\lambda I -A_v) = 
@@ -550,8 +543,7 @@ Together with
 \begin{align*}
 & z^\top B_v E_m = ((\nu_\lambda^\top C_y^\top) \otimes (\alpha_1^\top B_u  +\alpha_2^\top)) E_m\\
 & = ((\nu_\lambda^\top C_y^\top) \otimes (-\mu_\lambda^\top B_u F (\lambda I -A -B_u F)^{-1} B_u)) E_m \\
-& = ((\nu_\lambda^\top C_y^\top) \otimes (\mu_\lambda^\top B_u)) E_m\\
-& \quad - ((\nu_\lambda^\top C_y^\top) \otimes (\mu_\lambda^\top(\lambda I -A) (\lambda I -A -B_u F)^{-1} B_u)) E_m = \mathbf{0},
+& = ((\nu_\lambda^\top C_y^\top) \otimes (\mu_\lambda^\top B_u)) E_m - ((\nu_\lambda^\top C_y^\top) \otimes (\mu_\lambda^\top(\lambda I -A) (\lambda I -A -B_u F)^{-1} B_u)) E_m = \mathbf{0},
 \end{align*}
 % \begin{equation*}
 % \begin{split}
@@ -567,182 +559,108 @@ we show that \(z^\top\) is orthogonal to the subspace \(\mathcal{R}_{A_v,B_v E_m
 Because \(z^\top\) is a left generalized eigenvector corresponding to an unstable eigenvalue, \(z^\top\) is orthogonal to the stable subspace \(\mathcal{X}_A^s\). We know that \(z^\top x = 0\) for every \(x \in \mathcal{X}_{stab}\).
 However, from
 \begin{align*}
-    z^\top b_0 & = (\nu_\lambda ^\top\otimes \alpha_2^\top)\vc(F) = \alpha_2^\top F \nu_\lambda\\
-    & =  - \mu_\lambda^\top \sigma I (\lambda I -A -B_u F)^{-1} B_u F \nu_\lambda \\
+    z^\top b_0 & = (\nu_\lambda ^\top\otimes \alpha_2^\top)\vc(F) = \alpha_2^\top F \nu_\lambda =  - \mu_\lambda^\top \sigma I (\lambda I -A -B_u F)^{-1} B_u F \nu_\lambda \\
     & = \mu_\lambda^\top \sigma I\nu_\lambda - \mu_\lambda^\top (\lambda I -A -B_u F)^{-1}(\lambda I -A) \nu_\lambda = \sigma \neq 0
 \end{align*}
 by the arbitrary selection of \(\sigma\).
 \(b_0\) can't lie in \(\mathcal{X}_{stab}\).
 \end{proof}
-
-\section{Networked system state-space model construction}\label{appsec:nwss}
-Assume the state-space models of the subsystems in the plant are:
+\subsection{State-feedback solution simplification}
+In the special case of state-feedback, the plant is changed into
+\begin{equation}
+    P = \left[
+    \begin{array}{c|cc}
+        A & B_w & B_u \\
+        \hline
+        C_z & D_{zw} & D_{zu}\\
+        I & \mathbf{0} & \mathbf{0}
+    \end{array}\right]
+\end{equation}
+We emulate the generic output feedback solution to choose \(F,L\) so that  \(A_F\) and \(A_L\) are Schur. 
+\begin{subequations}
+\begin{align}
+G_{11} &= \left[\begin{array}{cc|c}
+    A_F & -B_u F & B_w\\
+   \mathbf{0}_{n_x,n_x} & A_L & B_w\\
+    \hline
+    C_z + D_{zu}F & -D_{zu}F & D_{zw}
+\end{array}\right];\\  
+G_{12} & = \left[
+    \begin{array}{c|c}
+        A_F & B_u \\
+        \hline
+        C_z + D_{zu}F & D_{zu} \\
+    \end{array}\right];\ 
+G_{21} = \left[
+    \begin{array}{c|c}
+        A_L & B_w\\
+        \hline
+        I & \mathbf{0} \\
+    \end{array}\right].
+\end{align}
+\end{subequations}
+The transfer function matrix of \(G_{11}\) can be simplified into:
+\begin{equation}
+\begin{split}
+G_{11} & = D_{zw} + 
+\begin{bmatrix}
+    C_z+D_{zu} F & -D_{zu} F
+\end{bmatrix} \left(z I - \begin{bmatrix}
+    A_F & -B_u F \\
+    \mathbf{0} & A_L
+\end{bmatrix}\right)^{-1}
+\begin{bmatrix}
+    B_w \\
+    B_w
+\end{bmatrix} \\
+= & D_{zw} + C_z (zI-A_L)^{-1} B_w  - (C_z + D_{zu} F) (zI-A_F)^{-1} L (zI-A_L)^{-1} B_w
+\end{split} 
+\end{equation}
+The tranfer function matrices of \(G_{12}\) and \(G_{21}\) are
 \begin{equation*}
-\begin{cases}
-    x_i^+ = 0.8 x_i + u_i \\
-    y_i = x_i ,\quad i \in \{1,3\};\\
-    \eta_{2i} = \eta_{4i} = 1.3 x_i + 0.1 u_i  
-\end{cases};
-\begin{cases}
-    x_i^+ = 0.8 x_i + u_i + \zeta_{i1} + \zeta_{i3}\\
-    y_i = x_i + 0.3 \zeta_{i1} + 0.3 \zeta_{i3},\quad i \in \{2,4\}\\
-    \zeta_{i1} = \frac{1}{z} \eta_{i1};\quad \zeta_{i3} = \frac{1}{z} \eta_{i3}
-\end{cases}
+\begin{split}
+& G_{12} = (C_z + D_{zu} F) (zI-A_F)^{-1} B_u + D_{zu}; \\
+& G_{21} = (zI-A_L)^{-1} B_w.
+\end{split} 
 \end{equation*}
-% \begin{equation*}
-% \begin{cases}
-%     x_3^+ &= 0.8 x_3 + w_{31} + u_3 \\
-%     y_3 &= x_3 + w_{32} \\
-%     \eta_{23} & = \eta_{43} = 1.3 x_3 + 0.1 u_3
-% \end{cases};
-% \end{equation*}
-
-% \begin{equation*}
-% \begin{cases}
-%     x_4^+ &= 0.8 x_4 + w_{41} + u_4 + \zeta_{41} + \zeta_{43}\\
-%     y_4 &= x_4 + w_{42} + 0.3 \zeta_{41} + 0.3 \zeta_{43}\\
-%     \zeta_{41} & = \frac{1}{z} \eta_{41};\quad \zeta_{43} = \frac{1}{z} \eta_{43}
-% \end{cases}.
-% \end{equation*}
-By absorbing the delays into subsystems \(1\) and \(3\), we obtain their augmented state-space models with state \(\bar{x}_i\) and the \(\bar{\eta}\) signals. The states of \(1\) and \(3\) also influence the dynamics of \(2\) and \(4\). 
-\begin{equation*}
-\begin{cases}
-    \bar{x}_i^+ &= \begin{bmatrix} 0.8 & 0 \\ 1.3 & 0 \end{bmatrix} \bar{x}_i 
-    + \begin{bmatrix} 1 \\ 0.1 \end{bmatrix}u_i \\
-    y_i &= \begin{bmatrix} 1 & 0 \end{bmatrix} \bar{x}_i + \begin{bmatrix} 0 & 1 \end{bmatrix} w_i\\
-    \bar{\eta}_{2i} & = \bar{\eta}_{4i} = \begin{bmatrix} 0 & 1 \end{bmatrix} \bar{x}_i 
-\end{cases},\quad i \in \{1,3\};
-\end{equation*}
-\begin{equation*}
-\begin{cases}
-    x_i^+ &= 0.8 x_i + u_i + \zeta_{i1} + \zeta_{i3}\\
-    & = 0.8 x_i + u_i + \begin{bmatrix} 0 & 1 \end{bmatrix} \bar{x}_1 + \begin{bmatrix} 0 & 1 \end{bmatrix} \bar{x}_3 \\
-    y_i &= x_i + 0.3 \zeta_{i1} + 0.3 \zeta_{i3}\\
-    & = x_i + \begin{bmatrix} 0 & 0.3 \end{bmatrix} \bar{x}_1 + \begin{bmatrix} 0 & 0.3  \end{bmatrix} \bar{x}_3 \\
-\end{cases},\quad i \in \{2,4\}.
-\end{equation*}
-Network Inputs: \(\zeta_1 = \left[\empty\right],\ \zeta_2 = \begin{bmatrix} \zeta_{21} \\ \zeta_{23}\end{bmatrix},\ \zeta_3 = \left[\empty\right],\ 
-\zeta_4 = \begin{bmatrix} \zeta_{41} \\ \zeta_{43}\end{bmatrix}\).
-Network Outputs: \(\bar{\eta}_1 = \begin{bmatrix} \bar{\eta}_{21} \\ \bar{\eta}_{41}
-\end{bmatrix},\ \bar{\eta}_2 = \left[\empty\right],\ \bar{\eta}_3 = \begin{bmatrix} \bar{\eta}_{23} \\ \bar{\eta}_{43} \end{bmatrix}, \ \bar{\eta}_4 = \left[\empty\right]\).
-
+We select \(F\) as the optimal LQR gain for input channel \(P_{12}\). As a result, \(G_{12}^\sim G_{12} = \Gamma_b\). Noticing that,
 \[
-\begin{bmatrix}
-    \zeta_{1} \\ \zeta_{2} \\ \zeta_{3} \\ \zeta{4}
-\end{bmatrix} = N \begin{bmatrix}
-    \bar{\eta}_{1} \\ \bar{\eta}_{2} \\ \bar{\eta}_{3} \\ \bar{\eta}_{4}
-\end{bmatrix} = 
-\left[
-\begin{array}{c:c:c:c}
-    \empty & \empty & \empty& \empty \\
-    \hdashline
-    I\ \mathbf{0} & \empty & \mathbf{0}\ \mathbf{0} & \empty\\
-    \mathbf{0}\ \mathbf{0} & \empty & I\ \mathbf{0} & \empty\\
-    \hdashline
-    \empty & \empty & \empty& \empty \\
-    \hdashline
-    \mathbf{0}\ I & \empty & \mathbf{0}\ \mathbf{0} & \empty\\
-    \mathbf{0}\ \mathbf{0} & \empty & \mathbf{0}\ I & \empty\\
-\end{array}\right]\begin{bmatrix}
-    \bar{\eta}_{1} \\ \bar{\eta}_{2} \\ \bar{\eta}_{3} \\ \bar{\eta}_{4}
-\end{bmatrix}.
+H_0 = G_{11} + G_{12} F G_{21} = (C_z + D_{zu} F) (zI-A_F)^{-1} B_w + D_{zw}.
 \]
-The aggregate state-space of the plant is therefore: 
-\begin{equation*}
-A = 
-\begin{bmatrix}
-A_{d_1} & 0 & 0 & 0\\
-A_{x} & A_{d_2} & A_{x} & 0\\
-0 & 0 & A_{d_1} & 0\\
-A_{x} & 0 & A_{x} & A_{d_2}
-\end{bmatrix},
-\left[
-\begin{array}{c:c}
-    A_{d_1} & \empty \\
-    \hdashline
-    A_x & A_{d_2}\\
-\end{array}\right]
-= 
-\left[
-\begin{array}{cc:c}
-    0.8 & 0 & \empty \\
-    1.3 & 0 & \empty \\
-    \hdashline
-    0 & 1 & 0.8\\
-\end{array}\right];
-\end{equation*}
-\begin{equation*}
-C_y = 
-\begin{bmatrix}
-C_{d_1} & 0 & 0 & 0\\
-C_{x} & C_{d_2} & C_{x} & 0\\
-0 & 0 & C_{d_1} & 0\\
-C_{x} & 0 & C_{x} & C_{d_2}
-\end{bmatrix},
-\left[
-\begin{array}{c:c}
-    C_{d_1} & \empty \\
-    \hdashline
-    C_x & C_{d_2}\\
-\end{array}\right]
-= 
-\left[
-\begin{array}{cc:c}
-    1 & 0 & \empty \\
-    \hdashline
-    0 & 0.3 & 1\\
-\end{array}\right];
-\end{equation*}
-\begin{equation*}
-B_u = 
-\begin{bmatrix}
-B_{d_1} & & & \\
-& B_{d_2} & & \\
-& & B_{d_1} &\\
-& & & B_{d_2}
-\end{bmatrix};\ 
-B_{d_1} = \begin{bmatrix}
-1\\
-0
-\end{bmatrix},\ B_{d_2} = 1;\ D_{yu} = \mathbf{0}_{4\times 4}.
-\end{equation*}
-% In this example, we assume each subsystem \(i\) has independent local exogenous noise \(w_i\). Each \(w_i = \left[w_{i1},w_{i2}\right]^\top\) is a 2-d vector. \(w_{i1}\) is the processing noise and \(w_{i2}\) is the measuring noise.
-In the generalized plant, we let:
-\begin{equation*}
-B_w = 
-\begin{bmatrix}
-B_{d_1} & & & \\
-& B_{d_2} & & \\
-& & B_{d_1} &\\
-& & & B_{d_2}
-\end{bmatrix},\ 
-B_{d_1} = \begin{bmatrix}
-1 & 0\\
-0 & 0
-\end{bmatrix},\ B_{d_2} = \begin{bmatrix}
-1 & 0\\
-\end{bmatrix};
-\end{equation*}
-% The performance output vector \(z\) is selected as \(z = \left[x_1 + u_1, x_2 + u_2, x_3 + u_3, x_4 + u_4\right]^\top\). 
-\begin{equation*}
-C_z = 
-\begin{bmatrix}
-C_{d_1} & & & \\
-& C_{d_2} & & \\
-& & C_{d_1} &\\
-& & & C_{d_2}
-\end{bmatrix},\ 
-C_{d_1} = \begin{bmatrix}
-1 & 0\\
-\end{bmatrix},\ C_{d_2} = 1;
-\end{equation*}
-\begin{equation*}
-D_{yw} = I_4 \otimes \begin{bmatrix}
-0 & 1\\
-\end{bmatrix},\ 
-D_{zu} = I_4,\  
-D_{zw} = \mathbf{0}_{4\times 8}
-\end{equation*}
+is the optimal centralized closed-loop response and is invariant with \(L\) selection. Therefore, we can arbitrary pick \(L\). Putting \(L\) equal to \(-A\) bring us huge benefits that \(G_{21} = \frac{1}{z} B_w\) becomes a one-step delayed gain block and thereby \(J_\mathcal{S}\) in Problem~\ref{Prob::H2min_infHorQuad} becomes:
+\begin{equation}
+     J_\mathcal{S} \coloneqq \underset{Q\in\mathcal{RH}_\infty}{\min} \|\Gamma_b^{\frac{1}{2}}(Q + F) B_w\|_{\mathcal{H}_2}^2.
+\end{equation}
+
+
+
+% \begin{equation*}
+% \begin{split}
+% & G_{11} = \begin{bmatrix}
+%     C_z+D_{zu} F & -D_{zu} F
+% \end{bmatrix} \begin{bmatrix}
+%     (zI-A_F)^{-1} & -(zI-A_F)^{-1} B_u F (zI-A_L)^{-1} \\
+%     \mathbf{0} &  (zI-A_L)^{-1}
+% \end{bmatrix}
+% \begin{bmatrix}
+%     B_w \\
+%     B_w
+% \end{bmatrix} + D_{zw}\\
+% & = D_{zw} +C_z(zI-A_F)^{-1} B_w  + D_{zu} F(zI-A_F)^{-1} B_w - C_z (zI-A_F)^{-1} B_u F (zI-A_L)^{-1} B_w \\ 
+% & - D_{zu} F (zI-A_F)^{-1} B_u F (zI-A_L)^{-1} B_w - D_{zu} F (zI-A_L)^{-1} B_w \\
+% & = D_{zw} + C_z(zI-A_F)^{-1} B_w  + D_{zu} F(zI-A_F)^{-1} B_w \\
+% & - C_z (zI-A_F)^{-1} B_u F (zI-A_L)^{-1} B_w \\ 
+% & - D_{zu} F (zI-A_F)^{-1} (zI -A) (zI-A_L)^{-1} B_w \\ 
+% & = D_{zw} + C_z(zI-A_F)^{-1} (I - B_u F (zI-A_L)^{-1}) B_w \\
+% & + D_{zu} F (zI-A_F)^{-1} (I - (zI -A) (zI-A_L)^{-1}) B_w \\
+% & = D_{zw} + C_z(zI-A_F)^{-1} (zI - A - B_u F - L) (zI-A_L)^{-1} B_w \\
+% & - D_{zu} F (zI-A_F)^{-1} L (zI-A_L)^{-1} B_w \\
+% & = D_{zw} + C_z (zI-A_L)^{-1} B_w  \\
+% & - (C_z + D_{zu} F) (zI-A_F)^{-1} L (zI-A_L)^{-1} B_w
+% \end{split} 
+% \end{equation*}
+
+
 \section{State-space Kronecker products}\label{appsec::sskron}
 Let \(G_i = \left[
     \begin{array}{c|c}
@@ -770,7 +688,213 @@ The realization of a vectorized state-space model and the realization of the Kro
 B_1 \otimes C_2 & A_1\otimes I_{n_{y_2}} & B_1 \otimes D_2 \\
 \hline
 D_1 \otimes C_2 & C_1 \otimes I_{n_{y_2}} & D_1 \otimes D_2 
-\end{array}\right],
+\end{array}\right].
 \end{split}
 \end{equation*}
 
+\section{Technical Implementations}\label{appsec:syntech}
+To improve the numerical robustness of the optimization, we avoid parameterizing the quadratic program directly in terms of the open-loop input sequence $\{u[i]\}_{i=0}^{N-1}$ in~\eqref{eqn::ss::reducedvec}. Instead, we perform a time-varying state-feedback change of variables,
+\[
+u[i] = \kappa_i \zeta[i] + v[i],
+\]
+where $\kappa_i$ is a stabilizing feedback gain and $v[i]$ serves as the new optimization variable.
+
+The feedback gains are initialized using the infinite-horizon LQR solution. Let $(X_m,\kappa_m)$ denote the stabilizing solution of the discrete-time algebraic Riccati equation (DARE)
+\begin{align*}
+    X_m &= \mathrm{DARE}\!\left(A_r, B_r^m, C_r^\top \Gamma C_r, D_m^\top \Gamma D_m, C_r^\top \Gamma D_m, I\right), \\
+    \kappa_m &=
+    -\!\left(D_m^\top \Gamma D_m + (B_r^m)^\top X_m B_r^m\right)^{-1}
+    \left((B_r^m)^\top X_m A_r + D_m^\top \Gamma C_r\right).
+\end{align*}
+For $i<m$, the gain $\kappa_i$ and the associated cost-to-go matrix $X_i$ are computed recursively via the backward Riccati recursion
+\begin{equation}\label{eqn::backrec}
+\begin{aligned}
+    R_i &\coloneqq D_i^\top \Gamma D_i + (B_r^i)^\top X_{i+1} B_r^i, \\
+    \kappa_i &\coloneqq -R_i^{-1}\!\left((B_r^i)^\top X_{i+1} A_r + D_i^\top \Gamma C_r\right), \\
+    X_i &\coloneqq C_r^\top \Gamma C_r + A_r^\top X_{i+1} A_r - \kappa_i^\top R_i \kappa_i .
+\end{aligned}
+\end{equation}
+
+Note that for $0 \le i < m$, the dimension of $v[i]$ grows in the same manner as that of $u[i]$. Under this change of variables, the state evolution of $\zeta$ can be written entirely in terms of $v$ as
+\begin{equation}\label{eqn::ss::redshift}
+\begin{aligned}
+\zeta[i+1] &= A_s^i \zeta[i] + B_s^i v[i] + b\,\delta, \\
+q[i] &= C_s^i \zeta[i] + D_s^i v[i] + d_0\,\delta ,
+\end{aligned}
+\end{equation}
+with
+\[
+A_s^i = A_r + B_r E_i \kappa_i,\;
+B_s^i = B_r E_i,\;
+C_s^i = C_r + D_r E_i \kappa_i,\;
+D_s^i = D_r E_i .
+\]
+\(E_i = E_m\) and \(\kappa_i = \kappa_m\), \(\forall i\geq m\). By construction, the matrices $A_s^i$ are Schur stable, i.e., their spectral radii are strictly less than one. As a result, we avoid the numerical growth typically associated with unstable or marginally stable open-loop dynamics as the truncation length $N$ increases.
+
+We use the following notation to compactly write vertical concatenations of input/state/output trajectories:
+\[
+\bar{v}_N \coloneqq \ver\left[v[i]\right]_{i \in \mathcal{F}_N}, \bar{\zeta}_N \coloneqq \ver[\zeta[i]]_{i = 1, \hdots ,N}, \bar{q}_N \coloneqq \ver\left[q[i]\right]_{i \in \mathcal{F}_N}.
+\]
+Given \(\zeta[0] = \mathbf{0}\) and \(\bar{v}_N\), \(\bar{\zeta}_N\) and \(\bar{q}_N\) can be given as a Toeplitz-like form,
+\begin{align*}
+\bar{\zeta}_N & = h_N^1 + U_N^1 \bar{v}_N,\quad \bar{q}_N = h_N^2 + U_N^2 \bar{v}_N,\\
+\end{align*}
+where
+\[
+h_N^1 \coloneqq 
+\left[\begin{array}{c}
+    b \\
+    A_s^1 b\\
+    \vdots\\
+    A_s^{N - 1} A_s^{N-2} \hdots A_s^1 b
+\end{array}\right],\quad
+h_N^2 \coloneqq 
+\left[\begin{array}{c}
+    d_0 \\
+    C_s^1 b\\
+    \vdots\\
+    C_s^{N - 1} A_s^{N-2} \hdots A_s^1 b
+\end{array}\right],
+\]
+\[
+U_N^1 \coloneqq
+\left[
+\begin{array}{cccc}
+    B_s^0 & & & \\
+    A_s^1 B_s^0 & B_s^1 & &\\
+    \vdots & \ddots & \ddots & \\
+    A_s^{N - 1} A_s^{N-2} \hdots A_s^1 B_s^0 & \hdots & A_s^{N - 1} B_s^{N-2} & B_s^{N-1}
+\end{array}\right],
+\]
+\[
+U_N^2 \coloneqq
+\left[
+\begin{array}{cccc}
+    D_s^0 & & &\\
+    C_s^1 B_s^0 & D_s^1 & &\\
+    \vdots & \ddots & \ddots & \\
+    C_s^{N - 1} A_s^{N-2} \hdots A_s^1 B_s^0 & \hdots & C_s^{N - 1} B_s^{N-2} & D_s^{N-1}
+\end{array}\right].
+\]
+The final state \(\zeta[N] = [h_N^1]_N + [U_N^1]_N \bar{v}_N\). \([h_N^1]_N\) and \([U_N^1]_N\) respectively represent the last row of \(h_N^1\) and \(U_N^1\).
+
+The prefix \(\ell_1\) norm and tail \(\ell_2\) norm are changed into:
+
+\begin{subequations}
+\begin{align}
+\mu_{1N}^2 & = \|\bar{\phi}_N\|_1^2 = \|(h_N - U_N h_N^2) -U_N U_N^2 \bar{v}_N\|_1^2 \\
+\mu_{2N}^2 & = \|\begin{bmatrix}
+    \bar{q}_N \\ 1
+    \end{bmatrix} \|_{\Pi_N}^2 + \|\zeta[N]\|_X^2
+= \|\begin{bmatrix}
+    \bar{v}_N \\ 1
+    \end{bmatrix} \|_{\Psi_N}^2 \\
+\Psi_N & = 
+\begin{bmatrix}
+    (U_N^2)^\top & \mathbf{0} \\
+    (h_N^2)^\top & 1
+\end{bmatrix} \Pi_N
+\begin{bmatrix}
+    U_N^2 & h_N^2 \\
+    \mathbf{0} & 1
+\end{bmatrix} + \begin{bmatrix}
+    ([U_N^1]_N)^\top\\
+    ([h_N^1]_N)^\top
+\end{bmatrix} 
+{X_m}
+\begin{bmatrix}
+    [U_N^1]_N & [h_N^1]_N \\
+\end{bmatrix}    
+\end{align}
+\end{subequations}
+
+% \[
+% \begin{split}
+% \left[\begin{array}{c}
+%     \zeta[1]\\
+%     \zeta[2]\\
+%     \vdots\\
+%     \zeta[N]
+% \end{array}\right] & 
+% = 
+% \left[
+% \begin{array}{cccc}
+%     B_s^0 & & & \\
+%     A_s^1 B_s^0 & B_s^1 & &\\
+%     \vdots & \ddots & \ddots & \\
+%     A_s^{N - 1} A_s^{N-2} \hdots A_s^1 B_s^0 & \hdots & A_s^{N - 1} B_s^{N-2} & B_s^{N-1}
+% \end{array}\right]
+% \left[\begin{array}{c}
+%     v[0]\\
+%     v[1]\\
+%     \vdots\\
+%     v[N - 1]
+% \end{array}\right]
+% + \left[\begin{array}{c}
+%     b \\
+%     A_s^1 b\\
+%     \vdots\\
+%     A_s^{N - 1} A_s^{N-2} \hdots A_s^1 b
+% \end{array}\right]
+% \end{split}
+% \]
+% \[
+% \begin{split}
+% \left[\begin{array}{c}
+%     q[0]\\
+%     q[1]\\
+%     \vdots\\
+%     q[N - 1]
+% \end{array}\right] & 
+% = 
+% \left[
+% \begin{array}{cccc}
+%     D_s^0 & & &\\
+%     C_s^1 B_s^0 & D_s^1 & &\\
+%     \vdots & \ddots & \ddots & \\
+%     C_s^{N - 1} A_s^{N-2} \hdots A_s^1 B_s^0 & \hdots & C_s^{N - 1} B_s^{N-2} & D_s^{N-1}
+% \end{array}\right]
+% \left[\begin{array}{c}
+%     v[0]\\
+%     v[1]\\
+%     \vdots\\
+%     v[N - 1]
+% \end{array}\right]
+% + \left[\begin{array}{c}
+%     d_0 \\
+%     C_s^1 b\\
+%     \vdots\\
+%     C_s^{N - 1} A_s^{N-2} \hdots A_s^1 b
+% \end{array}\right]
+% \end{split}
+% \]
+
+Therefore, we can reformulate Problem~\ref{Prob::l1NFir_QP} with \(\bar{v}_N\) as an unconstrained variable.
+\begin{opt}[QP implementation]\label{Prob::l1NFir_QP_tech}
+\begin{equation}
+\begin{split}
+    & \underset{\bar{v}_N}{\min}\ \|(h_N - U_N h_N^2) -U_N U_N^2 \bar{v}_N\|_1^2 + c \cdot \|\begin{bmatrix}
+    \bar{v}_N \\ 1
+    \end{bmatrix} \|_{\Psi_N}^2\\
+\end{split}
+\end{equation}
+\end{opt}
+\begin{rem}
+The notation $\ell_1$ norm is used with a slight abuse of terminology here, since the expression $(h_N - U_N h_N^2) - U_N U_N^2 \bar{v}_N$ is not a matrix-valued sequence but rather a stacked column vector of dimension $n_z n_w N$. To evaluate its $\ell_1$ norm, one may equivalently reshape this vector into the corresponding matrix sequence and then apply the standard $\ell_1$ norm definition. This procedure is made precise by the algorithm described below.
+\begin{algorithm}
+\caption{Vecotorized finite response sequence \(\ell_1\) norm evaluation}\label{alg::FRl1cal}
+\begin{algorithmic}[1]
+\State \(\beta \gets \mathrm{abs}((h_N - U_N h_N^2) -U_N U_N^2 \bar{v}_N)\). Calculate the element-wise absolute value of the vector.
+
+\State \(\mathrm{RSPv}_i \gets \beta_{i n_z n_w +1 \colon (i + 1) n_z n_w}, \forall i\in \mathcal{F}_N\). Each \(\mathrm{RSPv}_i\) is an \(n_z n_w\) vector.
+
+\State \(\mathrm{RSPv}_\mathrm{sum}  \gets \sum_{i\in \mathcal{F}_N} \mathrm{RSPv}_i\). \(\mathrm{RSPv}_\mathrm{sum}\) is an \(n_z n_w\) vector, summing up the absolute value of responses from time \(0\) to \(N - 1\).
+
+\State \(\mathrm{RSP}_\mathrm{sum} \gets \mathrm{reshape} (\mathrm{RSPv}_\mathrm{sum}, n_z, n_w)\). \(\mathrm{RSP}_\mathrm{sum}\) is an \(n_z \times n_w\) matrix.
+
+\State \(z_\mathrm{max} \gets \mathrm{RSP}_\mathrm{sum} \mathbf{1}_{n_w}\). \(z_\mathrm{max}\) is an \(n_z\) size vector with the \(i\)-th element recording the largest magnitude \(z_i\) can reach by restricting \(|w_i| \le 1\).
+
+\State \(\mu_1^N \gets \max_{j \in \{1, \hdots, n_z\}} z_\mathrm{max}[j]\)
+\end{algorithmic}
+\end{algorithm}
+\end{rem}

@@ -1,11 +1,25 @@
 \chapter{Distributed \(\mathcal{H}_2\) control}
-
+\label{chap:H2ctrl}
 \section{Gist of the Chapter}
+
+This chapter addresses the problem of $\mathcal{H}_2$ optimal control for networked systems. We aim to find the optimal internally stabilizing output-feedback controller that respects the communication constraints of the underlying network. Our approach builds on the Youla parameterization by the centralized \(\mathcal{H}_2\) controller, where the network structure imposes an infinite-dimensional affine constraint on the Youla parameter. We reformulate the structural constraints induced by the network as an equivalent time-domain dynamical condition. By analyzing this representation, we derive necessary and sufficient conditions for the existence of stabilizing controllers within the prescribed structure and provide an exact synthesis method for the optimal distributed $\mathcal{H}_2$ controller. The proposed approach yields rational, implementable solutions without approximation.
+
+Unlike recent approaches that over-parameterize stabilizing controllers, we take a step back to focus on algebraically analyzing the constraint presented in \eqref{eqn:strcst_0}. Based on our analysis, we present a complete solution of the optimal distributed \(\mathcal{H}_2\) controller for the networked plant. 
+
+% \begin{enumerate}
+%     \item We demonstrate that quadratic invariance (QI) is insufficient for differentiating structured yet centralized controllers from network-implementable distributed controllers with a concrete example. We focus on a large subclass of QI problems where the network implementability is guaranteed.
+%     \item We formulate a complete characterization of admissible controllers with a fictitious dynamical system constructed via standard Youla Parameterization. We demonstrate the equivalence between the open-loop stabilizability of this system and the feasibility of the structured stabilization problem. Furthermore, we provide a condition that determines the stabilizability.
+%     \item We construct the finite-dimensional \(\mathcal{H}_2\) distributed controller algebraically from the fictitious system by solving three discrete-time algebraic Riccati equations (DARE), thus eschewing approximation methods. This result hugely reduces the computational time and the controller order.
+% \end{enumerate}
+
+
+
+
 \section{State-of-the-art on distributed \(\mathcal{H}_2\) optimal control}
 
 Searching for stabilizing controllers with an arbitrary structure is not a convex problem in general~\cite{Tsitsiklis1985NP_decentralized}. Optimal controllers for an LTI plant in some structures can even be non-linear~\cite{ Witsenhausen1968ACI}. While the Youla parametrization enables us to search over stabilizing controllers convexly through closed-loop (CL) maps \cite{YoulaPar} when there is no structure, the structural constraints on the controllers may be projected into nonconvex constraints on the Youla Parameter, as their convexity is not preserved under linear fractional transformation (LFT).
 
-Following the Youla parameterization approach, Voulgaris is the first to notice the usefulness of constructing a doubly coprime factorization (DCF) consistent with the desired structure, which enables a direct search for the Youla parameter \(Q\) within the same structured set \cite{Voulgaris2001convexity}. Other works identify several particular structures where consistently structured DCFs are accessible and establish convex control synthesis methods for such structures~\cite{Voulgaris2000nested, XinQ2004Nested, Bamieh2005CvxSI}. Later,~\cite{SanjayLQIsufficient} introduces the notion of Quadratic Invariance (QI) to unify all the structures for which one can search for the controllers convexly~\cite{LessardQI}. As part of their contribution, they establish the theoretical foundation for parameterizing all in-structure stabilizing controllers using a stable, structured, and stabilizing initial controller. However, obtaining such an initial controller is generally nontrivial.
+Following the Youla parameterization approach, Voulgaris is the first to notice the usefulness of constructing a doubly coprime factorization (DCF) consistent with the desired structure, which enables a direct search for the Youla parameter \(Q\) within the same structured set \cite{Voulgaris2001convexity}. Other works identify several particular structures where consistently structured DCFs are accessible and establish convex control synthesis methods for such structures~\cite{Voulgaris2000nested, XinQ2004Nested, Bamieh2005CvxSI}. Later,~\cite{SanjayLQIsufficient} introduces the notion of Quadratic Invariance (QI) to algebraically characterize all the structures for which one can search for the controllers convexly~\cite{LessardQI}. As part of their contribution, they establish the theoretical foundation for parameterizing all in-structure stabilizing controllers using a stable, structured, and stabilizing initial controller. However, obtaining such an initial controller is generally nontrivial.
 
 
 To address this limitation, \cite{SabauVectorization} seeks to establish the classical Youla parameterization without relying on structured DCFs. In return, they introduce an affine constraint rather than a direct structural constraint as the price for eschewing structured DCFs:
@@ -18,7 +32,16 @@ This constraint does not necessarily admit finite-impulse-response (FIR) solutio
 A class of recent methods, e.g., SLP~\cite{SLSparametrization, wang2019SLS}, IOP~\cite{Furieri2019IOP}, and mixed parameterizations~\cite{Zheng2022SLP_IOP}, abandon the Youla parameterization approach. These methods over-parametrize the search spaces (not just $Q$) and enforce stabilization implicitly through infinite-dimensional equality constraints, which unfortunately are not guaranteed to have finite-dimensional feasible solutions. \cite{Matni2017SLStol} later addresses the tolerance of equality constraint violations in the SLP method. Overall, their synthesis formulation is sophisticated and leads to order inflation in the controller order. Fundamentally, these new parametrizations are equivalent to the Youla Parameterization~\cite{Zheng2021Equi_SLP_IOP, Tseng2021Equi_Par}.
 
 
-The Youla operator state-space (YOSS) framework provides an alternative, over-parameterizing representation for all stabilizing controllers with a predefined structure~\cite{naghnaeian2019youla}. This approach introduces the notion of a generalized Luenberger observer with internal dynamics designed for networked systems. The paper establishes a distributed analogue of the Separation Principle, showing that distributed state estimation can be carried out independently and then used with “state-like” controllers to obtain the set of all output-feedback stabilizing controllers with a given structure. A key advantage of this approach is that the estimator and state-like feedback controller satisfy relaxed infinite-dimensional "inequalities", which admit finite-dimensional feasible solutions.
+The Youla operator state-space (YOSS) framework provides an alternative, over-parameterizing representation for all stabilizing controllers with a predefined structure~\cite{naghnaeian2019youla}. This approach introduces the notion of a generalized Luenberger observer with internal dynamics designed for networked systems. The paper establishes a distributed analogue of the Separation Principle, showing that distributed state estimation can be carried out independently and then used with “state-like” controllers to obtain the set of all output-feedback stabilizing controllers with a given structure. A key advantage of this approach is that the estimator and state-like feedback controller satisfy relaxed infinite-dimensional inequalities, which admit finite-dimensional feasible solutions.
+
+\section{Contribution}
+The key points of our contributions are:
+\begin{enumerate}
+    \item We derive an exact, finite-dimensional distributed \(\mathcal{H}_2\) controller by extending the centralized solution with an additional discrete-time algebraic Riccati equation (DARE) and a backward recursion. Solving this DARE quantifies the minimal performance degradation induced by the structural constraints and simultaneously yields the optimal controller within the prescribed structure.
+    \item We give a constructive approach to find exact solutions to the constraints on Youla parameter \(Q\), i.e. \(H -U Q V \in \mathcal{S}\), which ensures that the stabilizing controller lies in \(\mathcal{S}\). This approach is broadly applicable to other structured controller synthesis problems.
+    \item We provide a condition that checks the existence of stabilizing controllers in the prespecified structure and establish its connection with the standard PBH test. 
+    \item We show with an example that QI alone cannot distinguish structured centralized from networked distributed controllers. 
+\end{enumerate}
 
 
 \section{Problem Formulation}\label{sec:ProbForm}
@@ -73,9 +96,9 @@ Given $\mathcal{G}^c=(\mathcal{V},\mathcal{A}^c)$,
 % \footnote{\(\mathcal{A}^c\) decides the communication dependence among sub-controllers. More edges in \(\mathcal{G}^c\) enhance the controllability of the network plant, whereas \(\mathcal{A}^c = \mathbf{0}_n\) is the most complex problem, the fully decentralized control.}
 find an internally stabilizing output feedback network distributed controller \(K\in {\cal K}_N \coloneqq \mathfrak{S}(\mathcal{G}^c, \mathcal{P}_u, \mathcal{P}_y)\)  that minimizes the following closed-loop \(\mathcal{H}_2\) cost:
 \begin{equation}
-    \mu_{\mathrm{dis},\mathcal{H}_2} \coloneqq  \displaystyle\min_{K\in {\cal K}_N-stabilizing}\ \|\Phi_{zw}(K)\|_{\mathcal{H}_2}^2, 
+    \mu_{\mathrm{dis},\mathcal{H}_2} \coloneqq  \displaystyle\min_{K\in {\cal K}_N-stabilizing}\ \|\Phi_{zw}(K)\|_{\mathcal{H}_2}, 
 \end{equation}
-where
+where 
 \begin{equation}\label{eqn::Phi_K}
 \Phi_{zw}(K) \coloneqq \lft(P,K) = P_{11}+P_{12} K(I-P_{22}K)^{-1} P_{21}.
 \end{equation}
@@ -92,33 +115,36 @@ The full state-feedback case has well-established bottom-up synthesis approaches
 Instead, we follow the standard practice of relaxing the optimization domain into all stabilizing structured transfer function matrices that conform to the controller network, which means we search over the TFMs in \({\cal S}\coloneqq \mathfrak{T}(\mathcal{G}^c,\mathcal{P}_{u},\mathcal{P}_y)\)
 (for notational simplicity, we will refer to this set as \(\mathcal{S}\)).
 \footnote{Example~\ref{exp:4nodediamond} in section \ref{sec::numex} presents a case where this relaxation is strict.}
-
 \begin{opt}[Structured optimal control]\label{Prob::networkoptcontrol}
 Under the setting of Problem \ref{Prob::DistributedH2}, consider the following relaxation where we search over the set of structured transfer function matrices compatible with the network to minimize:
 \begin{equation}
-    \mu_{\mathrm{str}, \mathcal{H}_2} \coloneqq \underset{K - \text{stab and } K\in \mathcal{S}}{\min}\ \|\Phi_{zw}(K)\|_{\mathcal{H}_2}^2.
+    \mu_{\mathrm{str}, \mathcal{H}_2} \coloneqq \underset{K - \text{stab and } K\in \mathcal{S}}{\min}\ \|\Phi_{zw}(K)\|_{\mathcal{H}_2}.
 \end{equation}
 \end{opt}
-The above problem is still non-convex for two reasons: 1) \(\Phi_{zw}\) is a nonconvex function about \(K\) itself; 2) The set of all stabilizing controllers is not a convex set.
-
+The above problem is still non-convex for two reasons: 
+\begin{enumerate}
+    \item \(\Phi_{zw}\) is a nonconvex function about \(K\) itself.
+    \item The set of all stabilizing controllers is not a convex set.
+\end{enumerate}
 
 \subsection{Youla Parameterization}
 % {\color{blue} Youla Parameterization is used to transform the non-convex cost function about \(K\) into a model-matching like cost function about Youla Parameter \(Q\) via a change of variables.}
 The Youla-Kucera Parameterization is a well-established framework for resolving the non-convexity of both the linear fractional transformation and the stabilizing controller set by parametrizing all proper internally stabilizing controllers and recasting the objective function into a convex model-matching form with a stable variable \(Q\), often referred to as the Youla parameter~\cite{YoulaPar}.
 \begin{figure}[ht]
     \centering
-    \includegraphics[width=0.5\linewidth]{figures/DisCtrlfigure/YoulaParablkdiagram.png}
+    \includegraphics[width=0.6\linewidth]{figures/DisCtrlfigure/YoulaParablkdiagram.png}
     \caption[Youla parameterization block diagram]{The block diagram of Youla parameterization. \(
     K_\mathrm{stab} = \lft(J_{YP},Q) = (Y_r - M_r Q) (X_r - N_r Q)^{-1}\). \(J_{YP}\) can be considered as an initial stabilizing controller. Setting \(Q = \mathbf{0}\) recovers the observer-based controller. A non-zero \(Q\) maps the output estimation error \(e = y - C_y \hat{x}\) to an additional input \(v\) that modifies the feedback behavior.}
     \label{fig:Youlapar}
 \end{figure}
-The central step for this parameterization is the \textbf{doubly co-prime factorization (DCF)} of \(P_{22}\)~\cite{ZhouRobustControl}. The DCF is given by eight stable transfer function matrices \(M_r,\ N_r,\ X_r,\ Y_r,\ M_l,\ N_l,\ X_l,\ Y_l\), which factorizes \(P_{22} = N_r M_r^{-1} = M_l^{-1} N_l\) and satisfies the Bézout identity:
+The central step for this parameterization is the \textbf{doubly co-prime factorization (DCF)} of \(P_{22}\)~\cite{Zhou1996RobustControl}. The DCF is given by eight stable transfer function matrices \(M_r,\ N_r,\ X_r,\ Y_r,\ M_l,\ N_l,\ X_l,\ Y_l\), which factorizes \(P_{22} = N_r M_r^{-1} = M_l^{-1} N_l\) and satisfies the Bézout identity:
 \begin{equation}\label{eqn:Bezout}
     X_l M_r - Y_l N_r = I; \quad M_l X_r - N_l Y_r = I.
 \end{equation}
 As the stabilizable and detectable realization of the plant is available, we construct the DCF by selecting a pair of state-feedback gain and Luenberger observer \((F, L)\) such that \(A_F = A + B_u F\), \(A_L = A + L C_y\) are Schur.
-\begin{equation}\label{DCF_r}
-    \left[\begin{array}{cc}
+\begin{subequations}
+\begin{align}
+& \left[\begin{array}{cc}
     M_r & Y_r \\
     N_r & X_r
     \end{array}\right]
@@ -128,10 +154,8 @@ As the stabilizable and detectable realization of the plant is available, we con
         \hline
         F & I & \mathbf{0}\\
         C_y & \mathbf{0} & I
-    \end{array}\right]
-\end{equation}
-\begin{equation}\label{DCF_l}
-    \left[\begin{array}{cc}
+    \end{array}\right];  \label{DCF_r} \\
+& \left[\begin{array}{cc}
     X_l & -Y_l \\
     -N_l & M_l
     \end{array}\right]
@@ -141,8 +165,9 @@ As the stabilizable and detectable realization of the plant is available, we con
         \hline
         -F & I & \mathbf{0}\\
         -C_y & \mathbf{0} & I
-    \end{array}\right]
-\end{equation}
+    \end{array}\right]. \label{DCF_l}
+\end{align}
+\end{subequations}
 By such construction, we have all stabilizing controller parametrized by:
 \begin{equation}\label{eqn::allstabK}
 \begin{split}
@@ -177,9 +202,9 @@ The resulting CL \(\Phi_{zw}\) is given by:
 \(G_{11} = P_{11} + P_{12} Y_r M_l P_{21}\), \(G_{12} = P_{12} M_r\) and \(G_{21} = M_l P_{21}\) are all stable TFMs, see Appendix~\ref{appsec::optH2} for more information. After the change of variable in Youla Parameterization, Problem~\ref{Prob::networkoptcontrol} becomes the following optimization about Youla parameter \(Q\):
 \begin{equation}\label{eqn::YoulaNonQI}
 \begin{split}
-    & \mu_{\mathrm{str}, \mathcal{H}_2} =   \min_{Q \in \mathcal{RH}_\infty^{n_u,n_y}} \quad 
+    \mu_{\mathrm{str}, \mathcal{H}_2}^2 = \min_{Q \in \mathcal{RH}_\infty^{n_u,n_y}} \quad & 
         \|\, G_{11} - G_{12} Q G_{21} \,\|_{\mathcal{H}_2}^2,\\
-    & \text{subject to } K_\mathrm{stab} = (Y_r - M_r Q) (X_r - N_r Q)^{-1} \in \mathcal{S}.
+    \text{subject to}\quad & K_\mathrm{stab} = (Y_r - M_r Q) (X_r - N_r Q)^{-1} \in \mathcal{S}.
 \end{split}
 \end{equation}
 Unfortunately, forcing \(K_\mathrm{stab} \in \mathcal{S}\) doesn't necessarily pose a convex constraint on \(Q\).
@@ -190,10 +215,7 @@ The structured DCF simplifies the constraint~\eqref{eqn:mmstructconstr} into \(Q
 \subsection{Quadratic Invariance}\label{subsec::QI}
 Initially, quadratic invariance(QI) was proposed as a condition to unify the structures (w.r.t the plant) so that one can search over \(K_{\mathrm{stab}}\in \mathcal{S}\) by equivalently searching for CL \(\Phi \coloneqq \mathrm{feedback}(K_\mathrm{stab},P_{22}) = K_\mathrm{stab}( I - P_{22} K_\mathrm{stab})^{-1} \in \mathcal{S}\)~\cite{SanjayLQIsufficient}. Later, it's shown that QI is the necessary and sufficient condition that ensures \(K_\mathrm{stab} \in \mathcal{S}\) poses a convex constraint on \(Q\)~\cite{LessardQI, Sabau2011Vec}. The definition of QI is given as: 
 \begin{defn}
-${\cal S}$ is quadratic invariant w.r.t. $P_{22}$ if 
-$$
-KP_{22}K\subset {\cal S} ,\quad \forall K\in {\cal S} .
-$$
+${\cal S}$ is quadratic invariant w.r.t. $P_{22}$ if \(KP_{22}K\subset {\cal S}\), \(\forall K\in {\cal S}\).
 \end{defn}
 % When QI holds and the plant is stable or there is a stable stabilizing controller in \(\mathcal{S}\), \(\Phi\in \mathcal{S}\) can be a trivial structured DCF can be found for the plant.
 \begin{thm}~\cite{Sabau2011Vec}\label{thm:struct_stab_cont_para}
@@ -205,25 +227,20 @@ A controller \(K_\mathrm{stab} \in \mathcal{S}\) internally stabilizes \(P_{22}\
 \end{equation*}
 \end{thm}
 \begin{rem}
-The QI structure is highly related but not limited to network-distributed control problems. Some centralized structural constraints are also QI, e.g. \(\mathcal{O} \coloneqq \{K\vert\mathbf{1}^\top K =\mathbf{0}\}\).
+The QI structure is highly related but not limited to network-distributed control problems. Some centralized structural constraints are also QI, e.g. \(\mathcal{O} \coloneqq \{K\vert\mathbf{1}^\top K =\mathbf{0}\}\). This kind of constraints are usually involved in network averaging systems.
 \end{rem}
 Theorem~\ref{thm:struct_stab_cont_para} provides a means to translate the structural constraint on the controller \(K\) into an equivalent condition requiring the closed-loop transfer matrix \(\Phi\) in the same set \(\mathcal{S}\). This equivalence allows the distributed optimal control problem to be reformulated as a convex model-matching problem in the single parameter \(Q\):
 \begin{opt}\label{Prob::H2minafterpara}
-\begin{equation}\label{eqn:mmcost}
-    \mu_{\mathrm{str}, \mathcal{H}_2} = \underset{Q\in\mathcal{RH}_\infty}{\min}\ \|G_{11} - G_{12} Q G_{21}\|_{\mathcal{H}_2}^2 
-\end{equation}
-subject to
-\begin{equation}\label{eqn:mmstructconstr}
-    \Phi=(Y_r - M_r Q) M_l\in \mathcal{S}.
-\end{equation}
+\begin{subequations}
+\begin{align}
+\mu_{\mathrm{str}, \mathcal{H}_2}^2 = \underset{Q\in\mathcal{RH}_\infty}{\min}\quad & \|G_{11} - G_{12} Q G_{21}\|_{\mathcal{H}_2}^2 \label{eqn:mmcost}\\
+\textit{subject to} \quad &\Phi=(Y_r - M_r Q) M_l\in \mathcal{S} \label{eqn:mmstructconstr}.  
+\end{align}
+\end{subequations}
 \end{opt}
 Conventional FIR approximation methods for solving model-matching problems are not applicable to Problem~\ref{Prob::H2minafterpara}, since the constraint~(\ref{eqn:mmstructconstr}) generally does not admit FIR solutions and tolerates no approximation error directly violates the structural constraints\footnote{When the graph is strongly connected, \(\Phi\) is a full block transfer function matrix with relative order constraints on some entries.}.
 
-% ) (14-15) is an infinite dim convex optimization, (why in Banach instead of Hilbert is a minor point but takes the focus away). 2) Fir approximation is generally infeasible. 3) out of the blue, "huge efforts have been devoted to to further simplify the constraint...".
-% Maybe you mean, (14-15) is an inf-dim convex problem in general, early work focused on the assumption that network-structured DCF can be found so that $\Phi\in {\cal S}$ simplifies to $Q\in{\cal S}$, and the problem becomes finite-dim. However, how to find such S-DCF in general is an open problem. We note that the classical finite-dim approximation by $Q$-FIR, is generally infeasible for (15). A main contribution of this paper, is to show how (14-15) can be exactly solved with finite dimensions. Even this line seems false or not linear. In reality, people did not know (15) at the time,or that they were trying to simplify (15). They assumed S-DCF, and directly? using QI got $Q\in S$, they did not have to go through $\Phi$ right? This is why this part, excluding (14-15) should be in the preliminary section, because it is a critical  review of the historical development }
-% It essentially follows the intuition of first designing a networked stabilizing controller and then optimizing its behavior via a network-structured parameter.
-
-\subsection{Stronger controller network assumption}
+\subsection{Partially nestedness assumption}
 The optimization in (\ref{eqn::YoulaNonQI}) remains nonconvex when the QI condition doesn't hold. In this paper, we focus on scenarios where every interaction link in the plant dynamics is also available to the controller. Formally:
 \begin{assumption}\label{ass::samegraph}
 We assume \(\mathcal{A}^c \succeq \mathcal{A}^p\), where \(\mathcal{A}^p\) and \(\mathcal{A}^c\) denote the adjacency matrices of the plant and controller network graphs, respectively.
@@ -307,7 +324,8 @@ K_{\mathrm{dis}} = \begin{bmatrix}
 Since replicating stable poles preserves internal stability, constructing stable network dynamics is more manageable. Consequently, prior studies have relied on the stabilized closed-loop to realize networked controllers on networks~\cite{wang2019SLS, Gulnihal2018thesis, Rantzer2019Netimpl}. In this work, we adopt the realization approach of~\cite{Gulnihal2018thesis}. Notably, all existing network realization methods require the network realization of \(P_{22}\); developing realizations without this information remains an open problem.
 \end{rem}
 
-\section{Main results}\label{sec:Mainresult}
+
+\section{Proposed Solution}\label{sec:Mainresult}
 
 
 % We demonstrate that a Youla parameter subject to implicit infinite-dimensional sparsity constraints (\ref{eqn:mmstructconstr}) cannot be approximated by truncation over a finite horizon in general. 
@@ -341,11 +359,13 @@ Since the hardness of structured DCF, we use an alternative method that enjoys o
 \end{enumerate}
 As a result, the model-matching cost in Problem \ref{Prob::H2minafterpara} can be reformulated as a matrix weighted norm minimization problem on the Youla parameter in Problem \ref{Prob::H2min_infHorQuad}. Details are in the Appendix~\ref{appsec::optH2}.
 \begin{opt}\label{Prob::H2min_infHorQuad}
-\(\mu_{\mathrm{str}, \mathcal{H}_2} = \|G_{11}^0\|_2^2 + J_\mathcal{S}\)
-\begin{equation}
-     J_\mathcal{S} \coloneqq \underset{Q\in\mathcal{RH}_\infty}{\min} \|\Gamma_b^{\frac{1}{2}}(Q-R_0) \Gamma_c^{\frac{1}{2}}\|_{\mathcal{H}_2}^2  
-\end{equation}
-subject to \(\quad\Phi = (Y_r - M_r Q) M_l\in \mathcal{S}\). 
+\(\mu_{\mathrm{str}, \mathcal{H}_2}^2 = \|G_{11}^0\|_2^2 + J_\mathcal{S}\)
+\begin{subequations}
+\begin{align}
+    J_\mathcal{S} \coloneqq \underset{Q\in\mathcal{RH}_\infty}{\min} \quad & \|\Gamma_b^{\frac{1}{2}}(Q-R_0) \Gamma_c^{\frac{1}{2}}\|_{\mathcal{H}_2}^2 \\
+    \textit{subject to} \quad & \Phi = (Y_r - M_r Q) M_l\in \mathcal{S}.
+\end{align}
+\end{subequations}
 \end{opt}
 Problem~\ref{Prob::H2min_infHorQuad} suggests that the structured \(\mathcal{H}_2\) cost is essentially equivalent to the cost penalty \(J_\mathcal{S}\) caused by the structural constraints on~\eqref{eqn:mmstructconstr}.
 
@@ -381,7 +401,7 @@ The structural constraints can be enforced by a time-dependent support pattern o
     \mathbf{0}_{\mathcal{P}_u(i)\times \mathcal{P}_y(j)},\ \text{Otherwise}
 \end{array}\right. .
 \end{equation}
-For illustration, we take Example~\ref{exp::3nodesys} again and assume all the subsystems are SISO without losing generality, namely \(\mathcal{P}_u=\mathcal{P}_y =[1,1,1]\). The time-domain responses of \(\Phi\) are:
+For illustration, we take Example~\ref{exp:plant_3node} again and assume all the subsystems are SISO without losing generality, namely \(\mathcal{P}_u=\mathcal{P}_y =[1,1,1]\). The time-domain responses of \(\Phi\) are:
 \begin{equation*}
 \Phi[0] \in \left[
 \begin{array}{ccc}
@@ -397,8 +417,6 @@ For illustration, we take Example~\ref{exp::3nodesys} again and assume all the s
 \mathbb{R} & 0 & \mathbb{R}\\
 \end{array}
 \right];\ 
-\end{equation*}
-\begin{equation*}
 \Phi[2],\ \Phi[3],\hdots \in \left[
 \begin{array}{ccc}
 \mathbb{R} & \mathbb{R} & 0\\
@@ -406,7 +424,8 @@ For illustration, we take Example~\ref{exp::3nodesys} again and assume all the s
 \mathbb{R} & \mathbb{R} & \mathbb{R}\\
 \end{array}
 \right].
-\end{equation*} 
+\end{equation*}
+
 % (\ref{eqn:mmstructconstr}) implies:
 
 % \begin{equation}
@@ -444,13 +463,11 @@ For any \(Q, \Phi\in \mathcal{RH}_\infty\) that satisfies: \(\Phi = (Y_r - M_r Q
 \end{equation}
 \(\delta\) denotes the unit impulse signal applied at time \(i =0\). The matrices are given by:
 \begin{equation}\label{eqn::ss::vecmat} 
-\begin{split}
-& \left[\begin{array}{c|c:c}
+\left[\begin{array}{c|c:c}
     A_v & b_0 & B_v \\
     \hline
     C_v & d_0 & D_v
-\end{array}\right]   \\
-& \coloneqq 
+\end{array}\right] \coloneqq 
 \left[
 \begin{array}{cc|c:c}
 I_{n_y}\otimes A &  \mathbf{0}_{n_y n_x,n_x n_u} & \mathbf{0}_{n_x n_y,1} & I_{n_y} \otimes B_u\\
@@ -458,7 +475,6 @@ I_{n_y}\otimes A &  \mathbf{0}_{n_y n_x,n_x n_u} & \mathbf{0}_{n_x n_y,1} & I_{n
 \hline
 I_{n_y} \otimes F & L^\top \otimes I_{n_u} & \mathbf{0}_{n_u n_y,0} & -I_{n_u n_y} 
 \end{array}\right].
-\end{split}
 \end{equation} 
 Furthermore, sequences \(\eta,q,\phi\) are all in \(\ell_2\). For later use, we succinctly write \eqref{eqn::ss::vecPhitovecQ} as \(q = \mathcal{O}(\phi)\), where \(\mathcal{O} : \left( \mathbb{N} \to \mathbb{R}^{n_u n_y , 1} \right) \to \left( \mathbb{N} \to \mathbb{R}^{n_u n_y , 1} \right)\).
 
@@ -574,8 +590,8 @@ where \( x[k] \in \mathcal{X} = \mathbb{R}^n \), \( A \in \mathbb{R}^{n \times n
 The \textbf{stabilizable subspace} of the pair \( (A, B) \), denoted by \(\mathcal{X}_{stab}(A, B) \) (or in brief \(\mathcal{X}_{stab}\)), is defined as
 \begin{equation*}
 \begin{aligned}
-\mathcal{X}_{\mathrm{stab}}(A, B) \coloneqq \bigl\{ x_0 \in \mathbb{R}^n \mid \ & \exists\, u[k] \text{ (a Bohl function) s.t. } \\
-& x_u[k; x_0] \in \ell_2 \bigr\},
+\mathcal{X}_{\mathrm{stab}}(A, B) \coloneqq \bigl\{ x_0 \in \mathbb{R}^n \mid \ \exists\, u[k] \text{ (a Bohl function) s.t. }
+ x_u[k; x_0] \in \ell_2 \bigr\},
 \end{aligned}
 \end{equation*}
 where \( x_u[k; x_0] \) denotes the state trajectory under input \( u \) starting from \(x_0\).
@@ -589,7 +605,7 @@ Reachable subspace:
 and stable subspace, which is irrelevant to \(B\): \(\mathcal{X}_A^s \coloneqq \ker(\psi_A^s(A))\).
 The stable subspace \(\mathcal{X}_A^s\) is spanned by the (generalized) eigenvectors of all stable (i.e. $|\lambda|<1$) modes.
 \begin{lemma}
-    \(\mathcal{X}_{stab} = \mathcal{R}_{A,B} + \mathcal{X}_A^s\)
+    \(\mathcal{X}_{stab} = \mathcal{R}_{A,B} + \mathcal{X}_A^s\).
 \end{lemma}
 \begin{proof}
     Proof is in the book \cite{trentelman2012control}, Chapter 4, Page 92.
@@ -740,12 +756,12 @@ The state-space equation \eqref{eqn:strct_vecss} has an input-state-output solut
 Given any finite trajectory tuple \((u^\circ, \eta^\circ, q^\circ)\) on horizon \( 0\leq j <m\), it steers the state to \(\eta^\circ[m] = A_v^{m-1} b_0+ \sum_{j=0}^{m-1} A_v^{m-1-j} B_v E_j u^\circ[j]\).
 Since \(b_0 \in \mathcal{X}_{stab}\), \(\eta^\circ[m] \in \mathcal{X}_{stab}\).
 Consider the following auxiliary state-space starting from \(i = m\):
-\begin{equation}\label{eqn:strct_vecss_residue}
-\begin{split}
+\begin{subequations}\label{eqn:strct_vecss_residue}
+\begin{align}
     \eta^*[i+1] &= A_v \eta^*[i] + B_v E_m u^*[i] + b^* \delta_m,\\
-    q^*[i] &= C_v \eta^*[i] + D_v E_m u^*[i], \quad \eta^*[m]=0
-\end{split}
-\end{equation}
+    q^*[i] &= C_v \eta^*[i] + D_v E_m u^*[i], \quad \eta^*[m]=0   
+\end{align}  
+\end{subequations}
 with \(b^* \coloneqq A_v \eta^\circ[m]\in \mathcal{X}_{stab}\). From Theorem~\ref{thm::vecconstraintsoln}, \eqref{eqn:strct_vecss_residue} admits a trajectory
 $(u^*,\eta^*,q^*)\in \ell_2$ for $i\geq m$.
 Now define the input for \eqref{eqn:strct_vecss} by
@@ -923,13 +939,13 @@ Unlike the locally detectable and stabilizable condition in \cite{Lessard2012str
 \subsection{Solution and optimal controller recovery}
 When \(b_0\) lies in the stabilizable subspace of \((A_v,B_v E_m)\), \((A_r, B_r^m)\) is stabilizable by Theorem~\ref{thm::vecconstraintsoln}.
 Problem~\ref{Prob::H2min_ssqp} is a standard infinite-horizon LQR problem. The optimal solution can be explicitly obtained by solving a discrete algebraic Riccati equation (DARE)~\eqref{eqn:vecDARE} for the time-invariant stage for (\(i \geq m\)) and a backward recursion in~\eqref{eqn::backrec} for the time-varying stage from \(i = m - 1\) to \(i = 0\).
-\begin{equation}\label{eqn:vecDARE}
-\begin{split}
+\begin{subequations}\label{eqn:vecDARE}
+\begin{align}
     X_m &= \mathrm{DARE}(A_r, B_r^m, {C_r}^\top \Gamma {C_r}, {D_m}^\top\Gamma D_m,{C_r}^\top \Gamma {D_m},I);\\
     \Theta_m & = {D_{m}}^\top\Gamma D_m + {B_r^m}^\top X_{m}{B_r^m}; \\
-    \kappa_m &= -\Theta_m^{-1} ({B_r^m}^\top X_{m} A_r +{D_{m}}^\top\Gamma C_r).\\
-\end{split}
-\end{equation}
+    \kappa_m &= -\Theta_m^{-1} ({B_r^m}^\top X_{m} A_r +{D_{m}}^\top\Gamma C_r).
+\end{align}
+\end{subequations}
 For \(i= m-1,\hdots,0\), the optimal cost-to-go after (exclusive) step \(i\) takes a quadratic form only about state \(\zeta[i+1]\),
 \[
 J_\mathrm{opt}^{i + 1} = \inf\sum_{j \geq i + 1} v[j]^\top v[j] = \zeta[i + 1]^\top X_{i+1} \zeta[i + 1],
@@ -943,13 +959,13 @@ u[j] = \left\{
 \end{array}\right.,
 \]
 where \(\{X_i\},\{\kappa_i\}\) are matrix sequences recursively defined as:
-\begin{equation}\label{eqn::backrec}
-\begin{split}
+\begin{subequations}\label{eqn::backrec}
+\begin{align}
     \Theta_i &= {D_{i}}^\top\Gamma D_i + {B_r^i}^\top X_{i+1}{B_r^i}; \\
     \kappa_i &= -\Theta_i^{-1} ({B_r^i}^\top X_{i+1} A_r +{D_{i}}^\top\Gamma C_r); \\
-    X_i &= {C_r}^\top \Gamma {C_r} + {A_r}^\top X_{i+1} A_r - {\kappa_i}^\top \Theta_i \kappa_i. \\
-\end{split}
-\end{equation}
+    X_i &= {C_r}^\top \Gamma {C_r} + {A_r}^\top X_{i+1} A_r - {\kappa_i}^\top \Theta_i \kappa_i.
+\end{align}
+\end{subequations}
 \(\Theta_i\) is positive-definite for any \(i\) because \(D_i=D_v E_i\) is full column rank and \(\Gamma\) is positive-definite from construction.
 At time \(0\), the optimal input explicitly depends on the perturbation \(b_r\):
 \begin{equation}\label{eqn::optu0}
@@ -1000,10 +1016,7 @@ We iteratively recover optimal input sequence \(\{u^*\}\), state sequence \(\{\z
 \end{equation}
 \(\{q^*\}\) is a sequence in \(\ell_2\) because \(A_r + B_r^m \kappa_m\) is a Schur matrix from the DARE solution. We construct the TFM of the Youla parameter \(Q\) from its time-domain response:
 \begin{equation}\label{eqn::YPrecovery2}
-\begin{split}
-    \vc(Q_\mathrm{opt}) &= \sum_{i=0}^{m-1} \frac{1}{z^i} q^*[i] \\
-    &+ \frac{1}{z^{m-1}}(C_r + D_m \kappa_m) (zI- A_r - B_r^m \kappa_m)^{-1}\zeta^*[m] 
-\end{split}
+    \vc(Q_\mathrm{opt}) = \sum_{i=0}^{m-1} \frac{1}{z^i} q^*[i] + \frac{1}{z^{m-1}}(C_r + D_m \kappa_m) (zI- A_r - B_r^m \kappa_m)^{-1}\zeta^*[m] 
 \end{equation}
 Finally, we find the optimal controller in \(\mathcal{S}\) with:
 \begin{equation}\label{eqn::Krecovery}
@@ -1013,251 +1026,205 @@ Finally, we find the optimal controller in \(\mathcal{S}\) with:
 \end{equation}
 Algorithm~\ref{alg::optcontroller} provides a structured stabilizing controller TFM. One can follow Theorem~\ref{thm:samegraphReal} to construct the networked implementation of \(K_\mathrm{str, opt}\) when Assumption~\ref{ass::samegraph} is satisfied.
 
-\section{A simplified solution for full-state-feedback problems}
-
-In the special case of state-feedback, the plant is changed into
-\begin{equation}
-    P = \left[
-    \begin{array}{c|cc}
-        A & B_w & B_u \\
-        \hline
-        C_z & D_{zw} & D_{zu}\\
-        I & \mathbf{0} & \mathbf{0}
-    \end{array}\right]
-\end{equation}
-
-\(F,L\) are still chosen to ensure \(A_F,A_L\) are Schur. 
+\subsection{A simplified solution for full-state-feedback problems}
+It's notable that the full-state-feedback optimal control problem has been thoroughly solved by \cite{Lamperski2015StateFB}. Even though, we'd like to present the variation of our output feedback solution in such case. 
+\begin{opt}[State-feedback structured optimal control]\label{Prob::H2minSF}
+\begin{subequations}
+\begin{align}
+\mu_{\mathrm{str}, \mathcal{H}_2}= \underset{Q\in\mathcal{RH}_\infty}{\min}\quad & \|G_{11} - G_{12} Q G_{21}\|_{\mathcal{H}_2}^2 \\ 
+    % & = \|H_0\|_2^2 + \|U (Q + F) B_w\|_2^2 \\
+    = \|H_0\|_2^2 + \min_{Q\in\mathcal{RH}_\infty} \quad & \|\Gamma_b^{1/2} (Q + F) B_w\|_{\mathcal{H}_2}^2 \\
+\textit{subject to} \quad & \Phi=(Y_r - M_r Q)\in\mathfrak{T}(\mathcal{G}_c,P_u,P_y)
+\end{align}
+\end{subequations}
+Here, \(F\) is selected as the LQR feedback gain for \(P_{12}\) and consequently \(G_{12}^\sim G_{12} = \Gamma_b\). \(H_0\) is the centralized \(\mathcal{H}_2\) optimal closed-loop response given by:
 \begin{equation*}
-G_{12} = \left[
-    \begin{array}{c|c}
-        A_F & B_u \\
-        \hline
-        C_z + D_{zu}F & D_{zu} \\
-    \end{array}\right];\ 
-G_{21} = \left[
-    \begin{array}{c|c}
-        A_L & B_w\\
-        \hline
-        I & \mathbf{0} \\
-    \end{array}\right]
+H_0 = G_{11} + G_{12} F G_{21} = (C_z + D_{zu} F) (zI-A_F)^{-1} B_w + D_{zw}.
 \end{equation*}
-\begin{equation}
-    G_{11} = \left[\begin{array}{cc|c}
-    A_F & -B_u F & B_w\\
-   \mathbf{0}_{n_x,n_x} & A_L & B_w\\
-    \hline
-    C_z + D_{zu}F & -D_{zu}F & D_{zw}
-\end{array}\right]
-\end{equation}
-
-\begin{equation*}
-\begin{split}
-& G_{11} = \begin{bmatrix}
-    C_z+D_{zu} F & -D_{zu} F
-\end{bmatrix} \\
-& \begin{bmatrix}
-    (zI-A_F)^{-1} & -(zI-A_F)^{-1} B_u F (zI-A_L)^{-1} \\
-    \mathbf{0} &  (zI-A_L)^{-1}
-\end{bmatrix}
-\begin{bmatrix}
-    B_w \\
-    B_w
-\end{bmatrix} \\
-& = D_{zw} +C_z(zI-A_F)^{-1} B_w  + D_{zu} F(zI-A_F)^{-1} B_w \\
-& - C_z (zI-A_F)^{-1} B_u F (zI-A_L)^{-1} B_w \\ 
-& - D_{zu} F (zI-A_F)^{-1} B_u F (zI-A_L)^{-1} B_w - D_{zu} F (zI-A_L)^{-1} B_w \\
-& = D_{zw} + C_z(zI-A_F)^{-1} B_w  + D_{zu} F(zI-A_F)^{-1} B_w \\
-& - C_z (zI-A_F)^{-1} B_u F (zI-A_L)^{-1} B_w \\ 
-& - D_{zu} F (zI-A_F)^{-1} (zI -A) (zI-A_L)^{-1} B_w \\ 
-& = D_{zw} + C_z(zI-A_F)^{-1} (I - B_u F (zI-A_L)^{-1}) B_w \\
-& + D_{zu} F (zI-A_F)^{-1} (I - (zI -A) (zI-A_L)^{-1}) B_w \\
-& = D_{zw} + C_z(zI-A_F)^{-1} (zI - A - B_u F - L) (zI-A_L)^{-1} B_w \\
-& - D_{zu} F (zI-A_F)^{-1} L (zI-A_L)^{-1} B_w \\
-& = D_{zw} + C_z (zI-A_L)^{-1} B_w  \\
-& - (C_z + D_{zu} F) (zI-A_F)^{-1} L (zI-A_L)^{-1} B_w
-\end{split} 
-\end{equation*}
-\begin{equation*}
-\begin{split}
-& G_{12} = (C_z + D_{zu} F) (zI-A_F)^{-1} B_u + D_{zu} \\
-& G_{21} = (zI-A_L)^{-1} B_w
-\end{split} 
-\end{equation*}
-We now put \(F\) be the LQR feedback gain for \(P_{12}\) such that \(G_{12}^\sim G_{12} = P_{12}^{\sim} P_{12} = \Gamma_b\). For any stabilizing \(L\) we pick, we notice:
-\begin{equation*}
-\begin{split}
-H_0 = G_{11} + G_{12} F G_{21} = (C_z + D_{zu} F) (zI-A_F)^{-1} B_w + D_{zw}
-\end{split} 
-\end{equation*}
-which achieves the optimal \(\mathcal{H}_2\) performance in standard state-feedback problems. Besides, putting \(L\) equal to \(-A\) bring us huge benefits that \(G_{21} = \frac{1}{z} B_w\) becomes a delayed gain block. By a shift of Youla parameter we should formulate the following optimazation problem, 
-\begin{opt}\label{Prob::H2minSF}
-\begin{equation}
-\begin{split}
-    \underset{Q\in\mathcal{RH}_\infty}{\mathrm{minimize}}\ &\|G_{11} - G_{12} Q G_{21}\|_2^2 \\ 
-    & = \|H_0\|_2^2 + \|U (Q + F) B_w\|_2^2 \\
-    & = \|H_0\|_2^2 + \|\Gamma_b^{1/2} (Q + F) B_w\|_2^2
-\end{split}
-\end{equation}
-subject to
-\begin{equation}
-    \Phi=(Y_r - M_r Q)\in\mathfrak{T}(\mathcal{G}_c,P_u,P_y)
-\end{equation}
 \end{opt}
+\begin{rem}
+\end{rem}
+
+
+
+
+
+
 \begin{equation}
 \begin{split}
     X[i+1] &=A X[i] + B_u \Phi[i] - A \delta,\\
     Q[i] &= F X[i] - \Phi[i]
 \end{split}
 \end{equation}
-{\color{blue}
-\begin{equation}
-\begin{split}
-    \underset{Q\in\mathcal{RH}_\infty}{\mathrm{minimize}}\ &\|\Gamma_b^{1/2}FB_w + \Gamma_b^{1/2}Q B_w\|_2^2 
-\end{split}
-\end{equation}
-subject to
-\begin{equation}
-    Q=M_r^{-1}Y_y-M_r^{-1}\Phi;, \Phi\in\mathfrak{T}(\mathcal{G}_c,P_u,P_y)
-\end{equation}
-Note that \(\mathcal{P}_y = \mathcal{P}_x\) in the state-feedback setting.
-
-
-$$
-\min \|T\Phi B_w\|^2
-$$
-subject to 
-The dynamics associated with $T$
-\begin{equation}
-T=     \left[
-    \begin{array}{c|cc}
-        A & -A & B_u \\
-        \hline
-        -\Gamma_b^{1/2}F & \Gamma_b^{1/2}F & \Gamma_b^{1/2}D_{zu}
-    \end{array}\right]
-\end{equation}
-\begin{equation}
-\begin{split}
-    X[i+1] &=A X[i] + B_u \Phi[i] - A \delta,\\
-    T[i] &=-\Gamma_b^{1/2}F X[i] +\Gamma_b^{1/2}D_{zu}\Phi[i]+\Gamma_b^{1/2}F \delta
-\end{split}
-\end{equation}
-}
-
-
 
 \section{Numerical Examples}\label{sec:Exp}
-
-
 \label{sec::numex}
-In Example~\ref{exp::3nodesys}, we provide an illustrative solution and compare our algorithm with an SLS-based solution.
-In Example~\ref{exp:4nodediamond}, we use our approach to find optimal controller \(K_\mathrm{opt}\) in \(\mathcal{S}\), where \(\mathcal{S}\) is QI w.r.t the plant but not fitting in Assumption~\ref{ass::samegraph}. We prove that \(K_\mathrm{opt}\) is not realizable on its graph.
 
-\subsection{3-agent distributed control problem}
-In Example~\ref{exp::3nodesys} proposed in section II, we let the partition of states, inputs, outputs be \(\mathcal{P}_x =[2;2;2], \mathcal{P}_y = \mathcal{P}_u =[1;1;1]\). Per the controller graph, we want to find optimal controller in the structure set:
-\[
-\mathcal{S}= \begin{bmatrix}
-    \mathcal{R}_p & \frac{1}{z} \mathcal{R}_p & 0 \\
-    \frac{1}{z} \mathcal{R}_p & \mathcal{R}_p & 0\\
-    \frac{1}{z} \mathcal{R}_p & \frac{1}{z^2}\mathcal{R}_p & \mathcal{R}_p\\
-\end{bmatrix}.
-\]
-We evaluate the generalized plant with:
-\begin{equation*}
-A = \left[
-\begin{array}{cc:cc:cc}
-0  &  3.3  & 0 &  -0.4  &  0 &  0 \\
--0.1  &  0.7  &  0.1  & -0.5 &  0 &  0 \\
-\hdashline
-0 & -0.7 &  0.4 & -0.6  & 0 & 0 \\
--0.4 & 1.7  & 0.6 & -1.6 & 0 & 0 \\
-\hdashline
--0.1 &  -1.4  & 0  & 0  &  -0.2  &  0.7 \\
--2.0  & -0.8  & 0 & 0 & 0.3  &  1.1 \\
-\end{array}
-\right]
-\end{equation*}
-\begin{equation*}  
-B_w = 
-\begin{bmatrix}
-0.6 & -0.6 & -0.5\\
-0.2 & 0.6 & 0.4\\
-1 & -1 & -2.2\\
-0 & -1 & 0\\
-0.3 & 0.5 & 0.2\\
-0 & -0.5 & 0.3\\
-\end{bmatrix};\  B_u = \left[ \begin{array}{c:c:c}
-    0.8 & 0 & 0 \\
-    0.5 & 0 & 0\\
-    \hdashline
-    0 & 0.2 & 0\\
-    0 & 0.4 & 0\\
-    \hdashline
-    0 & 0 & 1 \\
-    0 & 0 & -0.4
-\end{array}
-\right]
-\end{equation*}
-
-\begin{equation*}
-    C_z = \begin{bmatrix}
-    0.1 & 0.4 & 0.1& 0.4& 0.1& 0.4 \\
-    0.3 & 0 & 0.5& 1 & 0.6 & 2 \\
-    -1 & -0.1 & 0.2 & -0.5 & 0.3 & 1
-\end{bmatrix};\
-\end{equation*}
-\begin{equation*}
-C_y = \left[
-\begin{array}{cc:cc:cc}
-    0.2 & 1 & 0 & -1 & 0 & 0 \\
-    \hdashline
-    1 & 0 & 0.2 & -1 & 0 & 0\\
-    \hdashline
-    0 & 1 & 0 & 0 & 0.2 & -1
-    \end{array}
-\right]
-\end{equation*}
-\begin{equation}
-    D_{zu}^\top  = D_{yw} = \begin{bmatrix}
-        I_3
-    \end{bmatrix};\     
-    D_{zw} = \mathbf{0}_{3\times 3};\ D_{yu} = \mathbf{0}_{3\times 3}.
-\end{equation}
-% \[
-% \left[
-% \begin{array}{cc}
-% D_{zw} & D_{zu}\\
-% D_{yw} & D_{yu}
-% \end{array}
-% \right]
-% =\left[
-% \begin{array}{cc}
-% \mathbf{0} & I_3\\
-% I_3 & \mathbf{0}
-% \end{array}
-% \right].
-% \]
-
-For this plant, the centralized \(\mathcal{H}_2\) gives a norm \(\|G_{11}^0\|_2 = 5.6615\). Our algorithm obtains the optimal controller within \(0.0446s\), with 14 states. We adopt the Theorem~\ref{thm:samegraphReal} to get an implementation with a total of \(25+21+11 = 57\) internal states. The optimal \(\mathcal{H}_2\) norm obtained by a distributed controller is \(\sqrt{\mu_{\mathrm{dis}, \mathcal{H}_2}} = 7.7418\). 
-\begin{figure}[ht]
-    \centering
-    \includegraphics[width=0.85\linewidth]{figures/DisCtrlfigure/SLSCostvsFIRsteps_3nodeV2.png}
-    \caption[Our exact optimal solution and the suboptimal SLS solutions]{The top subplot plots the optimal \(\mathcal{H}_2\) norm obtained by SLS approach, while the bottom subplot plots the value \((\|\cdot\|^2 - \mu_{\mathrm{dis}, \mathcal{H}_2})\) on a logarithm scale.}
-    \label{fig:SLScostvsFIR}
-\end{figure}
-% \begin{figure}[ht]
-%     \centering
-%     \includegraphics[width=0.85\linewidth]{figures/DisCtrlfigure/SLSvsFIRsteps_3nodeV2.png}
-%     \caption{The optimization time consumption and controller states number versus the FIR truncation level.}
-%     \label{fig:SLSRuntmevsFIR}
-% \end{figure}
-
-In comparison, the SLS approach approximates the optimal controller by designing closed-loop dynamics with FIR truncation levels ranging from 10 to 60 in increments of 5. In this case, FIR solutions exist for the SLS method since \((A,B_u)\) is controllable and \((A,C_y)\) is observable~\cite{SLSparametrization}.
-As the FIR horizon increases, the achieved cost gradually converges toward the optimal value.
-
-We find that the controller order grows linearly with the number of FIR steps. The computational time for convex optimization also grows with the number of steps. With 60 steps of FIR, the optimization problem takes \(2.29s\) to solve and gives a controller with 546 states, but the cost is still suboptimal. This trend indicates that while longer FIR horizons improve accuracy, the approximation can never produce the exact optimal closed-loop behavior.
+In this section, we cover the solution to two example problems. Both problems continue from the examples firstly introduced in Chapter~\ref{chap:networksys}. In Example~\ref{exp:4nodediamond}, we use our approach to find optimal controller \(K_\mathrm{opt}\) in \(\mathcal{S}\), where \(\mathcal{S}\) is QI w.r.t the plant but not fitting in Assumption~\ref{ass::samegraph}. We prove that \(K_\mathrm{opt}\) is not realizable on its graph.
+After that, we consider Example~\ref{exp:plant_3node} and provide an illustrative solution and compare our algorithm with an SLS-based solution.
 
 \subsection{4-agent structured control problem}
-The state-space representation of the networked plant is provided in Appendix~\ref{appsec:nwss}, along with a detailed walkthrough of its construction from the dynamics of individual sub-plants.
+In this example, continuing from Example~\ref{exp:4nodediamond} given in Chapter~\ref{chap:networksys}, we first walk through the construction of the aggregate state-space of a networked plant from the dynamics of all individual sub-plants. We show that our approach is still effective in finding \(K_\mathrm{opt}\in \mathcal{S}\), but the found controller is not realizable on the desired information graph without Assumption~\ref{ass::samegraph}.
+We assume the state-space models of the plant subsystems in Example~\ref{exp:4nodediamond} are:
+\begin{equation*}
+\begin{cases}
+    x_i^+ = 0.8 x_i + u_i \\
+    y_i = x_i\\
+    \eta_{2i} = \eta_{4i} = 1.3 x_i + 0.1 u_i  
+\end{cases},\; i \in \{1,3\};\quad 
+\begin{cases}
+    x_i^+ = 0.8 x_i + u_i + \zeta_{i1} + \zeta_{i3}\\
+    y_i = x_i + 0.3 \zeta_{i1} + 0.3 \zeta_{i3}\\
+    \zeta_{i1} = \frac{1}{z} \eta_{i1};\quad \zeta_{i3} = \frac{1}{z} \eta_{i3}
+\end{cases},\; i \in \{2,4\}.
+\end{equation*}
+By absorbing the delays into subsystems \(1\) and \(3\), we obtain their augmented state-space models with state \(\bar{x}_i\) and the \(\bar{\eta}\) signals. The states of \(1\) and \(3\) also influence the dynamics of \(2\) and \(4\). 
+\begin{equation*}
+\begin{cases}
+    \bar{x}_i^+ &= \begin{bmatrix} 0.8 & 0 \\ 1.3 & 0 \end{bmatrix} \bar{x}_i 
+    + \begin{bmatrix} 1 \\ 0.1 \end{bmatrix}u_i \\
+    y_i &= \begin{bmatrix} 1 & 0 \end{bmatrix} \bar{x}_i + \begin{bmatrix} 0 & 1 \end{bmatrix} w_i\\
+    \bar{\eta}_{2i} & = \bar{\eta}_{4i} = \begin{bmatrix} 0 & 1 \end{bmatrix} \bar{x}_i 
+\end{cases},\quad i \in \{1,3\};
+\end{equation*}
+\begin{equation*}
+\begin{cases}
+    x_i^+ &= 0.8 x_i + u_i + \zeta_{i1} + \zeta_{i3}\\
+    & = 0.8 x_i + u_i + \begin{bmatrix} 0 & 1 \end{bmatrix} \bar{x}_1 + \begin{bmatrix} 0 & 1 \end{bmatrix} \bar{x}_3 \\
+    y_i &= x_i + 0.3 \zeta_{i1} + 0.3 \zeta_{i3}\\
+    & = x_i + \begin{bmatrix} 0 & 0.3 \end{bmatrix} \bar{x}_1 + \begin{bmatrix} 0 & 0.3  \end{bmatrix} \bar{x}_3 \\
+\end{cases},\quad i \in \{2,4\}.
+\end{equation*}
+
+Network Inputs: \(\zeta_1 = \left[\empty\right],\ \zeta_2 = \begin{bmatrix} \zeta_{21} \\ \zeta_{23}\end{bmatrix},\ \zeta_3 = \left[\empty\right],\ 
+\zeta_4 = \begin{bmatrix} \zeta_{41} \\ \zeta_{43}\end{bmatrix}\).
+
+Network Outputs: \(\bar{\eta}_1 = \begin{bmatrix} \bar{\eta}_{21} \\ \bar{\eta}_{41}
+\end{bmatrix},\ \bar{\eta}_2 = \left[\empty\right],\ \bar{\eta}_3 = \begin{bmatrix} \bar{\eta}_{23} \\ \bar{\eta}_{43} \end{bmatrix}, \ \bar{\eta}_4 = \left[\empty\right]\).
+
+\[
+\begin{bmatrix}
+    \zeta_{1} \\ \zeta_{2} \\ \zeta_{3} \\ \zeta{4}
+\end{bmatrix} = N \begin{bmatrix}
+    \bar{\eta}_{1} \\ \bar{\eta}_{2} \\ \bar{\eta}_{3} \\ \bar{\eta}_{4}
+\end{bmatrix} = 
+\left[
+\begin{array}{c:c:c:c}
+    \empty & \empty & \empty& \empty \\
+    \hdashline
+    I\ \mathbf{0} & \empty & \mathbf{0}\ \mathbf{0} & \empty\\
+    \mathbf{0}\ \mathbf{0} & \empty & I\ \mathbf{0} & \empty\\
+    \hdashline
+    \empty & \empty & \empty& \empty \\
+    \hdashline
+    \mathbf{0}\ I & \empty & \mathbf{0}\ \mathbf{0} & \empty\\
+    \mathbf{0}\ \mathbf{0} & \empty & \mathbf{0}\ I & \empty\\
+\end{array}\right]\begin{bmatrix}
+    \bar{\eta}_{1} \\ \bar{\eta}_{2} \\ \bar{\eta}_{3} \\ \bar{\eta}_{4}
+\end{bmatrix}.
+\]
+The aggregate state-space of the plant is therefore: 
+\begin{equation*}
+A = 
+\begin{bmatrix}
+A_{d_1} & 0 & 0 & 0\\
+A_{x} & A_{d_2} & A_{x} & 0\\
+0 & 0 & A_{d_1} & 0\\
+A_{x} & 0 & A_{x} & A_{d_2}
+\end{bmatrix},
+\left[
+\begin{array}{c:c}
+    A_{d_1} &  \\
+    \hdashline
+    A_x & A_{d_2}\\
+\end{array}\right]
+= 
+\left[
+\begin{array}{cc:c}
+    0.8 & 0 & \empty \\
+    1.3 & 0 & \empty \\
+    \hdashline
+    0 & 1 & 0.8\\
+\end{array}\right];
+\end{equation*}
+\begin{equation*}
+C_y = 
+\begin{bmatrix}
+C_{d_1} & 0 & 0 & 0\\
+C_{x} & C_{d_2} & C_{x} & 0\\
+0 & 0 & C_{d_1} & 0\\
+C_{x} & 0 & C_{x} & C_{d_2}
+\end{bmatrix},
+\left[
+\begin{array}{c:c}
+    C_{d_1} & \empty \\
+    \hdashline
+    C_x & C_{d_2}\\
+\end{array}\right]
+= 
+\left[
+\begin{array}{cc:c}
+    1 & 0 & \empty \\
+    \hdashline
+    0 & 0.3 & 1\\
+\end{array}\right];
+\end{equation*}
+\begin{equation*}
+B_u = \diag(B_{d_1}, B_{d_2}, B_{d_1}, B_{d_2})
+% \begin{bmatrix}
+% B_{d_1} & & & \\
+% & B_{d_2} & & \\
+% & & B_{d_1} &\\
+% & & & B_{d_2}
+% \end{bmatrix};
+\textit{, where }
+B_{d_1} = \begin{bmatrix}
+1\\
+0
+\end{bmatrix},\ B_{d_2} = 1;\ D_{yu} = \mathbf{0}_{4\times 4}.
+\end{equation*}
+% In this example, we assume each subsystem \(i\) has independent local exogenous noise \(w_i\). Each \(w_i = \left[w_{i1},w_{i2}\right]^\top\) is a 2-d vector. \(w_{i1}\) is the processing noise and \(w_{i2}\) is the measuring noise.
+In the generalized plant, we let:
+\begin{equation*}
+B_w = \diag(B_{d_1}, B_{d_2}, B_{d_1}, B_{d_2})
+% \begin{bmatrix}
+% B_{d_1} & & & \\
+% & B_{d_2} & & \\
+% & & B_{d_1} &\\
+% & & & B_{d_2}
+% \end{bmatrix},
+\textit{, where }
+B_{d_1} = \begin{bmatrix}
+1 & 0\\
+0 & 0
+\end{bmatrix},\ B_{d_2} = \begin{bmatrix}
+1 & 0\\
+\end{bmatrix};
+\end{equation*}
+% The performance output vector \(z\) is selected as \(z = \left[x_1 + u_1, x_2 + u_2, x_3 + u_3, x_4 + u_4\right]^\top\). 
+\begin{equation*}
+C_z = \diag(C_{d_1}, C_{d_2}, C_{d_1}, C_{d_2})
+% \begin{bmatrix}
+% C_{d_1} & & & \\
+% & C_{d_2} & & \\
+% & & C_{d_1} &\\
+% & & & C_{d_2}
+% \end{bmatrix},\ 
+\textit{, where }
+C_{d_1} = \begin{bmatrix}
+1 & 0\\
+\end{bmatrix},\ C_{d_2} = 1;
+\end{equation*}
+\begin{equation*}
+D_{yw} = I_4 \otimes \begin{bmatrix}
+0 & 1\\
+\end{bmatrix},\ 
+D_{zu} = I_4,\  
+D_{zw} = \mathbf{0}_{4\times 8}
+\end{equation*}
+
+
+
 % We walk through the construction of the networked plant in Appendix~\ref{appsec:nwss}.
 Rather than searching for controllers in the full space \(\mathfrak{T}(\mathcal{G}^c,\mathcal{P}_{u},\mathcal{P}_y)\),  we further restrict attention to the subset:
 \[  
@@ -1363,12 +1330,124 @@ As a result, any realization structured as in (\ref{eqn::4nodereal}) will violat
     \caption{The controller collects measurements from vertices \(2,4\) processes them centrally and then assigns control actions to vertices \(1,3\).}
     \label{fig:4nodefakedis}
 \end{figure}
-In conclusion, the controller cannot be implemented on the network in Fig.~\ref{fig:4nodecannot_real} without violating internal stability. 
+In summary, the controller cannot be implemented on the network in Fig.~\ref{fig:4nodecannot_real} without violating internal stability. 
 Instead, the resulting controller corresponds to the centralized configuration shown in Fig.~\ref{fig:4nodefakedis}. This distinction cannot be captured by transfer functions alone.
 
-\section{Conclusion}
 
-In this paper, we derived the exact finite-dimensional solution to the network-distributed $\mathcal{H}_2$ control problem for an LTI networked plant, assuming that the controller network is at least as well-connected as the plant dynamics. This setup defines a subclass of QI problems that not only satisfies QI conditions but also guarantees the implementability of structured controllers over networks. 
+
+\subsection{3-agent distributed control problem}
+In Example~\ref{exp:plant_3node}, we let the partition of states, inputs, outputs be \(\mathcal{P}_x =[2;2;2], \mathcal{P}_y = \mathcal{P}_u =[1;1;1]\). Per the controller graph, we want to find optimal controller in the structure set:
+\[
+\mathcal{S}= \begin{bmatrix}
+    \mathcal{R}_p & \frac{1}{z} \mathcal{R}_p & 0 \\
+    \frac{1}{z} \mathcal{R}_p & \mathcal{R}_p & 0\\
+    \frac{1}{z} \mathcal{R}_p & \frac{1}{z^2}\mathcal{R}_p & \mathcal{R}_p\\
+\end{bmatrix}.
+\]
+We evaluate the generalized plant with:
+\begin{equation*}
+A = \left[
+\begin{array}{cc:cc:cc}
+0  &  3.3  & 0 &  -0.4  &  0 &  0 \\
+-0.1  &  0.7  &  0.1  & -0.5 &  0 &  0 \\
+\hdashline
+0 & -0.7 &  0.4 & -0.6  & 0 & 0 \\
+-0.4 & 1.7  & 0.6 & -1.6 & 0 & 0 \\
+\hdashline
+-0.1 &  -1.4  & 0  & 0  &  -0.2  &  0.7 \\
+-2.0  & -0.8  & 0 & 0 & 0.3  &  1.1 \\
+\end{array}
+\right]
+\end{equation*}
+\begin{equation*}  
+B_w = 
+\begin{bmatrix}
+0.6 & -0.6 & -0.5\\
+0.2 & 0.6 & 0.4\\
+1 & -1 & -2.2\\
+0 & -1 & 0\\
+0.3 & 0.5 & 0.2\\
+0 & -0.5 & 0.3\\
+\end{bmatrix};\  B_u = \left[ \begin{array}{c:c:c}
+    0.8 & 0 & 0 \\
+    0.5 & 0 & 0\\
+    \hdashline
+    0 & 0.2 & 0\\
+    0 & 0.4 & 0\\
+    \hdashline
+    0 & 0 & 1 \\
+    0 & 0 & -0.4
+\end{array}
+\right]
+\end{equation*}
+
+\begin{equation*}
+    C_z = \begin{bmatrix}
+    0.1 & 0.4 & 0.1& 0.4& 0.1& 0.4 \\
+    0.3 & 0 & 0.5& 1 & 0.6 & 2 \\
+    -1 & -0.1 & 0.2 & -0.5 & 0.3 & 1
+\end{bmatrix};\; C_y = \left[
+\begin{array}{cc:cc:cc}
+    0.2 & 1 & 0 & -1 & 0 & 0 \\
+    \hdashline
+    1 & 0 & 0.2 & -1 & 0 & 0\\
+    \hdashline
+    0 & 1 & 0 & 0 & 0.2 & -1
+\end{array}\right]
+\end{equation*}
+\begin{equation}
+\left[
+\begin{array}{c|c}
+    D_{zw} & D_{zu}\\
+    \hline
+    D_{yw} & D_{yu} \\
+\end{array}\right]
+= 
+\left[
+\begin{array}{c|c}
+    \mathbf{0}_{3 \times 3} & I_3\\
+    \hline
+    I_3 & \mathbf{0}_{3 \times 3} \\
+\end{array}\right].
+\end{equation}
+% \[
+% \left[
+% \begin{array}{cc}
+% D_{zw} & D_{zu}\\
+% D_{yw} & D_{yu}
+% \end{array}
+% \right]
+% =\left[
+% \begin{array}{cc}
+% \mathbf{0} & I_3\\
+% I_3 & \mathbf{0}
+% \end{array}
+% \right].
+% \]
+
+For this plant, the centralized \(\mathcal{H}_2\) gives a norm \(\|G_{11}^0\|_2 = 5.6615\). Our algorithm obtains the optimal controller within \(0.0446s\), with 14 states. We adopt the Theorem~\ref{thm:samegraphReal} to get an implementation with a total of \(25+21+11 = 57\) internal states. The optimal \(\mathcal{H}_2\) norm obtained by a distributed controller is \(\mu_{\mathrm{dis}, \mathcal{H}_2} = 7.7418\). 
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.85\linewidth]{figures/DisCtrlfigure/SLSCostvsFIRsteps_3nodeV2.png}
+    \caption[Our exact optimal solution and the suboptimal SLS solutions]{The top subplot plots the optimal \(\mathcal{H}_2\) norm obtained by SLS approach, while the bottom subplot plots the value \((\|\cdot\|^2 - \mu_{\mathrm{dis}, \mathcal{H}_2}^2)\) on a logarithm scale.}
+    \label{fig:SLScostvsFIR}
+\end{figure}
+% \begin{figure}[ht]
+%     \centering
+%     \includegraphics[width=0.85\linewidth]{figures/DisCtrlfigure/SLSvsFIRsteps_3nodeV2.png}
+%     \caption{The optimization time consumption and controller states number versus the FIR truncation level.}
+%     \label{fig:SLSRuntmevsFIR}
+% \end{figure}
+
+In comparison, the SLS approach approximates the optimal controller by designing closed-loop dynamics with FIR truncation levels ranging from 10 to 60 in increments of 5. In this case, FIR solutions exist for the SLS method since \((A,B_u)\) is controllable and \((A,C_y)\) is observable~\cite{SLSparametrization}.
+As the FIR horizon increases, the achieved cost gradually converges toward the optimal value.
+
+We find that the controller order grows linearly with the number of FIR steps. The computational time for convex optimization also grows with the number of steps. With 60 steps of FIR, the optimization problem takes \(2.29s\) to solve and gives a controller with 546 states, but the cost is still suboptimal. This trend indicates that while longer FIR horizons improve accuracy, the approximation can never produce the exact optimal closed-loop behavior.
+
+
+\section{Summary}
+
+In this chapter, we derived the exact finite-dimensional solution to the network-distributed $\mathcal{H}_2$ control problem for an LTI networked plant, assuming that the controller network is at least as well-connected as the plant dynamics. This setup defines a subclass of QI problems that not only satisfies QI conditions but also guarantees the implementability of structured controllers over networks. 
 
 Building on the Youla parameterization initialized by the centralized \(\mathcal{H}_2\) controller, we reformulated the problem as minimizing the cost penalty induced by the imposed structural constraints. By interpreting the constraints in the time domain, we expressed them in a state-space form and evaluated the cost penalty through an associated LQR problem. The exact solution is obtained via an additional DARE and a backward recursion.
 

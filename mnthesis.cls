@@ -91,32 +91,44 @@
 \setlength{\paperheight}{11.0in}
 \setlength{\paperwidth}{8.5in}
 
-%\setlength{\oddsidemargin}{1.937cm}  % default -> 2.0 cm odd side
-%\setlength{\oddsidemargin}{0.55in} % final version to grad school
-\setlength{\oddsidemargin}{0.55in}
-\setlength{\evensidemargin}{0.1in} % default -> 3.4 cm even side
-%\setlength{\evensidemargin}{0.1in} % default -> 3.4 cm even side
+% Horizontal margins
+\setlength{\oddsidemargin}{0.35in}
+\setlength{\evensidemargin}{0.1in}
+\setlength{\textwidth}{6.05in}
 
-%\setlength{\topmargin}{0.75in}
+% Vertical margins
 \setlength{\topmargin}{0.25in}
-%\setlength{\headheight}{0.0in}
 \setlength{\headheight}{0.4in}
 \setlength{\headsep}{0.1in}
-
-\setlength{\marginparsep}{0in}
-\setlength{\marginparwidth}{0in}
-
-\setlength{\textwidth}{5.75in}
-%\setlength{\textheight}{8.25in}
 \setlength{\textheight}{7.85in}
 
 \setlength{\footskip}{0.4in}
+
+% %\setlength{\oddsidemargin}{1.937cm}  % default -> 2.0 cm odd side
+% %\setlength{\oddsidemargin}{0.55in} % final version to grad school
+% \setlength{\oddsidemargin}{0.55in}
+% \setlength{\evensidemargin}{0.1in} % default -> 3.4 cm even side
+% %\setlength{\evensidemargin}{0.1in} % default -> 3.4 cm even side
+
+% %\setlength{\topmargin}{0.75in}
+% \setlength{\topmargin}{0.25in}
+% %\setlength{\headheight}{0.0in}
+% \setlength{\headheight}{0.4in}
+% \setlength{\headsep}{0.1in}
+
+% \setlength{\marginparsep}{0in}
+% \setlength{\marginparwidth}{0in}
+
+% \setlength{\textwidth}{6.5in}
+% \setlength{\textheight}{9.0in}
+
+% \setlength{\footskip}{0.4in}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Documentstyle Modifications
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\brokenpenalty = 10000 % Do not break pages at hyphens.
+\brokenpenalty = 1 % Do not break pages at hyphens.
 
 % use baselinestretch of 2.0 for 10 pt
 % use baselinestretch of 1.6 for 11 pt

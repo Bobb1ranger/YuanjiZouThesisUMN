@@ -21,7 +21,8 @@
 \usepackage[noabbrev]{cleveref} % Automatically determine \cref type
 \usepackage{amsthm}
 \usepackage{amsmath}
-
+\usepackage{arydshln}
+\usepackage{mathtools}
 \usepackage{cite}
 \usepackage{graphicx}
 \usepackage{subfigure}
@@ -34,10 +35,9 @@
 \usepackage[samesize]{cancel}
 
 \usepackage{setspace}
-\usepackage{arydshln}
 \usepackage{url}
 \usepackage{amsfonts}
-\usepackage{amssymb}
+
 \usepackage{mathtools}
 \usepackage{textcomp}
 
@@ -49,9 +49,6 @@
 \usepackage{textcomp}
 \usepackage{xcolor}
 \usepackage{wrapfig}
-
-
-
 \usepackage{ulem}
 \usepackage{soul}
 \usepackage{bm}
@@ -67,7 +64,6 @@
 \newcommand{\creflastconjunction}{, and } % Always use the serial comma
 
 \input{my_definitions}
-
 \linespread{1.5}
 
 % Compile only the chapters listed here
@@ -98,11 +94,11 @@
 % Now lets include the body of the document...
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \include{chapters/intro}
-% \include{chapters/prelim}
-%Base Chapters
-% \include{chapters/NWsys}
-% \include{chapters/H2optimal}
-% \include{chapters/l1optimal}
+\include{chapters/prelim}
+% Base Chapters
+\include{chapters/NWsys}
+\include{chapters/H2optimal}
+\include{chapters/l1optimal}
 \include{chapters/RMSS}
 
 %Software Chapters
@@ -123,8 +119,9 @@
 % Appendices
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \appendix
-% \include{chapters/app_RMSS}
-% \include{chapters/app_DisCtrl}
+
+\include{chapters/app_DisCtrl}
+\include{chapters/app_RMSS}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

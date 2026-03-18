@@ -32,77 +32,113 @@
 
 % \end{itemize}
 \section{Centralized control and network distributed control}
-In systems and control, centralized control has long served as a benchmark paradigm for regulating systems of varying complexity, owing to its optimality in performance and streamlined design procedures. However, its dependence on a single, powerful central controller introduces a vulnerability to single-point failures, which poses a fundamental risk to system resilience, especially for large-scale systems in which multiple subsystems spanning a vast spatial scale are coupled.
+In systems and control, centralized control has long served as a benchmark paradigm for regulating systems of varying complexity, owing to its optimality in performance and streamlined design procedures. However, its dependence on a single, powerful central controller introduces a vulnerability to single-point failures that can be caused by malicious attacks~\cite{Ukraine2021CyberAttack} or unexpected natural disasters~\cite{Joshua2021TexasStorm}. Such vulnerability poses a fundamental risk to system resilience, especially in large-scale systems where multiple subsystems spanning vast spatial scales are coupled.
 
 To mitigate this vulnerability, decision-making is often decentralized across multiple agents. However, in the absence of proper coordination mechanisms, such decentralization can neglect coupling dynamics among subsystems, potentially leading to instability and, more generally, to significant degradation of global performance.
 
-The fundamental challenge lies in the limited information available to individual system components under decentralized architectures. When subsystems are coupled through dynamics or shared performance objectives, purely local information is generally insufficient to ensure stability or achieve satisfactory system-level performance. This motivates the introduction of information exchange to enable coordination without reverting to fully centralized control.
+The fundamental challenge lies in the asymmetric information available to individual system components under decentralized architectures. When subsystems are coupled through dynamics or shared performance objectives, purely local information is generally insufficient to ensure stability or achieve satisfactory system-level performance. This motivates introducing information exchange to enable coordination without reverting to fully centralized control.
 
 With the advent and rapid development of communication technologies, modern networks enable fast and reliable information exchange among physically distributed subsystems~\cite{ge2017OverviewNCS}. This capability has stimulated extensive research on network-distributed controller design, in which information sharing is exploited to improve control performance in large-scale systems with localized decision-making. The paradigm of distributed control has been widely applied across disciplines, including collaborative multi-robot systems,  distributed computing, distributed transportation networks, distributed electrical power systems, smart grids, and remote surgery.
 
-\section{Challenges in network distributed control}
+While communication enhances system resilience and coordination capabilities, it also introduces significant challenges in controller design. Designers must explicitly account for communication constraints, such as limited bandwidth, transmission delays, quantization, and the associated computational burden. Moreover, during validation and implementation, additional analysis is required to assess robustness against adverse network effects, including packet dropouts, channel fading, and signal distortions.
 
-While communication enhances system resilience and coordination capabilities, it also introduces significant challenges in controller design. Designers must explicitly account for communication constraints, such as limited bandwidth, transmission delays, quantization, and the associated computational burden. Moreover, during validation and implementation, additional analysis is required to assess robustness against adverse network effects, including packet dropouts, channel fading, and communication noise.
-
-
-% Such systems may consist of multiple subsystems that are coupled not only through their physical dynamics, but also through shared performance objectives or cost functions.
 
 \section{Linear-time-invariant(LTI) distributed networked systems}
 
-While the objectives of distributed control and their respective approaches vary across application contexts, researchers have devoted substantial effort to establishing the fundamental theory of optimal distributed control for linear time-invariant (LTI) networked systems.
+In the design of distributed controllers, the adopted methodologies are often ad hoc for the specific application scenario. For nonlinear or time-varying systems, control strategies are typically tailored to specific problem settings, and vary with the objectives, thereby lacking general applicabability~\cite{ge2017OverviewNCS}. Consequently, to establish a unified theoretical foundation, researchers commonly focus on controlled plants that are assumed to be linear and time-invariant, thereby ear and time-invariant, enabling the development of broadly applicable analysis and synthesis results.
 
+An LTI distributed networked system typically consists of several interacting LTI dynamical subsystems. 
+State variations in one subsystem may causally and linearly influence the dynamics of other subsystems. Such interconnection and influence patterns are commonly described using a directed graph that captures the network's underlying topological structure. 
 
-
+In Chapter~\ref{chap:networksys}, we will walk through how an LTI networked system is constructed and different ways to characterize it. 
+Among these representations, the concatenated state-space model explicitly reveals the underlying network topology. In contrast, the transfer function matrix representation emphasizes the aggregate causal relationships from inputs to outputs and, despite abstracting away the internal interconnection structure, is often more convenient for computational analysis.
 
 
 
 \section{Optimal network distributed control}
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.68\linewidth]{figures/DisCtrlfigure/Opt_cont_genplant.png}
+    \caption[Optimal Feedback Control Problem]{Optimal Feedback Control Problem}
+    \label{fig:optfbctrl}
+\end{figure}
+Consider the optimal control problem shown in Figure~\ref{fig:optfbctrl}, where \(P\) is called a generalized plant and \(K\) is the controller. Specifically, \(P\) is a given LTI dynamical system, and \(K\) is another LTI system we'd like to design. 
+The straightforward way to formulate an optimal control problem is typically given by:
+\begin{equation}
+\begin{split}
+    \min_{K} \quad & \|\Phi\|_* \\
+    \textit{subject to } & K\textit{ internally stabilizes }P, \\
+    & K\in \mathcal{S}.
+\end{split}
+\end{equation}
+In the network control context, the specific structures induced by information asymmetry is reflected by the extra constraint \(K\in \mathcal{S}\). These structures usually include delays and sparsity in the controller's aggregate transfer function matrices.
 
-The goal shifts to finding a stabilizing feedback controller that optimizes closed-loop performance within specific structures, reflecting the communication limitations imposed by the network topology. These structures usually include delays and sparsities in the controller's aggregate transfer function matrices.
+Modern optimal control synthesis is often formulated in terms of achievable closed-loop maps generated by internally stabilizing controllers. For an LTI plant with an LTI controller, these closed-loop maps form an affine space, enabling performance objectives and structural requirements to be imposed directly at the closed-loop level. This reformulation underlies many classical and modern controller parameterization techniques, such as Youla Parameterization, System Level Parameterization, and provides the basis for convex treatments of constrained control problems. An informal representation of such formulation is given as:
+\begin{equation}
+\begin{split}
+    \min_{\Phi} \quad & \|\Phi\|_* \\
+    \textit{subject to } & \Phi\textit{ is achievable and stable,}\\
+    & \Phi\in \mathcal{S}_\Phi.
+\end{split}
+\end{equation}
+Here, $\mathcal{S}_\Phi$ denotes an additional constraint set on $\Phi$ induced by the structural constraints imposed on the controller $K$. In general, this set is nonconvex unless the constraint set $\mathcal{S}$ is quadratically invariant (QI) with respect to the plant $P$~\cite{SanjayLQIsufficient,LessardQI}. The QI condition has become a standard assumption in distributed control, as it guarantees the convexity and hence tractability of the resulting optimization problem. We also adopt QI assumption throughout this thesis.
 
-\section{Robustness of distributed control}
+Beyond tractability, the QI condition admits a meaningful network interpretation: it requires that information propagates across the controller network at least as fast as the dynamical coupling in the plant, which has been previously named as ``partially nestednes''\cite{Ho1972infostrc}. In the absence of this property, the structured optimal control problem is generally nonconvex.
 
- 
-\cite{Meansquarenorm} has first proposed a robust control framework for MIMO LTI systems subject to IID random gains. A random gain is represented by its mean value (corresponding to the nominal parameter value) and a zero-mean stochastic perturbation $\Delta$ of bounded variance. \cite{Meansquarenorm} derives a necessary and sufficient condition for Mean Square Stability (MSS), showing that MSS can be equivalently thought of as robust mean stability. The framework has been extended to various network control settings \cite{padmasola2006tradeoffs, Padma06ACC, Jeff11, Matt2014cvxMScontrol, Matt2014cvxMScontrol_act, MattACC15, Matt2017thesis} which are relevant in this paper. In particular, \cite{Ma2015} is the first to show that MS performance is equivalent to an augmented MSS problem in the same vain of the analogous robust performance problems for deterministic uncertainty, and \cite{Matt2017thesis} show that the optimal MS performance synthesis is convex for a large class of systems. 
+Within this closed-loop formulation, different performance indices are chosen depending on the control objective, e.g. the \(\mathcal{H}_2\) norm and \(\ell_1\) norm of \(\Phi\). 
+
+The $\mathcal{H}_2$ norm optimization minimizes the energy of the regulated output $z$ induced by additive white-noise disturbance $w$. This formulation is particularly relevant to noise suppression problems in sensor networks, where measurement noise is often modeled as stochastic disturbances and the objective is to minimize the steady-state variance of estimation or control signals.
+
+Meanwhile, the $\ell_1$ optimal control problem concerns the $\ell_\infty$-induced norm of the closed-loop system, which characterizes the worst-case peak-to-peak amplitude of the system response. In the distributed setting, the $\ell_1$ metric provides a natural way to quantify how disturbances accumulate across the network and how this accumulation impacts the worst-case magnitudes of states and control inputs needed for stabilization. 
 
 
 
-\cite{Willems1971FreqMSS, Willems1973MSstability} found state space and frequency domain necessary and sufficient conditions for MS stability. Recently, some researchers have observed similarities between robust stability and stochastic stability and have designed MS stabilizing controllers for stochastic systems using robust control methods~\cite{RobustControl_Mulnoise}.  
+\section{Networked control robustness}
+
+In the realm of control theory, robustness has been an essential aspect of controller properties. Classical robustness theory provides stability guarantees for a controlled system with norm-bounded modeling error, including unmodeled dynamics and real parametric uncertainty, which are unknown yet deterministic~\cite{Doyle1987UncertainSS, Packard1990QuadStab, packard_mainloop}.
+
+In networked control systems, communication reliability is not always guaranteed, introducing an additional source of model uncertainty. This uncertainty is often modeled as a nominal mean feedback gain perturbed by memoryless random multiplicative noise.
+
+To assess stability under such conditions, \cite{Meansquarenorm} introduces the concept of Mean Square Stability (MSS), which requires that the expected state second-moment matrix converges as time approaches infinity. Analogous to the role of the open-loop \(\mathcal{H}_\infty\) norm to classical robustness theory, in classical robustness theory, \cite{Meansquarenorm} defines an open-loop performance metric, referred to as the mean square norm, which is closely related to MSS. This framework establishes a foundation for evaluating robustness in the presence of unreliable communication. However, many more fundamental questions remain open.
+
+
+
+
+
+
+
 
 
 % A norm minimization problem subject to an equation constraint is obtained. The violation is penalized in the total cost to enforce the structure and stabilization constraints.
 
-\subsection{Example}
+% \subsection{Example}
 
-Consider a two-agent distributed system:
+% Consider a two-agent distributed system:
 
-\[
-\begin{bmatrix}
-    x_1[k + 1] \\ x_2[k + 1] 
-\end{bmatrix} =
-A \begin{bmatrix}
-    x_1[k] \\ x_2[k] 
-\end{bmatrix}
-+ B_w \begin{bmatrix}
-    w_1[k] \\ w_2[k] 
-\end{bmatrix}
-\]
-On step \(k\) at agent 1, the most recent information of \(x_1[k]\) and history states are fully available, while the delayed information of state \(x_2[k - 1]\) and history states are available. The core problem is how to establish the MMSE estimator \(\hat{x}_2[k]\) at agent 1.
-
-
-\subsection{Contribution}
-Unlike recent approaches that over-parameterize stabilizing controllers, we take a step back to focus on algebraically analyzing the constraint presented in (\ref{eqn:strcst_0}). Based on our analysis, we present a complete solution of the optimal distributed \(\mathcal{H}_2\) controller for the networked plant in this article. The key points of our contributions are:
-
-% \begin{enumerate}
-%     \item We demonstrate that quadratic invariance (QI) is insufficient for differentiating structured yet centralized controllers from network-implementable distributed controllers with a concrete example. We focus on a large subclass of QI problems where the network implementability is guaranteed.
-%     \item We formulate a complete characterization of admissible controllers with a fictitious dynamical system constructed via standard Youla Parameterization. We demonstrate the equivalence between the open-loop stabilizability of this system and the feasibility of the structured stabilization problem. Furthermore, we provide a condition that determines the stabilizability.
-%     \item We construct the finite-dimensional \(\mathcal{H}_2\) distributed controller algebraically from the fictitious system by solving three discrete-time algebraic Riccati equations (DARE), thus eschewing approximation methods. This result hugely reduces the computational time and the controller order.
-% \end{enumerate}
-\begin{enumerate}
-    \item We derive an exact, finite-dimensional distributed \(\mathcal{H}_2\) controller by extending the centralized solution with an additional discrete-time algebraic Riccati equation (DARE) and a backward recursion. Solving this DARE quantifies the minimal performance degradation induced by the structural constraints and simultaneously yields the optimal controller within the prescribed structure.
-    \item We give a constructive approach to find exact solutions to the constraints on Youla parameter \(Q\), i.e. \(H -U Q V \in \mathcal{S}\), which ensures that the stabilizing controller lies in \(\mathcal{S}\). This approach is broadly applicable to other structured controller synthesis problems.
-    \item We provide a condition that checks the existence of stabilizing controllers in the prespecified structure and establish its connection with the standard PBH test. 
-    \item We show with an example that QI alone cannot distinguish structured centralized from networked distributed controllers. 
-\end{enumerate}
+% \[
+% \begin{bmatrix}
+%     x_1[k + 1] \\ x_2[k + 1] 
+% \end{bmatrix} =
+% A \begin{bmatrix}
+%     x_1[k] \\ x_2[k] 
+% \end{bmatrix}
+% + B_w \begin{bmatrix}
+%     w_1[k] \\ w_2[k] 
+% \end{bmatrix}
+% \]
+% On step \(k\) at agent 1, the most recent information of \(x_1[k]\) and history states are fully available, while the delayed information of state \(x_2[k - 1]\) and history states are available. The core problem is how to establish the MMSE estimator \(\hat{x}_2[k]\) at agent 1.
 
 
+\section{Contributions and Overview of the Thesis}
+Chapter~\ref{chap:prelim} introduces the mathematical notation used throughout this thesis. Chapter~\ref{chap:networksys} defines networked systems and their key properties. Together, these chapters establish the foundational context for the problems studied in this thesis.
+
+\subsection{Optimal control synthesis approach for networked system}
+Towards the optimal control problems of networked system, several progresses have been carried out in this thesis. By transforming the structural constraints induced by network topology into an ``imaginary'' stabilization problem, we develop a novel method to parameterize LTI output-feedback stabilizing controllers within a pre-specified structure. This parameterization proves useful for solving optimal \(\mathcal{H}_2\) and \(\ell_1\) control problem in the network distributed system.
+\begin{itemize}
+    \item[$\blacksquare$] Chapter~\ref{chap:H2ctrl} presents the complete transformation of network structural constraints into a stabilization problem of a fictitious state-space model. 
+    Such transformation provides an exact algebraic approach to generate closed-loop map solutions to the infinite-dimensional structural constraints. On this basis, it provides an exact synthesis method for the optimal distributed \(\mathcal{H}_2\) controller by solving an additional Algebraic Riccati Equation to account for the cost penalty caused by the network structural constraints. 
+    \item[$\blacksquare$] Chapter~\ref{chap:l1ctrl} presents an approximation approach for finding the \(\ell_1\) optimal distributed controller. The key idea underneath is to replace the \(\ell_1\) norm of the closed-loop map with a surrogate combination of finite-horizon \(\ell_1\) norm and an infinite horizon \(\ell_2\) norm. The exact synthesis approach established in Chapter~\ref{chap:H2ctrl} is re-applied to optimize the infinite horizon \(\ell_2\) portion when the first \(N\) finite horizon response is fixed. The chapter proves that the solution converges to the optimal \(\ell_1\) response as \(N \to \infty\). Moreover, for each surrogate problem solved, we can compute a pair of tight upper and lower bounds on the optimal cost, which provides a natural stopping criterion as \(N\) increases. 
+\end{itemize}
+
+\subsection{Unveiling interplay between model uncertainties and unreliable communications}
+Based on mean square stability theory, I'm interested in the problem of how to evaluate one system's tolerance to modeling error when unreliable communications are present in the feedback control system. In Chapter~\ref{chap:RMSS}, we establish the stability analysis when both unreliable communications and modeling errors are present. Our method rely on Linear Matrix Inequality to bound the worst-case frequency response of the uncertain system and assess the mean square stability.

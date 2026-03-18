@@ -1,5 +1,5 @@
 \chapter{Preliminaries and Notations}
-\label{prelim}
+\label{chap:prelim}
 We provide most of the notations used throughout this thesis in this chapter.
 
 \section{Sets, Fields, and Vector spaces}
@@ -17,10 +17,7 @@ We will mainly analyze discrete-time linear systems in this thesis. The followin
 A linear system is a mapping between vector spaces that satisfies superposition.
 
 \begin{defn}[Linear system]
-Let $\mathcal U$ and $\mathcal Y$ be vector spaces. A system
-\[
-G: \mathcal U \to \mathcal Y
-\]
+Let $\mathcal U$ and $\mathcal Y$ be vector spaces. A system \(G: \mathcal U \to \mathcal Y\)
 is said to be linear if for all $u_1,u_2 \in \mathcal U$ and all scalars
 $\alpha,\beta$,
 \[
@@ -46,7 +43,7 @@ Let $G(z)$ be an $m\times n$ transfer function matrix.
 We say that $G(z)$ is a rational proper transfer function matrix if each entry
 $G_{ij}(z)$ is a rational function of $z$ and satisfies
 \[
-\lim_{z\to\infty} G_{ij}(z) < \infty, \quad \forall\, i=1,\ldots,m,\; j=1,\ldots,n.
+G_{ij}(\infty) \coloneqq \lim_{z\to\infty} G_{ij}(z) < \infty, \quad \forall\, i=1,\ldots,m,\; j=1,\ldots,n.
 \]
 The set of all $m\times n$ rational proper transfer function matrices is denoted by
 $\mathcal{R}_p^{\,m\times n}$. Superscripts are used to specify the dimensions of transfer function matrices when they enhance clarity and readability.
@@ -54,7 +51,7 @@ $\mathcal{R}_p^{\,m\times n}$. Superscripts are used to specify the dimensions o
 \begin{rem}
 Given a system's state-space realization \((A,B,C,D)\), \(G(z) \in \mathcal{R}_p\) if and only if \(A\) is a finite-dimensional matrix.
 \end{rem}
-Based on the transfer function matrix (TFM) value on the unit circle, we can introduce two useful classes of TFMs.
+Based on the transfer function matrix (TFM) value on the unit circle, we introduce two frequently used classes of TFMs.
 \begin{defn} \cite{Zhou1996RobustControl} 
 \(\mathcal{L}_\infty(\mathcal{C})\) space is the Banach space of matrix-valued functions that are essentially bounded on \(\mathcal{C}\), with a norm defined as \(
 \|G\|_{\infty} \doteq \mathrm{ess} \sup_{\omega \in[0,2\pi)} \bar{\sigma}(G(e^{j\omega}))\).
@@ -107,17 +104,21 @@ In analogy, we can define an upper LFT with respect to \(Q_u\) as:
 provided that \(I - Q_u(\infty) G_{11}(\infty) \) is non-singular.
 \end{defn}
 
-Notably, the feedback interconnection between two systems with compatible dimensions is a special form of \(\mathcal{F}_l\):
+Notably, the feedback interconnection of two systems with compatible dimensions—i.e., the number of output channels of \(G\) equals the number of input channels of \(H\), and vice versa—can be expressed as a special case of the lower linear fractional transformation \(\mathcal{F}_l\):
 \[
-H = \mathrm{feedback}(H^1,H^2) \coloneqq \mathcal{F}_l(\begin{bmatrix}
-    I \\
+G_{\mathrm{CL}} = \mathrm{feedback}(G,H) 
+\coloneqq 
+\mathcal{F}_l\!\left(
+\begin{bmatrix}
+    I \\[2pt]
     I
-\end{bmatrix} H^1 
+\end{bmatrix}
+G
 \begin{bmatrix}
     I & I
-\end{bmatrix}, H^2).
+\end{bmatrix},\, H
+\right).
 \]
-
 
 \section{Time-Domain Signals and Operator Representations}
 A linear-time-invariant (LTI) system (not necessarily finite-dimensional) can be equivalently characterized by its unilateral infinite impulse responses in the time domain. The impulse responses of discrete-time systems produce a matrix sequence defined on \(\mathbb{N}\).
@@ -188,8 +189,7 @@ For any fixed integer \(N\in \mathbb{N}\), \(\mathcal{H}_N \coloneqq \{0,1,\hdot
 \]
 
 We let \(y\in \mathbb{R}^{m\times n} \times \mathcal{H}_N\) be an arbitrary \(N\) steps sequence. Define the following operator that pads an infinite zeros at the end and extends \(y\) into an infinite sequence, 
-
-\(\bar{\mathbb{P}}_N: \mathbb{R}^{m\times n} \times \mathcal{H}_N \mapsto \ell^{m\times n}\)
+\(\bar{\mathbb{P}}_N: \mathbb{R}^{m\times n} \times \mathcal{H}_N \mapsto \ell^{m\times n}\),
 \[
 \bar{\mathbb{P}}_N y = 
 \left[y[0],\hdots,y[N-1],\mathbf{0},\hdots\right].
@@ -210,3 +210,44 @@ We have some properties of these operators:
 % The dual of a Banach space \(\cal{X}\) is denoted by \(\mathcal{X}^*\). Given \(\mathcal{A}\) a bounded linear operator from \(\cal{X}\) to \(\mathcal{Y}\). \(\mathcal{A}^*\colon \mathcal{Y}^* \mapsto \mathcal{X}^*\) denotes its adjoint.
 
 \section{Graph-Theoretic Notation for Networked Systems}
+
+Graph-theoretic notations play a fundamental role in describing networked systems. Throughout this thesis, a \emph{directed graph} (or \emph{digraph}) is defined as a triplet \(\mathcal{G} = (\mathcal{V}, \mathcal{A}, \mathcal{W})\), 
+where $\mathcal{V} = \{1,2,\dots,n\}$ denotes the set of vertices (or nodes), 
+\(\mathcal{A} = \left[a_{ij}\right]\) is an \(n \times n\) square matrix, known as the binary adjacency matrix of the graph that indicates the connectivity between vertices:
+\[
+\mathcal{A} = \left[a_{ij}\right]\colon a_{ij} = \begin{cases}
+1 & \ (j,i) \text{ is an edge}\\
+0 & \text{Otherwise}.
+\end{cases},
+\]
+\(\mathcal{W} = [w_{ij}] \in \mathbb{R}^{n\times n} \) assigns positive weights to the edges (\(a_{ij} = 1\)). When each edge is assigned a uniform unit weight, the weight matrix is omitted, in which case we simply write $\mathcal{G} = (\mathcal{V}, \mathcal{A})$ and identify $\mathcal{W}$ with the adjacency matrix, i.e., $\mathcal{W} = \mathcal{A}$.
+
+We define the in-neighbor and out-neighbor sets of node $i \in \mathcal{V}$ as
+\(\mathcal{N}_{i}^{-} \coloneqq \{\, j \in \mathcal{V} \mid j \neq i,\; a_{ij} = 1 \,\}\)
+ and \(\mathcal{N}_{i}^{+} \coloneqq \{\, j \in \mathcal{V} \mid j \neq i,\; a_{ji} = 1 \,\}\),
+respectively.
+
+For the convenience of characterizing the dynamical influence propagation over the graph, we introduce the definition of a transitive closure of an arbitrary digraph \(\mathcal{G}\).
+
+\begin{defn}
+Given a digraph $\mathcal{G}=\left( {\mathcal V}, \mathcal{A}, \mathcal{W}\right)$, denote \(\bar{\mathcal G} \coloneqq \left({\mathcal V}, {\bar{\mathcal A}}, {\bar{\mathcal W}}\right)\) as its transitive closure.
+\(\bar{\mathcal G}\) has the same set of vertices but with a modified adjacency matrix representing the transitive connectivity and a weight matrix informing the minimal path length given by:
+\(\bar{\mathcal A} = [\bar{a}_{ij}]\), \(\bar{\mathcal W}= [\bar{w}_{ij}]\)
+\[
+\bar{a}_{ij} = \begin{cases}
+1 & \ j \rightarrow i\text{ is a path in }\mathcal G\\
+0 & \text{Otherwise}.
+\end{cases};\ 
+\bar{w}_{ij} = 
+\begin{cases}
+l_{j \to i}
+, & \text{if } \bar{a}_{ij} = 1 \\
+0, & \text{Otherwise.}
+\end{cases}.
+\]
+\(l_{j \to i}\) means the weight of the shortest path from \(j\) to \(i\),
+\[
+l_{j\to i} = \min_{\pi_{j\to i}} \sum_{k = 0}^{r - 1} w_{v_{k+1} v_{k}},\quad \left(\pi_{j\to i} = v_0 v_1 \hdots v_r \text{ is a path},\ v_k \in \mathcal{V}, \ v_0 = j,\ v_r = i\right).
+\]
+
+\end{defn}

@@ -2,7 +2,7 @@
 % app_glossary.tex: Glossary Appendix:
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{RMSS Appendices}
-\label{app_glossary}
+\label{appsec:RMSS}
 \section{System configuration}
 \begin{table}[h]
     \caption{The setting of system parameters}\label{tab:sys_config}
@@ -11,28 +11,30 @@
     \hline
         Properties  & Value &description\\
     \hline
-        $m_c$ & 2.5 kg& Mass of cart\\
+        $m_c$ & 2 kg& Mass of cart\\
         $m_p$ & 0.1 kg& Mass of pendulum\\
-        $l$ & 2 m &Length of pendulum\\
-        $\tau$ & 0.05 s&Sampling step time\\
+        $l$ & 1 m &Length of pendulum\\
+        $f_s$ & \(60\mathrm{Hz}\) & Sampling Frequency\\
         \hline
     \end{tabular}
 \end{table}
-Let $x=[\theta,\dot{\theta},\dot{s}]^T$, the upper settings yield following discrete time state space matrices for plant $P$:
+Let $x=[\theta,\dot{\theta},s, \dot{s}]^T$, the upper settings yield following discrete time state space matrices for plant $P$:
 \begin{equation}
     \begin{split}
-    &   A = \left[\begin{array}{ccc}
-            1.0064 & 0.0501 & 0\\
-            0.2553 & 1.0064 & 0\\
-            -0.0196 & -0.0005 & 1
+    &   A = \left[\begin{array}{cccc}
+            1.0014 & 0.0167 & 0 & 0\\
+            0.1716 & 1.0014 & 0 & 0\\
+           -0.0001 & -0.0000 &  1 & 0.0167 \\
+           -0.0082 & -0.0001 &       0 & 1
         \end{array}\right];\ B = \left[\begin{array}{c}
-            -0.00025\\
-            -0.01\\
-            0.02
+            -6.9\times 10^{-5}\\
+            -8.3\times 10^{-3}\\
+            6.9\times 10^{-5}\\
+            8.3\times 10^{-3}
         \end{array}\right];\\
-    &   C = \left[\begin{array}{ccc}
-            1 & 0 & 0\\
-            0 & 0 & 1\\
+    &   C = \left[\begin{array}{cccc}
+            1 & 0 & 0 & 0\\
+            0 & 0 & 1 & 0\\
         \end{array}\right];\ D = \left[\begin{array}{c}
             0\\
             0
@@ -41,7 +43,7 @@ Let $x=[\theta,\dot{\theta},\dot{s}]^T$, the upper settings yield following disc
 \end{equation}
 
 \section{$H_\infty$ optimal controller design}
-The mean system is varying by different drop out probability $e$. Since $\E\{\xi\}= (1-e)I$. To avoid designing the optimal controller for different mean system, we do some block diagram transformations to a architecture that optimal controller/receiver change linearly w.r.t. $e$ \cite{Jeffthesis}. Use $\tilde{L}$ to denote $z^{-1} L$. 
+The mean system varies with different dropout probabilities $e$. Since \(\E\{\xi\}= (1-e)I\). To avoid designing the optimal controller for different mean systems, we do some block diagram transformations to an architecture where the optimal controller/receiver changes linearly w.r.t. $e$ \cite{Jeff2005Packet}. Use $\tilde{L}$ to denote $z^{-1} L$. 
 
 % \begin{figure}[h]
 %     \centering
@@ -51,27 +53,23 @@ The mean system is varying by different drop out probability $e$. Since $\E\{\xi
 % \end{figure}
 
 
-If there is no packet drop, then $e=0$, $\xi$ is perfectly connected as in figure (\ref{fig:CLblock}.c). Let $\hat{K} = K(I-\tilde{L})^{-1}$, $\hat{L} = L(I-\tilde{L})^{-1}$. It's easy to express $K$ and $L$ in terms of $\hat{K}$ and $\hat{L}$.
+When there is no packet drop, $e=0$ and $\xi$ is perfectly connected as in Figure (\ref{fig:CLRMSplant}.c). Let $\hat{K} = K(I-\tilde{L})^{-1}$, $\hat{L} = L(I-\tilde{L})^{-1}$. Write $K$ and $L$ in terms of $\hat{K}$ and $\hat{L}$.
 $$
 L =\hat{L} (z^{-1} \hat{L}+I)^{-1} ;\ K = \hat{K} (z^{-1} \hat{L}+I)^{-1} .
 $$
-When there is $e$ probability of packet drop in each channel, see figure (\ref{fig:CLblock}.d). We can accordingly adjust the optimal controller to generate the same closed loop mean system like below,
-
-$$
-\hat{L}_e = \frac{1}{1-e} \hat{L};\ \hat{K}_e = \frac{1}{1-e} \hat{K}.
-$$
-\begin{equation}\label{eqn:transfrom_LK}
-    L =\hat{L}_e (z^{-1} \hat{L}_e+I)^{-1} ;\ K = \hat{K}_e (z^{-1} \hat{L}_e+I)^{-1} .
-\end{equation}
-
-
-
-$[\hat{K},\hat{L}]^T$ is the controller for the system $[P,-z^{-1} I_{2}]$. So we can use $H_\infty$ optimal controller synthesis to obtain this controller. The solution of $H_\infty$ optimal synthesis is guaranteed to be proper and well-posed. From equation (\ref{eqn:transfrom_LK}), we know $L$ and $K$ are proper and well-posed whatever value $e$ takes. 
+When there is $e$ probability of packet drop in each channel, see Figure~\ref{fig:CLblk}.d. We can accordingly adjust the optimal controller to generate the same closed loop mean system as below,
+\begin{subequations}\label{eqn:transfrom_LK}
+\begin{align}
+    L & =\hat{L}_e (z^{-1} \hat{L}_e+I)^{-1} ;\ K = \hat{K}_e (z^{-1} \hat{L}_e+I)^{-1}. \\
+    \hat{L}_e & = \frac{1}{1-e} \hat{L};\ \hat{K}_e = \frac{1}{1-e} \hat{K}.
+\end{align}
+\end{subequations}
+$[\hat{K},\hat{L}]^T$ is a stabilizing controller for the system $[P,-z^{-1} I_{2}]$. So we can use $H_\infty$ synthesis to obtain this controller. The solution of $H_\infty$ synthesis is guaranteed to be proper and well-posed. From equation (\ref{eqn:transfrom_LK}), we know $L$ and $K$ are proper and well-posed for any arbitrary value $e$ takes. 
 
 Then in the closed loop mean system, we add following noise and choose following performance output to complete the $H_\infty$ optimal synthesis, shown in figure (\ref{fig:GPlantForHinfsyn}).
 \begin{figure}[h]
     \centering
-    \includegraphics[scale=0.45]{figures/RMSSfigure/Generalizedplant1.PNG}
+    \includegraphics[width = 0.8\linewidth]{figures/RMSSfigure/Generalizedplant1.PNG}
     \caption[\(\mathcal{H}_\infty\) optimal control with weighted noises]{$w$ are the noises, while $q$ are the performance outputs. $W_i$ is the weight matrix for inputs. $W_o$ is the weight matrix for outputs.}
     \label{fig:GPlantForHinfsyn}
 \end{figure}
