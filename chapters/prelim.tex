@@ -32,10 +32,7 @@ G : x[k + 1] &= A x[k] + B u[k], \label{eq:main:a} \\
 y[k]     &= C x[k] + D u[k]. \label{eq:main:b}
 \end{align}
 \end{subequations}
-The unique matrix-valued transfer function corresponding to the system is given by
-\[
-G(z) = D + C (z I -A)^{-1} B.
-\]
+The unique matrix-valued transfer function corresponding to the system is given by \(G(z) = D + C (z I -A)^{-1} B\).
 The number of rows is the number of output channels, and the number of columns is the number of input channels.
 
 \begin{defn} [Rational proper transfer function matrix]
@@ -141,7 +138,7 @@ Given any transfer function matrix (TFM) \(\hat{G}:\mathbb{C}\mapsto \mathbb{C}^
 \[
 \mathcal{Z}^{-1}:G[n] = \frac{1}{2\pi j} \oint_\mathcal{C} \hat{G}(z)z^{n-1} dz, 
 \]
-For any \(\hat{G}\in\mathcal{H}_2^{m\times n}\), its inverse Z-transform gives a sequence \(\{G\}\in\ell_2^{m\times n}\).
+For any \(\hat{G}\in\mathcal{H}_2^{m\times n}\), its inverse Z-transform gives a sequence \(\{G\}\in\ell_2^{m\times n}\). We use \(\|\cdot\|_\mathrm{F}\) to denote the Frobenius norm of a matrix. 
 Furthermore, given a weight matrix \(W \in \mathbb{S}^{m} \ge 0\), for a matrix \(M \in \mathbb{C}^{m \times n}\) we define
 \(\|M\|_W^2 \coloneqq \mathrm{trace}(M^\hermconj W M)\). More generally, for a sequence \(\{G\}\in\ell_2^{m\times n}\), the \(W\)-weighted \(\ell_2\) norm is defined as
 \[

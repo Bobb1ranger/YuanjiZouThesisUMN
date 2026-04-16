@@ -1,8 +1,6 @@
 \chapter{Robust Mean Square Stability}
 \label{chap:RMSS}
-\section{Gist of the chapter}
-
-In this chapter, we first recapitulate the classical $\mu$-analysis and the definition of MS norm and MS stability~\cite{Meansquarenorm}. We extend the notion of $\mu$-analysis to include both deterministic modeling error and stochastic process uncertainties. Inspired by the idea of relating performance to robustness, we introduce the robust MS norm to represent the system's MS performance upper bound with the presence of norm-bounded deterministic modeling error. We establish the extended \(\mu<1\) (Robust Mean Square Stable) condition and relate it to the optimally-weighted robust MS norm of the nominal model. We provide a convex optimization method to compute the tight robust MS norm upper bound and further establish a sufficient convex method for evaluating the newly-proposed \(\mu\) in robust MS stability analysis.
+In this chapter, we first recapitulate the classical $\mu$-analysis and the definition of MS norm and MS stability~\cite{Elia2005stabfading}. We extend the notion of $\mu$-analysis to include both deterministic modeling error and stochastic process uncertainties. Inspired by the idea of relating performance to robustness, we introduce the robust MS norm to represent the system's MS performance upper bound with the presence of norm-bounded deterministic modeling error. We establish the extended \(\mu<1\) (Robust Mean Square Stable) condition and relate it to the optimally-weighted robust MS norm of the nominal model. We provide a convex optimization method to compute the tight robust MS norm upper bound and further establish a sufficient convex method for evaluating the newly-proposed \(\mu\) in robust MS stability analysis.
 
 We validate our analysis through a classic pendulum-cart robot with a \(\mathcal{H}_\infty\) optimal controller and observe the trade-offs between deterministic modeling error and stochastic process uncertainties.
 
@@ -13,29 +11,28 @@ We validate our analysis through a classic pendulum-cart robot with a \(\mathcal
 
 
 %
-% The ability of bearing stochastic uncertainty, which is usually presented by the maximum allowed variance of the multiplicative noises, is the inner properties of a given LTI system. Like using $\mathcal{H}_2$ norm to denotes the energy transportation ability of LTI systems, MS norm is introduced by former researchers \cite{Meansquarenorm}\cite{IOstochastic} to quantify this ability of LTI systems. 
+% The ability of bearing stochastic uncertainty, which is usually presented by the maximum allowed variance of the multiplicative noises, is the inner properties of a given LTI system. Like using $\mathcal{H}_2$ norm to denotes the energy transportation ability of LTI systems, MS norm is introduced by former researchers \cite{Elia2005stabfading}\cite{IOstochastic} to quantify this ability of LTI systems. 
 %
  
 
 
 
-\section{State-of-the-art robust analysis and synthesis}
+\section{Stochastic linear system robustness analysis and synthesis literature review}
 
 In control theory, robust control is central to both theory and practice. 
 Robust control analysis provides stability guarantees for a controlled system with norm-bounded modeling error, including unmodeled dynamics and real parametric uncertainty, which are unknown yet deterministic~\cite{Zhou1996RobustControl, Doyle1987UncertainSS, Packard1990QuadStab, Gahinet1994LMIHinf,packard_mainloop}.
 
-Networked systems have drawn attention to stochastic systems and processes~\cite{IntroStoc}. In particular, stochastic stability problems arise from real-time uncertainties in the process, such as communication intermittency between subsystems and multiplicative noise. However, existing robustness analysis approaches can't effectively handle those real-time uncertainties arising from stochastic processes. To enlarge the scope of robust stability for stochastic processes, the notion of Mean Square (MS) stability is more relevant and has therefore been studied more extensively~\cite{IntroStoc, Willems1973MSstability, Willems1971FreqMSS, Meansquarenorm}.
+Networked systems have drawn attention to stochastic systems and processes~\cite{IntroStoc}. In particular, stochastic stability problems arise from real-time uncertainties in the process, such as communication intermittency between subsystems and multiplicative noise. However, existing robustness analysis approaches can't effectively handle those real-time uncertainties arising from stochastic processes. To enlarge the scope of robust stability for stochastic processes, the notion of Mean Square (MS) stability is more relevant and has therefore been studied more extensively~\cite{IntroStoc, Willems1973MSstability, Willems1971FreqMSS, Elia2005stabfading}.
 \cite{Willems1971FreqMSS, Willems1973MSstability} found state-space and frequency domain necessary and sufficient conditions for MS stability with a single multiplicative white-noise channel.
 
 
-\cite{Meansquarenorm} has first proposed a robust control framework for MIMO LTI systems subject to memoryless random gains. It derives a necessary and sufficient condition for MS stability, showing that MS stability can be equivalently thought of as robust mean stability. The framework has been extended to various network control settings \cite{padmasola2006tradeoffs, Padma06ACC, Jeff11, MattACC15, Matt2017thesis} which are relevant in this paper. In particular, \cite{Ma2015} is the first to show that MS performance is equivalent to an augmented MSS problem in the same vain of the analogous robust performance problems for deterministic uncertainty. 
+\cite{Elia2005stabfading} has first proposed a robust control framework for the remote stabilization of MIMO LTI systems with signal transmissions are subject to various stochastic dropout or fading. It derives a necessary and sufficient condition for MS stability, showing that MS stability can be equivalently thought of as robust mean stability. The framework has been extended to various network control settings \cite{Padma2006tradeoffs, Padma06ACC, Jeff11, MattACC15, Matt2017thesis} which are relevant in this paper. In particular, \cite{Ma2015} is the first to show that MS performance is equivalent to an augmented MSS problem in the same vain of the analogous robust performance problems for deterministic uncertainty. 
 
-Meanwhile, A control system need to tolerate and even actively compensate intermittent communications beyond those accounted for in the nominal control design. A common practice is to monitor the communication channel status and impute missing signals accordingly. \cite{Matt2014cvxMScontrol, Matt2014cvxMScontrol_act, Matt2017thesis} demonstrate that this compensation mechanism can be formulated as a linear component and synthesized via convex optimization for a large class of systems. 
+Meanwhile, A control system need to tolerate and even actively compensate intermittent communications beyond those accounted for in the nominal control design. A common practice is to monitor the status of communication channels and impute missing signals accordingly. \cite{Matt2014cvxMScontrol, Matt2014cvxMScontrol_act, Matt2017thesis} demonstrate that this compensation mechanism can be formulated as a linear component and synthesized via convex optimization for a large class of systems. 
 
 Despite these advances, existing mean square stability results typically assume perfect knowledge of the nominal system model, thereby neglecting classical modeling uncertainties. The interaction between deterministic modeling errors and stochastic process uncertainties remains insufficiently understood. In this chapter, we aim to investigate this interplay and develop a unified robustness framework that simultaneously accounts for modeling errors and process stochasticity.
 
-Several approaches have sought to capture the interplay between deterministic and stochastic uncertainties from different directions. \cite{Seiler2003BRLjs} investigated the $\mathcal{H}_\infty$ performance of a stochastic jumping system, which is robust stability of the jumping system by the small gain theorem. \cite{Stab_MJLS_1} and \cite{Stab_MJLS_2} focused on the robust stabilizing controller for such jumping systems. \cite{MixH_2infcontrolforrandomsys} optimized the mixed $\mathcal{H}_2$/$\mathcal{H}_\infty$ performance for random time delay network systems. 
-\cite{Seiler2003BRLjs,MixH_2infcontrolforrandomsys} focused on the $\mathcal{H}_\infty$ guarantees of random systems. \cite{CtrlPackDrop_uncertain} considered the norm-bounded model uncertainty in the random packet drop problem and found a sufficient condition for different controller schemes to ensure stability.
+Several approaches have sought to capture the interplay between deterministic and stochastic uncertainties from different directions. \cite{Seiler2003BRLjs} investigated the mean $\mathcal{H}_\infty$ performance of a Markovian jumping system. The expected \(\mathcal{H}_\infty\) norm provides a sufficient robustness margin of the jumping system. \cite{Seiler2005HinfNC, Stab_MJLS_1} and \cite{Stab_MJLS_2} established robust stabilizing control synthesis for such jumping systems under various assumptions. \cite{MixH_2infcontrolforrandomsys} considered random time delay network systems and optimized their mixed $\mathcal{H}_2$/$\mathcal{H}_\infty$ performance. \cite{CtrlPackDrop_uncertain} considered the norm-bounded model uncertainty in the random packet drop problem and found a sufficient condition for different controller schemes to ensure stability.
 Recently, some researchers have observed similarities between robust stability and stochastic stability and have designed MS stabilizing controllers for stochastic systems using robust control methods~\cite{RobustControl_Mulnoise}.  
 
 
@@ -43,6 +40,7 @@ Recently, some researchers have observed similarities between robust stability a
 
 
 \section{Problem Formulation}
+In this research, we consider the dynamical system with both model uncertainty and stochastic multiplicative channels. It is characterized as a nominal system \(M\) interconnecting with a \(\Delta \in \bm{\Delta}\) representing model uncertainty and \(\bar{\Delta}\) representing the stochastic gain. We'd like to establish the robust stability analysis of such dynamical systems and extend the classical \(\mu\)-analysis.
 \begin{problem}
 \begin{figure}[h]
     \centering
@@ -50,7 +48,7 @@ Recently, some researchers have observed similarities between robust stability a
     \caption[The block diagram of a system with both modeling error and stochastic feedback channel]{The construction of the system, where $M$ is the nominal block, $\Delta$ is the deterministic uncertain feedback channel and $\bar{\Delta}$ is the stochastic feedback channel.}
     \label{fig:sysconstr}
 \end{figure}
-Determine if the following dynamical system \(M\), with block diagram shown in Figure~\ref{fig:sysconstr},
+Determine if the uncertain stochastic dynamical system \(\mathcal{F}_l(\mathcal{F}_u(M,\Delta),\bar{\Delta})\), with block diagram shown in Figure~\ref{fig:sysconstr},
 \begin{subequations}\label{Discrete_statespace_Mix}
 \begin{align}
 M\colon x[k+1]& ={A}x[k]+{B_p}p[k]+{B_v}v[k]\\
@@ -58,13 +56,22 @@ q[k] &={C_q}x[k] +{D_{qp}}p[k]+{D_{qv}}v[k]\\
 y[k] &={C_y}x[k]+{D_{yp}}p[k]+{D_{yv}}v[k]
 \end{align}
 \end{subequations}
-interconnecting with $\forall\; \Delta(\colon q \mapsto p) \in \mathcal{B}_{\bm{\Delta}}^{\mathrm{LTI}}$ and \(\forall\; \bar{\Delta}(\colon y \mapsto v) \in \mathcal{B}_{\bar{\Delta}}^{\mathrm{stoc}}\) is mean square. 
+interconnecting with $\forall\; \Delta(\colon q \mapsto p) \in \mathcal{B}_{\bm{\Delta}}^{\mathrm{LTI}}$ and \(\forall\; \bar{\Delta}(\colon y \mapsto v) \in \mathcal{B}_{\bar{\Delta}}^{\mathrm{sto}}\) is mean square stable. 
 Mathematically, determine if the expected second moment matrix of the states \(\E\{x[k]x[k]^\top\}\to \mathbf{0}\) as \(k \to \infty\).
 \end{problem}
-In this formulation, \(\mathcal{B}_{\bm{\Delta}}^{\mathrm{LTI}}\) represent a class of linear time-invariant uncertainty with bounded \(\mathcal{H}_\infty\) norm, elaborated in subsection~\ref{subsec:mu}.
+
+\begin{rem}
+Without loss of generality, the sizes of all uncertainty blocks can be normalized to be bounded by one. Indeed, any scaling in the magnitude of the uncertainties can be absorbed into the nominal system through an appropriate rescaling. Therefore, it is sufficient to consider uncertainty sets satisfying \(\|\Delta\|\le 1\).
+
+In this formulation, \(\mathcal{B}_{\bm{\Delta}}^{\mathrm{LTI}}\) represent a class of linear-time-invariant uncertainty with \(\mathcal{H}_\infty\) norm bounded by \(1\), elaborated in subsection~\ref{subsec:mu}. 
+\(\mathcal{B}_{\bar{\Delta}}^{\mathrm{sto}}\) is a class of multi-channel random gain with zeros mean and variance not greater than \(1\), elaborated in subsection~\ref{subsec:MSS}.
+\end{rem}
+
+
 
 \subsection{Structured singular value in robustness analysis}\label{subsec:mu}
-In this chapter, we recapture $\mu$-analysis in robust control. We mainly follow the classical definition and notations from~\cite{packard_mainloop}.
+In this chapter, we recapture $\mu$-analysis in robust control. 
+$\mu$-analysis provides a paradigm for relating a system’s closed-loop robustness to structured uncertainties with its open-loop performance. We mainly follow the classical definition and notations from~\cite{packard_mainloop}.
 
 
 
@@ -189,22 +196,18 @@ Otherwise, the above optimization problem finds an upper bound for \(\mu_{\bm{\D
 
 
 
-\subsection{Mean Square(MS) stability and MS norm}
+\subsection{Mean Square(MS) stability and MS norm} \label{subsec:MSS}
 
-In this section, we briefly review some results on mean-square stability, first presented in \cite{Meansquarenorm}. For the related CT result, see \cite{Vaidya2018CtMSS}.
-In particular, IID random variables can be interpreted as stochastic uncertainty in the familiar robust control framework. We consider systems in DT.
+In this section, we briefly review some results on mean-square stability, first presented in \cite{Elia2005stabfading}. For the related continuous-time result, see \cite{Vaidya2018CtMSS}.
+In particular, IID random variables can be interpreted as stochastic uncertainty in the familiar robust control framework. We consider systems in discrete-time.
 
 \begin{figure}[h]\label{fig:sysconstr_elia}
     \centering
         \includegraphics[scale = 0.6]{figures/RMSSfigure/MSS_intercon.png}
-        \caption[LTI plant interconnected with stochastic gain channels]{The system is constructed with a nominal plant and a stochastic gain feedback between inputs and outputs. $\bar{\Delta}$ denotes the gain block, defined in following}
+        \caption[LTI plant interconnected with stochastic gain channels]{The system is constructed with a nominal plant and a random gain feedback between inputs and outputs. $\bar{\Delta}$ denotes the random gain block, defined in following}
 \end{figure}
 
-\cite{Meansquarenorm} considered the following state-space model of an LTI system with stochastic interconnection between output $y$ and input $v$
-\begin{equation}\label{eqn:DT_statespace}
-G: {x^+}={A}x+{B}{v};\ {y}={C}x+D v.
-\end{equation}
-\cite{Meansquarenorm} gives out the definition, based on the state-space realization in \ref{eqn:DT_statespace}, for the MS closed-loop stability. Interconnect the output $y$ with input $v$, $v=\bar{\Delta}y$, with the stochastic uncertainty $\bar{\Delta}$ satisfies the following assumptions:
+\cite{Elia2005stabfading} considered an LTI system with a stochastic perturbation interconnecting  output $y$ and input $v$. $v=\bar{\Delta}y$, with the stochastic $\bar{\Delta}$ satisfies the following assumptions:
 \begin{ass}\label{asp:MSS_stocDelta}
 $\bar{\Delta}$ is a diagonal multiplicative operator. Mathematically, $\bar{\Delta}=\mathrm{diag}(\delta_{s_i},i=1,...,n_v)$. $v=\bar{\Delta}y \Leftrightarrow v_i=\delta_{s_i} y_i$ for each \(i=1,\hdots,n_v\).
 \begin{enumerate}
@@ -214,49 +217,48 @@ $\bar{\Delta}$ is a diagonal multiplicative operator. Mathematically, $\bar{\Del
     \item $var(\delta_{s_i}[k])=\sigma^2$ in each channel.    
 \end{enumerate}
 We denote the set of stochastic uncertainty above with $\sigma^2\leq 1$ as 
-${\cal B}_{\bar{\Delta}}^{\mathrm{stoc}}$.
+${\cal B}_{\bar{\Delta}}^{\mathrm{sto}}$.
 \end{ass}
 
 
+
 \begin{defn}
-The system defined in \ref{eqn:DT_statespace} interconnected by $v=\bar{\Delta}y$ is said to be MS stable if $M[k] \coloneqq \E\{x[k]x[k]^T\},\forall k \in \mathbb{N}$ is well defined, and $\lim_{k\to\infty}M[k]=\mathbf{0}$.
+Given an LTI system \(G\) with state-space realization:
+\begin{equation}\label{eqn:DT_statespace}
+G: {x^+}={A}x+{B}{v};\quad {y}=C x+D v; x[0] = x_0.
+\end{equation}
+Its feedback interconnection with $v =\bar{\Delta} y$ is said to be MS stable if the states' expected second moment matrix $M[k] \coloneqq \E\{x[k]x[k]^T\}$ is well defined for all \(k \in \mathbb{N}\), and $\lim_{k\to\infty}M[k]=\mathbf{0}$.
 \end{defn}
 \begin{rem}
-The covariance-like matrix \(M[k]\) will converge to zero because there is no additive noise in the dynamics by the system in~\eqref{eqn:DT_statespace}.   
+The states' moment matrix \(M[k]\) will asymptotically converge to zero because there is no additive noise in the dynamics by the system in~\eqref{eqn:DT_statespace}. The Mean Square Stability implies that \(G\) is Schur stable, i.e. $\rho(A)<1$.
 \end{rem}
 
 
 
 
 
-Then transfer matrix mapping $v$ to $y$ is hence
-$G(z)=C(zI-A)^{-1}B+D$, a $n_y\times n_v$ (We require that $n_y = n_v$) transfer function matrix. Define the mean square norm:
+Then open loop transfer matrix mapping $v$ to $y$ is therefore
+$G(z)=C(zI-A)^{-1}B+D$, a $n_y\times n_v$ (We require that $n_y = n_v$) transfer function matrix. We now introduce the mean square norm, an open-loop performance index that is closely related to the analysis of a system’s closed-loop mean square stability:
 \begin{defn}\label{defn:MSnorm}
 The MS norm of $p\times p$ transfer function matrix $G=[G_{ij}]$ ($G_{ij}$ are proper transfer functions.) is defined as 
 $$
 \|G\|_{MS} \doteq \max_{i=1,\hdots,p}\sqrt{\sum_{j=1}^p{\|G_{ij}\|_2^2}}  
 $$
-
-
 \end{defn}
 Note that for a given explicit transfer matrix, MS norm gives the maximum among the output channels while the traditional $\mathcal{H}_2$ norm gives the sum energies of the output channels.
 
-Based on the definition of the MS stability, \cite{Meansquarenorm} further defines the MS structured norm.
+Motivated by the definition of MS stability and classical \(\mu\)-analysis, \cite{Elia2005stabfading} further defines the MS structured norm by the largest perturbation `size' that doesn't destabilize the system, measured in terms of the variance of \(\bar{\Delta}\). 
 \begin{defn}\label{defn:muMS}
-    The MS structured norm of a system $G$ with stochastic interconnection $\bar{\Delta}$, denoted by $\mu_{MS}(G,\bar{\Delta})$ is defined as
-    \begin{equation*}
-        \mu_{MS}(G,\bar{\Delta})=\frac{1}{\sup\{\sigma^2:\text{the closed loop system is MS stable}\}}
-    \end{equation*}
+The Mean Square structured norm of a system $G$ with stochastic interconnection $\bar{\Delta}$, denoted by $\mu_{\mathrm{MS}}(G,\bar{\Delta})$ is defined as
+\begin{equation*}
+    \mu_{\mathrm{MS}}(G,\bar{\Delta})=\frac{1}{\sup\{\sigma^2:\text{the closed loop system is MS stable}\}}
+\end{equation*}
 \end{defn}
-% {\color{red} 
-% Should we change the def as follows
-%     \begin{equation*}
-%         \mu_{MS}(G,\bar{\Delta})=\frac{1}{\inf\{\sigma^2:\text{the closed loop system is not MS stable}\}}
-%     \end{equation*}}
-This definition also implies that $\frac{1}{\mu_{MS}}$ is the maximal variance the system can tolerate in the stochastic feedback channel. 
-For simplicity, Assumption~\ref{asp:MSS_plant} is made to ensure the plant is stable by itself and its interconnection with \(\bar{\Delta}\) is always well-posed. \cite{Meansquarenorm} further provides the following core theorem on $\mu_{MS}$.
+This definition also implies that $\frac{1}{\mu_{\mathrm{MS}}}$ is the maximal variance the system can tolerate in the stochastic feedback channel. \(\mu_{\mathrm{MS}} < 1\) ensures that the interconnection of \(G\) with any \(\bar{\Delta} \in {\cal B}_{\bar{\Delta}}^{\mathrm{sto}}\) is MS stable.
+
+For simplicity, Assumption~\ref{asp:MSS_plant} is made to ensure the plant is stable by itself and its interconnection with \(\bar{\Delta}\) is always well-posed. \cite{Elia2005stabfading} further provides the following core theorem on $\mu_{MS}$.
 \begin{ass}\label{asp:MSS_plant}
-$G$ is Schur stable, i.e. $\rho(A)<1$, and \(D\) is either strictly upper or lower triangular.
+\(D\) is either strictly upper or lower triangular.
 \end{ass}
 
 \begin{thm}\label{thm:MSS}
@@ -271,7 +273,7 @@ Under Assumption~\ref{asp:MSS_plant} and \ref{asp:MSS_stocDelta}, the following 
     \end{align}
     \end{subequations}
     % \item $\sigma^2 \inf_{\theta>0,\mathrm{diag}}\|\theta G \theta^{-1}\|_{MS}^2<1$
-    \item $\sigma^2\rho(\tilde{G})<1$, where
+    \item $\sigma^2\rho(\tilde{G})<1$, where \(\tilde{G}\) is the element-wise \(\mathcal{H}_2\) norm matrix of LTI system \(G\):
     \begin{equation}   
     \tilde{G} \doteq
     \left[
@@ -280,15 +282,16 @@ Under Assumption~\ref{asp:MSS_plant} and \ref{asp:MSS_stocDelta}, the following 
         \vdots & \ddots &\vdots\\
         \|G_{{n_y}1}\|_2^2 & \ldots & \|G_{{n_y}{n_v}}\|_2^2
     \end{array}
-    \right]
+    \right].
     \end{equation}
+Note that the notation $\tilde{\cdot}$ is used throughout this chapter to denote the element-wise $\mathcal{H}_2$ norm matrix of an LTI system.
 \end{enumerate}
 \end{thm}
-Recalling that the spectral radius \(\rho(\cdot)\)of a matrix  is defined as its largest eigenvalue. Since \(\tilde{G}\) is a non-negative valued matrix, 
+Recalling that the spectral radius \(\rho(\cdot)\) of a matrix  is defined as its largest eigenvalue. Since \(\tilde{G}\) is a non-negative valued matrix, 
 Corollary~\ref{cor:muMScompute} follows immediately,
 \begin{cor}\label{cor:muMScompute}
 \begin{equation}
-\mu_{MS}=\rho(\tilde{G})=\inf_{\theta>0,\mathrm{diag}}\|\theta G \theta^{-1}\|_{MS}^2
+\mu_{\rm{MS}}=\rho(\tilde{G})=\inf_{\theta>0,\mathrm{diag}}\|\theta G \theta^{-1}\|_{\rm{MS}}^2
     =\inf_{\theta>0,\mathrm{diag}} \max_{i}\sum_{j}\|\theta_{i}G_{ij}\theta_j^{-1}\|_2^2
 \end{equation}
 \end{cor}
@@ -306,7 +309,7 @@ The above results show that the condition for MS stability in the presence of I.
 
 
 \section{Main results}
-In this section, we generalize the preliminary result from~\cite{Meansquarenorm} to the case where the plant model is subject to LTI-structured uncertainty. We next present formulations and solutions to new robust mean-square performance and stability problems.
+In this section, we build upon the preliminary result from~\cite{Elia2005stabfading} to the case where the plant model is subject to LTI-structured uncertainty. We next present formulations and solutions to new robust mean-square performance and stability problems.
 
 \subsection{{Robust Mean Square norm}}
 % {\color{red} I would expect a generalized notion of mu we have discussed and derived in the past} 
@@ -322,16 +325,16 @@ In this section, we generalize the preliminary result from~\cite{Meansquarenorm}
 
 
 
-For each class of $\mathcal{B}_{\bm{\Delta}}$, there is a class of corresponding multipliers which commute with $\Delta$:
+For each class of $\mathcal{B}_{\bm{\Delta}}$, there is a class of associated multipliers which commute with $\Delta$:
 $$
 {\bf{\Lambda}}_{(\bm{\Delta})}=\{\Lambda \vert\; \Lambda=\mathrm{diag}[\Lambda_1,\hdots,\Lambda_L,\lambda_{L+1} I_{m_1},\hdots,\lambda_{L+F} I_{m_F}] \}
 $$
 
 We denote by $G_\Delta \coloneqq \mathcal{F}_u(M, \Delta)$ the upper linear fractional interconnection of $M$ and $\Delta$. Adapted from Definition~\ref{defn:MSnorm}, we define the Robust MS-norm problem as follows:
 \begin{defn}\label{robust_MS.def}
-Given a nominal plant $M$ defined as \ref{Discrete_statespace_Mix}. If $G_\Delta$ is well defined and robustly stable for $\Delta\in\mathcal{B}_{\bm{\Delta}}^{\mathrm{LTI}}$,  then the system $M$ is said to have robust mean square norm $\|G\|_{MS,r}$ if 
+Given a nominal system $M$ defined as \ref{Discrete_statespace_Mix}. If $G_\Delta$ is well defined and robustly stable for $\Delta\in\mathcal{B}_{\bm{\Delta}}^{\mathrm{LTI}}$,  then the system $M$ is said to have robust mean square norm $\|G\|_{MS,r}$ if 
 \begin{equation*}
-    \|G\|_{MS,r} \doteq \sup_{\Delta \in \mathcal{B}_{\bm{\Delta}}^{\mathrm{LTI}}}\max_{i \in \{1,\hdots,n_y\}}\sqrt{\sum_{j=1}^{n_v}{\|G_{\Delta,ij}\|_2^2}} < \infty
+    \|G\|_{\mathrm{MS},r} \doteq \sup_{\Delta \in \mathcal{B}_{\bm{\Delta}}^{\mathrm{LTI}}}\max_{i \in \{1,\hdots,n_y\}}\sqrt{\sum_{j=1}^{n_v}{\|G_{\Delta,ij}\|_2^2}} < \infty
 \end{equation*}
 \end{defn}
 
@@ -352,7 +355,7 @@ Given a nominal plant $M$ defined as \ref{Discrete_statespace_Mix}. If $G_\Delta
 
 Note here, because of the interchanging properties of $\sup$ and $\max$ and the monotonicity of the square root, we have 
 \begin{equation*}
-    \|G\|_{MS,r}^2=\max_{i=1,\hdots,p}\sup_{\Delta \in \mathcal{B}_{\bm{\Delta}}^{\mathrm{LTI}}}\sum_{j=1}^p{\|G_{\Delta,ij}\|_2^2}
+    \|G\|_{\mathrm{MS},r}^2=\max_{i=1,\hdots,p}\max_{\Delta \in \mathcal{B}_{\bm{\Delta}}^{\mathrm{LTI}}}\sum_{j=1}^p{\|G_{\Delta,ij}\|_2^2}
 \end{equation*}
 which means the robust $MS$ norm square is just the maximum of robust $\mathcal{H}_2$ norm of each output channel. We can thereby solve the robust MS norm through convex optimization.
 We begin with the transfer function between the input and output (obtained from the minimal state-space realization):
@@ -395,17 +398,17 @@ where
     {C_y}(z{I}-{A})^{-1}{B_p}+{D_{yp}}&{C_y}(z{I}-{A})^{-1}{B_v}+D_{yv}\\
 \end{array}\right]\\
 \end{equation}
-We next construct a bunch of single-output transfer functions \(M_i(z)\) from $M(z)$.
+We next construct a bunch of transfer functions \(M_i(z)\) from $M(z)$.
 Let 
 \begin{equation}\label{constrM_i}
 M_i(z)=
 \left[
     \begin{array}{cc}
         M_{qp}&M_{qv}\\
-        M_{yp_i}&M_{yv_i}\\
+        M_{y_i p}&M_{y_i v}\\
     \end{array}\right]
 \end{equation}
-The following result is about robust ${\cal H}_2$-norm specifically for single-output systems.
+The following result is about robust ${\cal H}_2$ norm specifically for single-output systems.
 \begin{lemma}\label{MISOH_2}\cite{Sznaier1999RobustH2}
 Given a MISO system with input $v\in \mathbb{R}^{n_v}$ and scalar output \(y\in\mathbb{R}\). If there exist a positive definite Hermitian matrix $X(\omega)\in \mathbb{X}$ and a real transfer function $y(\omega)>0$ such that
 \begin{equation}\label{freqbound}
@@ -425,7 +428,7 @@ Given a MISO system with input $v\in \mathbb{R}^{n_v}$ and scalar output \(y\in\
 Then the robust $\mathcal{H}_2$ norm of the uncertain system is bounded by $\gamma$.
 
 \end{lemma}
-The condition is necessary and sufficient when the structure of the deterministic uncertainty $\Delta$ is $\mu$-simple, i.e., $2L+F\leq2$. While extending the result to robust ${\cal H}_2$-norm of MIMO systems can be conservative (see~\cite{Sznaier2000WNrobustH2} Theorem 3), it turns out that the extension to MIMO robust MS-norm is direct. This is our main result of this section. 
+The condition is necessary and sufficient when the structure of the deterministic uncertainty $\Delta$ is $\mu$-simple, i.e., $2L+F\leq2$. While extending the result to robust ${\cal H}_2$-norm of MIMO systems can be conservative (see~\cite{Sznaier2000WNrobustH2} Theorem 3), it turns out that the extension to MIMO robust MS-norm is direct. This is our main result of this subsection. 
 \begin{thm}\label{thm:robMSnorm}
 Nominal System $M$ has Robust MS Norm performance $<\gamma$ if there exist 
 positive definite Hermitian matrices $X_i(\omega)\in \mathbb{X}$ and real transfer function $y_i(\omega)>0$
@@ -454,10 +457,10 @@ Assume there are $X_i(\omega),y_i(\omega),\; \forall i\in\{1,\hdots,n_v\}$ satis
 Then, for each MISO sub-system with input $v$ and output $y_i$, apply Lemma~\ref{MISOH_2}; each of the systems has robust $H_2$ performance less than $\gamma$. According to the definition of MS norm of a MIMO system to be the largest $H_2$ norm of all its output channels, the robust MS norm performance of system $M$ is less than $\gamma$.
 
 Proof of Necessity (Assuming the structure of the deterministic uncertainty to be $\mu$-simple):
-From the definition of MS norm, each output channel has a robust $H_2$ norm less than $\gamma$ when the robust MS norm of system $M$ is less than $\gamma$.
+From the definition of MS norm, each output channel has a robust $\mathcal{H}_2$ norm less than $\gamma$ when the robust MS norm of system $M$ is less than $\gamma$.
 % (Otherwise, we can pick the $\Delta$ which makes one of the output channel have $H_2$ norm more than $\gamma$. Then the robust MS norm of $M$ is more than $\gamma$).
 
-Because Lemma~\ref{MISOH_2} is sufficient and necessary when $\Delta$ is $\mu$-simple. We can always find a pair of $X$ and $y$ which satisfy the LMIs \eqref{eqn:freqbound_2} and \eqref{eqn:intbyfreq_2} if one MISO system has robust $H_2$ performance less than $\gamma$, .
+Because Lemma~\ref{MISOH_2} is sufficient and necessary when $\Delta$ is $\mu$-simple. We can always find a pair of $X$ and $y$ that satisfy the LMIs \eqref{eqn:freqbound_2} and \eqref{eqn:intbyfreq_2} if one MISO system has robust $H_2$ performance less than $\gamma$.
 Therefore, for each output channel, there exists such a pair of functions of frequency $X_i(\omega)$ and $y_i(\omega)$. 
 \end{proof}
 % The proof is based on applying Lemma \ref{MISOH_2} on each output $y_i$.  
@@ -467,13 +470,19 @@ Therefore, for each output channel, there exists such a pair of functions of fre
 
 
 \subsection{Robust MS stability}
+
+
+Mimicking the structured singular value for multi-block uncertainty, we define the $\mu$ value of a nominal system $M$ with respect to a class of LTI uncertainties interconnected with $\diag(\Delta,\bar{\Delta})$. When both types of uncertainties are present, it is generally difficult to obtain analytical results comparable to Theorems~\ref{thm:musimple} and~\ref{thm:MSS}. 
+
+To address this challenge, we adopt a sequential loop-closing strategy. In \cite{Seiler2003BRLjs}, the loop is first closed with the stochastic uncertainty, and it is shown that the inverse of the expected $\mathcal{H}_\infty$ norm provides a sufficient lower bound on the size of uncertainties that preserve robust stability. In contrast, we first close the loop with $\Delta$ and then evaluate the resulting system in terms of its robust mean square performance. This approach leads to a necessary and sufficient condition for robust mean square stability.
+
 \begin{defn}
 Let $G_\Delta=\mathcal{F}_u(M,\Delta)$ be the upper LFT of $M$ and $\Delta$, Define 
 $$
 \mu_{\bm{\Delta},\bar{\Delta}} (M)= 
 \begin{cases}
-    \mu_{\bm{\Delta}}(M_{qp})& \text{ if }\mu_{\bm{\Delta}}(M_{qp})\geq1\\
-    \max\{\mu_{\bm{\Delta}}(M_{qp}),\sup_{\Delta\in\mathcal{B}_\Delta^{\mathrm{LTI}}}\mu_{MS}(G_{\Delta})\}& \text{else}    
+    \mu_{\bm{\Delta}}(M_{qp})& \text{ if }\mu_{\bm{\Delta}}(M_{qp})\geq 1\\
+    \max\{\mu_{\bm{\Delta}}(M_{qp}),\;\max_{\Delta\in\mathcal{B}_\Delta^{\mathrm{LTI}}}\mu_{\mathrm{MS}}(G_{\Delta})\}& \text{else}
 \end{cases}.
 $$
 
@@ -486,24 +495,34 @@ $\mu_{\bm{\Delta},\bar{\Delta}} (M)<1$ if and only if the $\mathcal{F}_u(M,\Delt
 Proof of sufficiency: 
 By the definition of \(\mu_{\bm{\Delta},\bar{\Delta}}(M)<1\), 
 \[
-\mu_{\bm{\Delta}}(M_{qp})<1,\quad  \sup_{\Delta\in\mathcal{B}_\Delta^{\mathrm{LTI}}}\mu_{MS}(G_{\Delta})<1.
+\mu_{\bm{\Delta}}(M_{qp})<1,\quad  \max_{\Delta\in\mathcal{B}_\Delta^{\mathrm{LTI}}}\mu_{\rm{MS}}(G_{\Delta})<1.
 \] 
-Therefore, $G_{\Delta} = \mathcal{F}_u(M, \Delta)$ is well defined and robustly stable for all $\Delta\in\mathcal{B}_\Delta^{\mathrm{LTI}}$. For all $\Delta\in\mathcal{B}_\Delta^{\mathrm{LTI}}$, the system $\mu_{MS}(G_\Delta)<1$, which means $G_{\Delta}$ is MS stable for all $\bar{\Delta}$ with variance $\sigma^2\leq1$.
+Therefore, $G_{\Delta} = \mathcal{F}_u(M, \Delta)$ is well defined and robustly stable for all $\Delta\in\mathcal{B}_\Delta^{\mathrm{LTI}}$. For all $\Delta\in\mathcal{B}_\Delta^{\mathrm{LTI}}$, the system $\mu_{\rm{MS}}(G_\Delta)<1$, which means $G_{\Delta}$ is MS stable for all $\bar{\Delta}$ with variance $\sigma^2\leq1$.
 
-Proof of necessity: If $\mu_{\bm{\Delta},\bar{\Delta}} (M)\geq1$, then $\mu_{\bm{\Delta}}(M_{qp})\geq1$ or $\mu_{\bm{\Delta}}(M_{qp})<1$ and $\sup_{\Delta\in\mathcal{B}_\Delta^{\mathrm{LTI}}}\mu_{MS}(G_{\Delta})\ge 1$. If $\mu_{\bm{\Delta}}(M_{qp})\geq1$, then $\mathcal{F}_u(M, \Delta)$ is not well defined or unstable for some $\Delta\in\mathcal{B}_\Delta^{\mathrm{LTI}}$. Otherwise, $\sup_{\Delta\in\mathcal{B}_\Delta^{\mathrm{LTI}}}\mu_{MS}(G_{\Delta})\geq1$. Note $G_{\Delta}$ is well defined and stable for all $\Delta\in\mathcal{B}_\Delta^{\mathrm{LTI}}$ in this case. Then for some ${\Delta}\in\mathcal{B}_\Delta^{\mathrm{LTI}}$, there exist $\bar{\Delta}$ with variance $\sigma^2\leq1$, which makes $G_\Delta$ MS unstable.
+Proof of necessity: If $\mu_{\bm{\Delta},\bar{\Delta}} (M)\geq1$, then $\mu_{\bm{\Delta}}(M_{qp})\geq1$ or $\mu_{\bm{\Delta}}(M_{qp})<1$ and $\max_{\Delta\in\mathcal{B}_\Delta^{\mathrm{LTI}}}\mu_{\rm{MS}}(G_{\Delta})\ge 1$. If $\mu_{\bm{\Delta}}(M_{qp})\geq1$, then $\mathcal{F}_u(M, \Delta)$ is not well defined or unstable for some $\Delta\in\mathcal{B}_\Delta^{\mathrm{LTI}}$. Otherwise, $\max_{\Delta\in\mathcal{B}_\Delta^{\mathrm{LTI}}}\mu_{\rm{MS}}(G_{\Delta})\geq1$. Note $G_{\Delta}$ is well defined and stable for all $\Delta\in\mathcal{B}_\Delta^{\mathrm{LTI}}$ in this case. Then for some ${\Delta}\in\mathcal{B}_\Delta^{\mathrm{LTI}}$, there exist $\bar{\Delta}$ with variance $\sigma^2\leq1$, which makes $G_\Delta$ MS unstable.
 \end{proof}
 
 Given the significance of MS-norm in the MS stability condition of Corollary~\ref{cor:muMScompute}, in this section, we consider the problem of robust MS stability. In analogy with the main loop theorem in \cite{packard_mainloop}, we have the following corollary,
 \begin{cor}\label{cor:MS_specr}
-Given a nominal system $M$ defined as \ref{Discrete_statespace_Mix}. Assume $G_\Delta= \mathcal{F}_u(M, \Delta)$ is well defined and robustly stable for $\Delta\in\mathcal{B}_\Delta^{\mathrm{LTI}}$. Then the following condition holds.
+Given a nominal system $M$ defined as \ref{Discrete_statespace_Mix}. Assume $G_\Delta= \mathcal{F}_u(M, \Delta)$ is well defined and robustly stable for $\Delta\in\mathcal{B}_\Delta^{\mathrm{LTI}}$. Then \(\mu_{\bm{\Delta},\bar{\Delta}} (M) < 1\) if and only if 
 \begin{equation*}
-    \mu_{\bm{\Delta},\bar{\Delta}} (M) = \rho_{r}(\tilde{G})\doteq \sup_{\Delta \in \mathcal{B}_{\bm{\Delta}}^{\mathrm{LTI}}}\rho(\tilde{G}_{\Delta}) < 1
-\end{equation*}    
+    \rho_{r}(\tilde{G})\doteq \max_{\Delta \in \mathcal{B}_{\bm{\Delta}}^{\mathrm{LTI}}}\rho(\tilde{G}_{\Delta}) < 1.
+\end{equation*}
+Here, the subscript $r$ denotes robustness.
 \end{cor}
 % Note is $M$ has robust spectral radius $\rho(\tilde{G})_r\geq 1 $ iff the feedback interconnection of $M$ with 
 % $\Delta_{mix}=\left[\begin{array}{cc}\Delta&\\& \bar{\Delta}\end{array}\right]$ is  MS stable for all $\Delta\in \mathcal{B}_{\bm{\Delta}}^{\mathrm{LTI}}$ and $\bar{\Delta}\in {\cal B}_{\bar{\Delta}}^{stoc}$. 
 
-Applying Corollary~\ref{cor:muMScompute}, $\rho_r(\tilde{G})=\sup_{\Delta\in\mathcal{B}_\Delta^{\mathrm{LTI}}}\inf_{\theta>0}\|\theta G_\Delta\theta^{-1}\|^2_{MS}<1$. The exact value of $\rho_r(\tilde{G})$ does not appear to be a simple task at the moment. 
+Applying Corollary~\ref{cor:muMScompute}, for a fixed $\Delta$, the quantity 
+$\rho(\tilde{G}_\Delta)$ can be computed by solving
+\[
+\rho(\tilde{G}_\Delta)
+= \inf_{\substack{\theta \succ 0 \\ \theta \in \mathrm{Diag}}}
+\left\| \theta G_\Delta \theta^{-1} \right\|_{\mathrm{MS}}^2.
+\]
+The quantity $\rho_r(\tilde{G})$ is defined as the maximum of these optimal values 
+over all $\Delta\in\mathcal{B}_{\bm{\Delta}}^{\mathrm{LTI}}$. Computing the exact value of $\rho_r(\tilde{G})$ is 
+challenging, as the $\theta$ depends on $\Delta$.
 
 % \begin{prop}
 % $\rho(\tilde{G})_r<\infty$, only if $\mu_\Delta(M_0)<1$
@@ -522,27 +541,26 @@ Applying Corollary~\ref{cor:muMScompute}, $\rho_r(\tilde{G})=\sup_{\Delta\in\mat
 % $\mu_{\Delta}(M_0)<1$ ensures that the nominal system is robustly MS stable within any $\Delta$ varying in $\|\Delta\|<1$. Given this satisfied, $\rho(\tilde{G})_r<1$ further requires the system be MS stable given any $\Delta$ LTI in $\|\Delta\|<1$ and $\bar{\Delta}$ with variance less than $1$. 
 % \end{remark}
 
-Towards the other end, Theorem~\ref{thm:robMSnorm} allows us to simply compute for a fixed $\theta$
+\subsection{Computational Methods}
+To obtain a tractable upper bound on $\rho_r(\tilde{G})$, we introduce some conservatism by interchanging the infimum over $\theta$ with the maximum over $\Delta$. This removes the dependence of $\theta_\Delta$ on $\Delta$. We leave to future research this investigation into reducing conservatism. 
+Define
 $$
-\sup_{\Delta\in\mathcal{B}_\Delta^{\mathrm{LTI}}}\|\theta G_\Delta\theta^{-1}\|^2_{MS}
+\bar{\rho}_r(\tilde{G}) \doteq \inf_{\theta>0}\max_{\Delta\in\mathcal{B}_\Delta^{\mathrm{LTI}}}\|\theta G_\Delta\theta^{-1}\|^2_{\rm{MS}}.
 $$
-By minimizing over weight $\theta>0$, we will obtain
-$$
-\bar{\rho}_r(\tilde{G}) \doteq \inf_{\theta>0}\sup_{\Delta\in\mathcal{B}_\Delta^{\mathrm{LTI}}}\|\theta G_\Delta\theta^{-1}\|^2_{MS}
-$$
-
+The quantity $\bar{\rho}_r(\tilde{G})$ represents the lower bound of robust mean-square norm of $G_\Delta$ under a fixed scaling $\theta$.
 Note that  
 \begin{equation*}
-\rho_r(\tilde{G})=\sup_{\Delta\in\mathcal{B}_\Delta^{\mathrm{LTI}}}\inf_{\theta>0}\|\theta G_\Delta\theta^{-1}\|^2_{MS}\leq \inf_{\theta>0}\sup_{\Delta\in\mathcal{B}_\Delta^{\mathrm{LTI}}}\|\theta G_\Delta\theta^{-1}\|^2_{MS} = \bar{\rho}_r(\tilde{G}).
+\rho_r(\tilde{G})=\max_{\Delta\in\mathcal{B}_\Delta^{\mathrm{LTI}}}\inf_{\theta>0}\|\theta G_\Delta\theta^{-1}\|^2_{\rm{MS}}\leq \inf_{\theta>0}\max_{\Delta\in\mathcal{B}_\Delta^{\mathrm{LTI}}}\|\theta G_\Delta\theta^{-1}\|^2_{\rm{MS}} = \bar{\rho}_r(\tilde{G}).
 \end{equation*}
-So what we are computing is, in general, an upper bound to $\rho_r(\tilde{G})$. We leave to future research this investigation into reducing conservatism. 
 \begin{rem}\label{rem:1chn}
 Notably, the conservatism introduced by interchanging the infimum and supremum disappears in the single-channel stochastic uncertainty case, since the robust performance is invariant under scaling by \(\theta\).
-Mathematically, if $n_v = 1$, $\rho(\tilde{G})_r = \bar{\rho}(\tilde{G})_r$.
+Mathematically, if $n_v = 1$, $\rho_r(\tilde{G}) = \bar{\rho}_r(\tilde{G})$.
 \end{rem}
 
 
-We have the main result of this section. The following theorem establishes a convex feasibility problem for verifying robust MS stability. 
+Theorem~\ref{thm:robMSnorm} provides a computational procedure to evaluate 
+$\max_{\Delta \in \mathcal{B}_\Delta^{\mathrm{LTI}}} \|\theta G_\Delta \theta^{-1}\|^2_{\rm MS}$ 
+for a fixed $\theta$. Building on this result, we now present the main theorem of this section, which formulates a convex feasibility problem for verifying robust mean square stability.
 
 \begin{thm}\label{thm:RMSSsuff}
 System $M$ has $\mu_{\bm{\Delta},\bar{\Delta}}(M)<1$ if there exist 
@@ -567,8 +585,9 @@ M_i(\omega)
 % 
 
 
+
 \begin{proof}
-First of all, LMI (\ref{eqn:mu_freq_lmi1}) implies, $M_{qp}(\omega)\tilde{X}_i(\omega)M_{qp}^*(\omega)<\tilde{X}_i(\omega)$, which ensures $\mu_{\bm{\Delta}}(M_{qp}) < 1$.
+First of all, LMI (\ref{eqn:mu_freq_lmi1}) implies, $M_{qp}(\omega)\tilde{X}_i(\omega)M_{qp}^*(\omega)<\tilde{X}_i(\omega)$, which ensures $\mu_{\bm{\Delta}}(M_{qp}) < 1$ for all \(\omega\in\left[0,2\pi\right)\).
 To include the diagonal weights \(\theta\), we let \({y^{\star}}={\theta}{y},\ {v^{\star}}={\theta}{v}\). Let \(M^\theta\) denote the re-weighted transfer function matrix by \(\theta\):
 \begin{equation}
 \begin{bmatrix}
@@ -703,7 +722,7 @@ Let $\theta_i^{-2}=\beta_i$, $\beta=\mathrm{diag}(\beta_i)$ and $y_i(\omega)\the
 \end{equation}
 The proof is complete.
 \end{proof}
-
+In Theorem~\ref{thm:RMSSsuff}, $\tilde{X}_i(\omega)$ is a frequency-dependent multiplier that enforces pointwise singular-value boundedness, whereas $\beta$ is a constant scaling factor that weights all frequencies equally, thereby enabling a correct evaluation of the mean square norm.
 
 
 % \section{Robust $\mathcal{H}_2$ Performance}
@@ -885,101 +904,187 @@ The proof is complete.
 
 \section{Numerical Examples}
 \subsection{System configuration}
-We apply the robust MS stability condition to the robustness analysis of the following example. We consider a classical inverted pendulum robot. We assume that the sensor can ideally measure somethe system's outputs. However, we are interested in analyzing the effects of intermittent attention. This can model a user paying discontinuous attention to the device or that the sensor is connected to the controller over unreliable network.
-We want to study how the robustness to unmodeled dynamics is affected by the unreliable networks and vice-versa.  
-
+We apply the robust MS stability condition to the robustness analysis of the following inverted pendulum robot example. We assume that the sensor can ideally measure some of the system's outputs without additive noises. However, we are interested in analyzing the effects of intermittent attention. This can model a user paying discontinuous attention to the device or that the sensor is connected to the controller over an unreliable network. We want to study how the robustness to unmodeled dynamics is affected by unreliable networks and vice versa.  
 
 \begin{figure}[h]
     \centering
-    \includegraphics[scale=0.5]{figures/RMSSfigure/Plant1.png}
+    \includegraphics[width = 0.5\linewidth]{figures/RMSSfigure/IPmodel.png}
     \caption[1-D inverted pendulum model]{$m_c$ is the mass of the cart. The pendulum is ideally modeled as a light pole with a concentrated mass $m_p$ at its tip. The driving force on the cart $u$ is the control input to the system.}
     \label{fig:pendulumplant}
 \end{figure}
 
-We assume that the stochastic communication intermittency occurs in each communication channel from sensors to controller. 
-The sensors measure the horizontal velocity of cart $\dot{s}$ and the bias angle $\theta$ from vertical of the pendulum. The controller is causal and gives out the driving force $u$ on cart to maintain the stability of the system based on the signals of measurements.  
-
-
-Deterministic model uncertainties may arise from multiple sources, such as gain fading, unmodeled dynamics, and model parameter errors. We aim to assess the overall tolerance to these uncertainties. So we choose an entrance to the $\Delta$ block, which describes the disk margin of the open-loop interconnection between the plant and controller. It is shown in Appendix~\ref{appsec:RMSS}.
-
-% {\color{red} gain and phase margins (are not imprecise) are a measure of the uncertainty of the system! More importantly, we are using disk uncertainty, which is a generalization of classical gain and phase margins}
 Equations of motion in continuous time are given as~\eqref{eqn:EoMPendulumCT}, adapted from \cite{leong2016understanding}.
 \begin{subequations}\label{eqn:EoMPendulumCT}
 \begin{align}
-(m_c+m_p)\ddot{s}+ m_p l (\ddot{\theta}-\dot{\theta}^2 \sin{\theta}) & = u  \\
-m_p (\ddot{s}\cos{\theta}+l\ddot{\theta}-g \sin{\theta})=0
+(m_c+m_p)\ddot{x}_c+ m_p l (\ddot{\theta}-\dot{\theta}^2 \sin{\theta}) & = u  \\
+m_p (\ddot{x}_c\cos{\theta}+l\ddot{\theta}-g \sin{\theta})=0
 \end{align}
 \end{subequations}
+We assume we have a sensor measuring the horizontal motion of a fixation point on the pendulum. The measurement is given by \(y= h \tan \theta + x_c\). We highlight that the system is observable from this output for all \(h>0\). The controller is causal and provides the driving force $u$ to the cart to maintain the pendulum's stability based on the measured signals.  
 
-Linearize the dynamic model about
-$$
-\left[
-\begin{array}{cccc}
-    \theta& \dot{\theta} & s & \dot{s}\\
-\end{array}\right]^T=
+
+
+
+
+% {\color{red} gain and phase margins (are not imprecise) are a measure of the uncertainty of the system! More importantly, we are using disk uncertainty, which is a generalization of classical gain and phase margins}
+Let the state be $x=[\theta,\dot{\theta},s, \dot{s}]^T$. Linearizing the dynamic model about \(x^T=
 \left[
 \begin{array}{cccc}
     0 & 0 & 0 & 0\\
-\end{array}\right]^T
-$$
-Discretize it to obtain the state-space expression in discrete time.
+\end{array}\right]\)
+gives the continuous time differential equation:
+
+\begin{subequations}\label{eqn:EoMPendulumCT_ss}
+\begin{align}
+P_{\rm{CT}}\colon \dot{x}
+= & \left[
+\begin{array}{cccc}
+    0 & 1 & 0 & 0 \\
+    \frac{(m_c + m_p) g}{m_c l} & 0 & 0 & 0 \\
+    0 & 0 & 0 & 1 \\
+    -\frac{m_p g}{m_c}  & 0 & 0 & 0 
+\end{array}\right]
+x +
+\left[
+\begin{array}{c}
+    0 \\ -\frac{1}{m_c l} \\ 0 \\ \frac{1}{m_c}\\
+\end{array}\right] u \\
+y = & 
+\left[
+\begin{array}{cccc}
+    h & 0 & 1 & 0 \\
+\end{array}\right]
+x
+\end{align}
+\end{subequations}
+
+% \begin{subequations}\label{eqn:EoMPendulumCT_ss}
+% \begin{align}
+% P_{\rm{CT}}\colon \left[
+% \begin{array}{c}
+%     \ddot{\theta} \\ \dot{\theta} \\ \dot{x}_c \\ \ddot{x}_c\\
+% \end{array}\right]
+% = & \left[
+% \begin{array}{cccc}
+%     0 & 1 & 0 & 0 \\
+%     \frac{(m_c + m_p) g}{m_c l} & 0 & 0 & 0 \\
+%     0 & 0 & 0 & 1 \\
+%     -\frac{m_p g}{m_c}  & 0 & 0 & 0 
+% \end{array}\right]
+% \left[
+% \begin{array}{c}
+%     \theta \\ \dot{\theta} \\ x_c \\ \dot{x}_c\\
+% \end{array}\right]+
+% \left[
+% \begin{array}{c}
+%     0 \\ -\frac{1}{m_c l} \\ 0 \\ \frac{1}{m_c}\\
+% \end{array}\right] u \\
+% \left[
+% \begin{array}{c}
+%     y_1 \\ y_2 
+% \end{array}\right]
+% = & \left[
+% \begin{array}{cccc}
+%     h_1 & 0 & 1 & 0 \\
+%     h_2 & 0 & 1 & 0
+% \end{array}\right]
+% \left[
+% \begin{array}{c}
+%     \theta \\ \dot{\theta} \\ x_c \\ \dot{x}_c\\
+% \end{array}\right]
+% \end{align}
+% \end{subequations}
+
+We adopt zero-order hold discretization to obtain the discrete-time state-space representation.
+Stochastic communication intermittency occurs in the communication channel between the sensor and the controller, i.e. controller receive intermittent \(y\) signals.
+Deterministic model uncertainties may arise from multiple sources, such as gain fading, unmodeled dynamics, and model parameter errors. We aim to assess the overall tolerance to these uncertainties. So we choose an entrance to the $\Delta$ block, which describes the disk margin of the open-loop interconnection between the plant and controller. It is shown in Appendix~\ref{appsec:RMSS}.
+
 % $$
 % x^+=A x + B u;\ y=Cx
 % $$
 % {\color{red} then next section is a bit problematic. 1) we have not been focused on design, so why do we focus on it now? The controller should be given, and motivated, and if justified it need to be explain correctly.}  
 \subsection{Controller Design}
+
 % {\color{red} the above sentence is illogical, if there were a design method it would be automatically based on an analysis method. Moreover, why don't we use the D-K design method for mu?}$\surd$
 
 
-We leave the optimal controller design in the presence of both stochastic packet drop and model uncertainty to future research. Herein, we evaluate the limitations of an existing controller. Such a controller has the structure shown in figure (\ref{fig:CLblk}.a), which is motivated by \cite{Jeff2005Packet}, to effectively deal with dropouts, but otherwise is an $\mathcal{H}_\infty$ controller based on the mean system shown in figure (\ref{fig:CLblk}.c). Need more details on how the $\mathcal{H}_\infty$ controller is designed, see appendix. 
+
+
+Motivated by~\cite{Jeff2005Packet}, we consider a controller architecture consisting of a controller and a ``receiver'' that monitors the communication channel status and imputes missing signals, shown in Figure~\ref{fig:Ctrl_Receiver}.
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.4\linewidth]{figures/RMSSfigure/PacketDropSyn_1chn.png}
+    \caption[Controller with receiver]{The schematic of the controller that compensates for the intermittent measurements.}
+    \label{fig:Ctrl_Receiver}
+\end{figure}
+$P_\mathrm{nom}$ is the nominal plant, $K$ is the output feedback controller. $L$ is the ``receiver'' which imputes the missing signals. $\xi$ is stochastic and takes value from $\{0,1\}$ at each time step. For example, $L = 1$ is equivalent to a zero-order hold: the output measurement from the last time step replaces the signal if it has dropped.
+
+Through a sequence of block diagram transformations, the design of $[K;L]$ is equivalent to the synthesis of a controller for the system in Figure~\ref{fig:CLRMSSsyn}, where $\hat{K} = K(I- z^{-1} L)^{-1}$, $\hat{L} = L(I- z^{-1} L)^{-1}$. \([\hat{K};\hat{L}]\) can be seen as a stabilizing controller for the augmented plant \(\left[P,-z^{-1} I_2\right]\).
+
+
+We now reintroduce the model uncertainty and signal intermittency into this closed-loop system; see Figure~\ref{fig:CLRMSSsyn}(b). $\bar{\Delta}\colon y\mapsto v$ is a mean \(0\) stochastic multiplicative block whose variance is determined solely by the packet drop probability $e$. $\Delta\colon q\mapsto p $ is an \(\mathcal{H}_\infty\) norm-bounded LTI uncertainty block, and its maximal size captures the open-loop disk margin of interconnection of plant and controller.
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width = 0.75\linewidth]{figures/RMSSfigure/ClosedloopBDG.PNG}
-    \caption[Block diagram transformation]{In (a), $P$ is the plant, $K$ is the output feedback controller, and $L$ is the receiver. For example, $L=1$ is equivalent to the zero-order hold, i.e., the output measurement from the last time step replaces the signal if it has dropped. $\xi=\mathrm{diag}(\xi_1,\xi_2)$, $\xi_1$ and $\xi_2$ are IID stochastic numbers which take value from $\{0,1\}$ at each time step. By a sequence of block diagram transformations, we obtain (b). In (c), $\hat{K} = K(I-\tilde{L})^{-1}$, $\hat{L} = L(I-\tilde{L})^{-1}$. By adjusting $\hat{K}_e$ and $\hat{L}_e$ w.r.t. $e$, we can always ensure the mean system of (d) is (c). In (d), $\bar{\Delta} =\mathrm{diag}(\delta_{s_1},\delta_{s_2})$, $\delta_{s_i}$ are IID mean 0, variance $e/(1-e)$, with $e$ probability to take $-1$ and $1-e$ probability to take $e/(1-e)$.}
-    \label{fig:CLblk}
+    \includegraphics[width =1\linewidth]{figures/RMSSfigure/completeCLsys.PNG}
+    \caption[mean system, robust analysis system model and generalized plant.]{(a) is the mean system. (b) is the complete system with stochastic and deterministic uncertainties. \(\bar{\Delta}\) has $e$ probability to take $-1$ and $1-e$ probability to take $e/(1-e)$. $\E {\bar{\Delta}} = 0$, variance $\mathrm{var}(\bar{\Delta}) = e/(1-e)$. On the other side, $\|\Delta\|_\infty<\eta$. (c) is the generalized plant used for \(\mathcal{H}_\infty\) synthesis. $w$ are the noises, while $z$ are the performance outputs. $W_i$ is the weight matrix for inputs. $W_o$ is the weight matrix for outputs.}
+    \label{fig:CLRMSSsyn}
 \end{figure}
 
+Within the robust mean square analysis framework, we aim to find \([\hat{K};\hat{L}]\) to minimize
+\(\max_{\Delta \in \eta \mathcal{B}_{\bm{\Delta}}^{\mathrm{LTI}}} \ \rho\big(\tilde{T}_{yv}(\Delta)\big)\), which represents the worst-case spectral radius of the $\mathcal{H}_2$ matrix associated with the transfer function from $v$ to $y$.
+However, such optimal controller design remains an open problem. Herein, we evaluate the limitations of an existing controller.  
 
-We implement the controller on the plant in Matlab Simulink, and test the system's response subject to an impulse on the cart's velocity, assume no packet drop and system uncertainty, shown in figure (\ref{fig:impulse_resp}). 
+As an reasonable approximation, we instead adopt \(\mathcal{H}_\infty\) synthesis to minimizes the weighted norm:
+\[
+\|W_o T W_i\|_\infty,\quad T \colon 
+\begin{bmatrix}
+p \\ v
+\end{bmatrix} \mapsto 
+\begin{bmatrix}
+q \\ y
+\end{bmatrix}
+\]
+Need more details on how the $\mathcal{H}_\infty$ controller is designed, see Appendix~\ref{appsec:RMSS}. By finely tuning the weight matrix $W_i$ and $W_o$, we can obtain a satisfactory controller.
+In Figure~\ref{fig:CLRMSSsyn}.b, the mean system has an equivalent loop transfer function of $\hat{K}(I+z^{-1}\hat{L})^{-1}P$.
+% From the controller we've designed, the loop transfer function has properties shown in Table~\ref{tab:margin}. The margins are sufficient. 
+% We can conclude that this controller is robust against model uncertainty. 
+% \begin{table}[h]
+%     \caption{Properties of the open loop system}\label{tab:margin}
+%     \centering
+%     \begin{tabular}{cc|cc}
+%     \hline
+%         Property  & Value & Property  & Value\\
+%     \hline
+%         Gain margin & $[0.5247,1.9055]$ & Disk margin & $ 0.6233$\\
+%         Phase margin & $[-34.62,34.62]\deg$ & $\mathcal{H}_\infty$ norm & 1.4627 \\
+%         \hline
+%     \end{tabular}
+% \end{table}
 
-In figure (\ref{fig:CLblk}.c), the mean system has an equivalent loop transfer function of $\hat{K}(I+z^{-1}\hat{L})^{-1}P$. From the controller we've designed, the loop transfer function has properties shown in Table~\ref{tab:margin}. The margins are sufficient. We can conclude that this controller is robust against model uncertainty. 
-\begin{table}[h]
-    \caption{Properties of the open loop system}\label{tab:margin}
-    \centering
-    \begin{tabular}{ccc}
-    \hline
-        Margin  & Value \\
-    \hline
-        Gain margin & $[0.5247,1.9055]$\\
-        Phase margin & $[-34.62,34.62]\deg$\\
-        Disk margin & $ 0.6233$\\
-        $\mathcal{H}_\infty$ norm & 1.4627 \\
-        \hline
-    \end{tabular}
-\end{table}
 
-\begin{figure}[ht]
-    \centering
-    \includegraphics[scale=0.7]{figures/RMSSfigure/states_plot.png}
-    \caption[Cart-pole impulse response]{The impulse response of a initial cart velocity $\dot{s}=0.1$ without model perturbation and packet drops. The system recovers zero state in about 10s.}
-    \label{fig:impulse_resp}
-\end{figure}
+% We implement the discrete-time controller on the nonlinear continuous-time plant using MATLAB Simulink. Before applying our framework to find the robustness margin, we validate the controlled inverted pendulum under two scenarios. 
+% In the first scenario, there are no perturbations: all sensor measurements reach the controller, and the dynamic model is accurate. 
+% In the second scenario, each measurement on both channels has a $0.4$ probability of dropout, and the model is subject to a perturbation $\Delta$ aligned with the worst-case direction, with $\|\Delta\| = 0.2393$. 
+% The initial conditions are both set as \([0.05,0.02,0,0.1]^\top\).
+% The simulation results are shown in Figure~\ref{fig:impulse_resp}.
 
+% We can see that the system stabilizes in both configurations, this shows that the controller tolerates the packet drop and model uncertainty decently.
+
+% \begin{figure}[ht]
+%     \centering
+%     \includegraphics[width = 0.95\linewidth]{figures/RMSSfigure/states_plot_detailed.png}
+%     \caption[Cart-pole impulse response]{The impulse response of a initial cart velocity $\dot{s}=0.1$ without model perturbation and packet drops. The system recovers zero state in about 10s.}
+%     \label{fig:impulse_resp}
+% \end{figure}
 
 \subsection{Robust Mean Square stability analysis}
 
 
 
 
-We now introduce deterministic and stochastic uncertainty into this closed-loop system; see Figure (\ref{fig:CLRMSplant}). $\bar{\Delta}$ is a stochastic block which determined only by the packet drop probability $e$. $\Delta$ is a norm-bounded linear deterministic $l_2\rightarrow l_2$ mapping, and its maximal size captures the open-loop disk margin of interconnection of plant and controller. % Its disk margin is $0.6335$. Its phase margin is $[-35.15\deg,35.15\deg]$.
+ % Its disk margin is $0.6335$. Its phase margin is $[-35.15\deg,35.15\deg]$.
 
-\begin{figure}[t]
-    \centering
-    \includegraphics[scale=0.6]{figures/RMSSfigure/completeCLsys.PNG}
-    \caption[Nominal model versus robust analysis model]{(a) is the mean system. (b) is the complete system with stochastic and deterministic uncertainties. $\bar{\Delta} =\mathrm{diag}(\delta_{s_1},\delta_{s_2})$,$\delta_{s_i}$ are IID mean 0, variance $e/(1-e)$, with $e$ probability to take $-1$ and $1-e$ probability to take $e/(1-e)$. On the other side, $\|\Delta\|_\infty<\eta$.}
-    \label{fig:CLRMSplant}
-\end{figure}
 
 Write the system in the expression of equation (\ref{Discrete_statespace_Mix}). Compute the $M(e^{j\omega})$ by \eqref{eqn:constrM} and \eqref{constrM_i} and apply Theorem~\ref{thm:RMSSsuff}. To implement it in numerical tools, we can only have finite constraints. Therefore, we uniformly sample $N=100$ points from $[0,2\pi)$ and approximate the integral LMIs by a finite sum. We get $2N$ different constraints and 2 sum constraints instead of the integral constraint in Theorem \ref{thm:RMSSsuff}.
 \begin{subequations}
@@ -996,33 +1101,38 @@ M_i(e^{j\omega(k)})
     0 & w_i(\omega(k))
 \end{array}\right],\\ 
 \frac{1}{N} \sum_{k=1}^{N}w_i(\omega(k)) \leq \gamma \beta_i, &  \quad i=1,2; \\
-\omega(k) =\frac{2k\pi}{N}+\alpha,& \quad k\in \mathcal{H}_N.
+\omega(k) =\frac{2k\pi}{N},& \quad k\in \mathcal{H}_N.
 \end{align}
 \end{subequations}
+For different fixation point height \(h\), we design the \(\mathcal{H}_\infty\) controller by the generalized plant established in the previous subsection with the same weights and evaluate the closed-loop properties by our analysis result.
 
-
-By checking the feasibility of these LMIs, we can find the maximum $\gamma$ corresponding to different deterministic size $\eta$, i.e. the inverse of maximum allowed variance in $\delta_{s_i}$. Since $\frac{1}{\gamma} = \sigma_{\max}^2 =\frac{e}{1-e}$.
+By checking the feasibility of these LMIs, we can find the maximum $\gamma$ corresponding to different deterministic size $\eta$, i.e. the inverse of maximum allowed variance in $\delta_{s_i}$. Since $\frac{1}{\gamma} = \sigma_{\max}^2 =\frac{e}{1-e}$,
 $$
-\frac{1}{\gamma} =\frac{e}{1-e}\Leftrightarrow e=\frac{1}{\gamma+1}
+e=\frac{1}{\gamma+1}.
 $$
-Figure~\ref{fig:eta_e} plots the largest allowed probability of packet drop against the uncertainty \(\ell_2\) induced norm bound $\eta$ in controller gain. 
+Figure~\ref{fig:eta_e} plots the largest allowed probability of packet drop against the model uncertainty's \(\mathcal{H}_\infty\) upper bound $\eta$. 
 \begin{figure}[h]
     \centering
     \includegraphics[scale=0.8]{figures/RMSSfigure/eta_e_plot.png}
     \caption[Robustness against both stochastic process and model uncertainty]{The relationship between the maximum drop-out probability against radius of disk uncertainty.}
     \label{fig:eta_e}
 \end{figure}
+From the curves in Figure~\ref{fig:eta_e}, we find that for both fixation points, the system can tolerate largest packet-drop probability when the model is perfectly align with the nominal model (\(\eta = 0\)). As the model uncertainty increases, the tolerance to the dropout diminishes.
 
-Basically, the nominal system with \(0\) drop-out probability achieves the largest disc robustness. As the system is subject to increasing drop-out, its robustness to deterministic disc uncertainty diminishes. This figure numerically demonstrates the interplay between the two different type of uncertainty. Finally, for a maximum dropout probability of $44\%$, the system is fragile to deterministic input uncertainty. 
+On the other side, it's also showing that with a lower fixation point on the pendulum, the controlled system becauses more fragile to both types of uncertainties. This implies that, in such configurations, either a more accurate model of the pendulum is required or more attention need to be paid.
+
+
 
 % It accords to our intuition that the relationship between $\eta$ and $e$ is trade-off. In other words, if we ensure less uncertainty in the controller $K$, then we can allow more packet drop in our communication. {\color{red} the conclusion needs to be precise and insightful. Basically. the largest disc robustness in for the nominal system (which is also our zero stochastic uncertainty) system.  As the system is subject to stochastic dropouts, its robustness to  deterministic disc uncertainty is diminished. This shows the interplay between the two different type  of uncertainty. Finally for a maximum  dropout probability of $~45\%$ the system is fragile to deterministic input uncertainty. } From figure (\ref{fig:eta_e}), we find that if the controller is perfect ($\eta=0$), then we can allow at most $44\%$ packet drop in each communication channel, which shows that, this CL system is robust in terms of stochastic uncertainty. And if the communications are perfect ($e=0$), then we have $0.61$ disk margin in this system, which is also satisfactory.
 
 
 \section{Summary}
-In this chapter, we formulated the robust MS stability problem in the presence of deterministic LTI perturbations. We extended the robust stability notion of $\mu$ to include both deterministic and stochastic uncertainties and provided an efficient computational sufficient condition that guarantees robust MSS. To our knowledge, this is the first time $\mu$ has been extended to deterministic and stochastic uncertainties. 
+In this chapter, we model intermittent communication channels in dynamical systems as stochastic channels composed of a nominal mean channel in parallel with a mean-zero random gain channel. 
+We introduce the concept of robust mean-square (MS) stability, which characterizes the asymptotic convergence of the state second moment in the presence of both intermittent communication and model uncertainty.  
 
-We used the inverted pendulum example, where the sensors are subject to communication packet drops, and examine the trade-offs between the size of sensor intermittency uncertainties and the disk margin. 
-
+We further extend classical $\mu$-analysis to incorporate these stochastic uncertainties and derive an efficient computational sufficient condition for guaranteeing robust MS stability. 
+The proposed framework is validated on an inverted pendulum example, where measurement signals are subject to packet dropouts. 
+The results quantify how different sources of uncertainty jointly degrade the system’s tolerance to each other.
 
 
 

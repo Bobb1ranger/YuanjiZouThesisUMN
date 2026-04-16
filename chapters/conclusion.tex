@@ -3,6 +3,32 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Conclusion and Discussion}
 \label{conclusion_chapter}
+\section{Research Summary and Contributions}
+In this dissertation, we studied addressed distributed control problems in two aspects--optimality and robustness. We proposed novel yet efficient synthesis approach to respective find optimal distributed controller with different performance index (\(\mathcal{H}_2\), \(\ell_1\)) respecting the given communication topology. We established the RMSS framework to evaluate a controlled system's robustness against model uncertainty and randomness in remote communication channels.
+Together, these results provide a foundation for the application of distributed control in real-world applications.
+
+First, we defined a linear networked system over a directed graph, where an array of subsystems are interconnected via an interaction network. We established standard representations for their state-space model, input-output transfer function matrix, and the interconnections among multiple networked systems. We showed that the network topology induces two types of structural asymmetry in the aggregate controller: communication delays and sparsity.
+
+Next, we addressed the design of optimal distributed controllers within a prespecified network structure. This dissertation mainly addressed two major challenges in the problem:
+\begin{itemize}
+\item Characterizing or representing the feasible domain of optimization, i.e., the set of internally stabilizing controllers consistent with the network structure. 
+\item Computing optimal or satisfactory sub-optimal solutions with guaranteed performance bounds within acceptable computational time. 
+\end{itemize}
+
+We extended from the Youla Parameterization and proposed a methodology to characterize all admissible controllers. For distributed \(\mathcal{H}_2\) control, we showed that it's equivalent to solving an time-varying LQR problem under our admissible controller parameterization framework and can be exactly solved through a standard dynamic programming method. For distributed \(\ell_1\) control, we proposed a surrogate \(\ell_1/\ell_2\) mixed norm and rigorously show its' convergence to \(\ell_1\) norm. We find exact solution to the mixed-norm minimization problem and approximate the optimal \(\ell_1\) optimal controller with progressing horizon. Moreover, the procedure yields convergent upper and lower bounds on the optimal cost, which provide a natural stopping criterion once a prescribed performance tolerance is achieved.
+
+We validated the proposed algorithms on a range of numerical and practical networked distributed control examples, and compared them with state-of-the-art methods, demonstrating significant advantages in efficiency and generality.
+
+Finally, we study the resilience of networked systems to adverse communication effects, with a particular focus on intermittent signal transmissions. Each communication channel is modeled as a nominal mean channel perturbed by a zero-mean random gain. We introduce the notion of Robust Mean Square Stability (RMSS) and analyze the extent of transmission intermittency that an uncertain system can tolerate. To this end, we develop a computational method based on linear matrix inequalities to evaluate the maximum allowable variance of the random gain. The proposed approach is validated on a classical inverted pendulum example.
+
+\section{Future Work Recommendation}
+Building upon the results of this dissertation, there's several promising and significant directions for future research is recommended:
+\begin{itemize}
+    \item Develop an efficient algorithm for the network implementation of distributed controllers. Existing methods typically construct the closed-loop response over the network and then reconstruct the controller by interconnecting the plant with this response. Such approaches often lead to inflated controller order and do not guarantee minimal realizations.
+    \item Another promising direction for future work is the study of mixed performance control problems within network structure constraints, where the objective is to minimize the $\mathcal{H}_2$ norm subject to $\ell_1$ constraints. This formulation captures the design of controllers that achieve optimal noise rejection performance while ensuring bounded state trajectories under bounded disturbances.
+    \item The synthesis of controllers that maximize the RMSS margin. This problem can be formulated as designing a controller that minimizes the robust structured mean-square norm of an uncertain dynamical system $G_\Delta\vert_{\|\Delta\|<\eta}$. Such a formulation directly targets robustness against stochastic network effects and model uncertainty, extending beyond analysis to controller design. Progress in this direction would provide a systematic framework for co-designing control and robustness guarantees in networked systems.
+\end{itemize}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

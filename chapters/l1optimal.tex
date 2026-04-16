@@ -1,10 +1,9 @@
 \chapter{Distributed \(\ell_1\) optimal control}
 \label{chap:l1ctrl}
-\section{Gist of this chapter}
-We propose a progressive approximation framework for structured $\ell_1$-optimal control of multiple-input multiple-output (MIMO) systems, where structural constraints arise from limitations in network information propagation. The $\ell_1$ objective is approximated by a family of mixed $\ell_1/\ell_2$ norms with increasing truncation, yielding a sequence of tractable surrogate optimization problems. Each surrogate problem admits an optimal solution that respects the prescribed controller structure and can be efficiently solved as a quadratic program. We show that, as the $\ell_1/\ell_2$ partition is progressively refined, the resulting sequence of surrogate solutions converges to the optimal solution of the original $\ell_1$ problem. Moreover, we derive computable upper and lower bounds from the primal--dual structure of the surrogate problems and establish their asymptotic tightness. Numerical examples demonstrate the effectiveness of finding both infinite- and finite-response solutions.
+In this chapter, wee propose a progressive approximation framework for structured $\ell_1$-optimal control of multiple-input multiple-output (MIMO) systems, where structural constraints arise from limitations in network information propagation. The $\ell_1$ objective is approximated by a family of mixed $\ell_1/\ell_2$ norms with increasing truncation, yielding a sequence of tractable surrogate optimization problems. Each surrogate problem admits an optimal solution that respects the prescribed controller structure and can be efficiently solved as a quadratic program. We show that, as the $\ell_1/\ell_2$ partition is progressively refined, the resulting sequence of surrogate solutions converges to the optimal solution of the original $\ell_1$ problem. Moreover, we derive computable upper and lower bounds from the primal--dual structure of the surrogate problems and establish their asymptotic tightness. Numerical examples demonstrate the effectiveness of finding both infinite- and finite-response solutions.
 
 
-\section{State-of-the-art networked \(\ell_1\) optimal control}
+\section{Networked \(\ell_1\) optimal control literature review}
 Classical $\ell_1$ synthesis dates back to the work of Boyd et al.~\cite{boyd1991linear}, who employed the Youla parameterization to approximate optimal solutions. Subsequent developments, including delay-augmentation methods~\cite{Bobillo1993DA, Dahleh1995Control}, established converging upper and lower bounds with provable accuracy guarantees, followed by refinements improving convergence rates and computational efficiency~\cite{Sznaier1995MIMOl1, Khammash1996ScaledQ, Elia1998qpl1, Khammash2000scaledQ}.
 
 However, controllers must additionally satisfy structural constraints induced by the communication graph. Within the Youla framework, such constraints can be convexly enforced only under quadratic invariance (QI)~\cite{LessardQI, SanjayLQIsufficient, SabauVectorization}, leading to implicit constraints of the generic form $H - U Q V \in \mathcal{S}$ unless one can find structured Youla parameterizations. These constraints generally do not admit finite-impulse-response (FIR) solutions, thereby undermining both computational tractability and the applicability of classical $\ell_1$ approximation techniques.
@@ -37,7 +36,7 @@ Our main contributions in thes chapter are the following:
 Our goal is to find an aggregate output-feedback policy \(K \colon y \mapsto u\) restricted to a structured set of transfer function matrices \(\mathcal{S}\), which reflects the network communication constraints. 
 \begin{opt}[Structured \(\ell_1\) optimal control]\label{Prob::Distributedl1}
 Given a generalized plant and its state-space realization:
-\begin{equation}\label{eqn::genplt_ss}
+\begin{equation}\label{eqn::genplant_ss_l1}
     P\colon 
     \begin{bmatrix} 
         w \\ u 
@@ -58,8 +57,8 @@ Given a generalized plant and its state-space realization:
     C_y & D_{yw} & D_{yu}
 \end{array}\right],
 \end{equation}
-where \((A,B_u)\) is stabilizable, \((A,C_y)\) is detectable. \(D_{yu}=\mathbf{0}\). Assumption~\ref{ass::statespace} is adopted here for simplicity of exposition.\footnote{In Assumption~\ref{ass::statespace}, (1) ensures that \(P_{21}\) and \(P_{12}\) have full normal row rank and normal column rank, respectively, whereas (2) ensures that they don't have any transmission zeros on the unit circle. (1) and (2) together enable and simplify the spectral factorization of \(P_{21}\) and \(P_{12}\).}
-\begin{assumption}\label{ass::statespace}
+where \((A,B_u)\) is stabilizable, \((A,C_y)\) is detectable. \(D_{yu}=\mathbf{0}\). Assumption~\ref{ass:l1:statespace} is adopted here for simplicity of exposition.
+\begin{assumption}\label{ass:l1:statespace}
 \begin{enumerate}
     \item Some channels of \(z\) are direct feedthroughs from the control input \(u\), which ensures \(D_{zu}\) is full column rank. \label{ass:termDzufull}
     \item The exogenous perturbation include measurement noise \(\delta_y\), which ensures \(D_{yw}\) is full row rank. \label{ass:termDywfull}
@@ -88,16 +87,8 @@ $\mathfrak{T}_{\mathrm{fea}}$ admits an implicit representation in terms of line
 \end{equation}
 The operator $\mathcal{A}_{\mathrm{fea}}$ and vector $b_{\mathrm{fea}}$ can be explicitly constructed via the Smith--McMillan decomposition of the plant. The intrinsic non-convexity associated with stabilization can be removed by reformulating the synthesis problem in terms of closed-loop maps.
 
-\subsection{Quadratic Invariance}
-Introducing a generic structural constraint on the controller renders Problem~\ref{Prob::Distributedl1} intractable, since the requirement $K\in\mathcal{S}$ induces a nonconvex constraint on the closed-loop map $\Phi$. To overcome this difficulty, the quadratic invariance (QI) assumption is widely adopted in the literature. We adopt this assumption throughout this work.
-\begin{assumption}[QI assumption]\label{ass::QI}
-\(\mathcal{S}\) is quadratic invariant w.r.t the plant object \(P_{22}\). Mathematically, 
-\[
-K P_{22} K\in \mathcal{S}, \quad \forall K \in \mathcal{S}.
-\]
-\end{assumption}
-The QI assumption ensures that the search for a structured controller remains convex by requiring the closed-loop transfer function \(K(I - P_{22}K)^{-1}\) to lie within the same set \(\mathcal{S}\)\cite{LessardQI}. By Assumption~\ref{ass::statespace}--(\ref{ass:termDzufull},\ref{ass:termDywfull}), we can, without losing generality, assume that the bottom right block of \(\Phi\), i.e. \(\Phi_{22}\), corresponds to the transfer function \(K(I - P_{22}K)^{-1}\).
 
+Introducing a generic structural constraint on the controller renders Problem~\ref{Prob::Distributedl1} intractable, since the requirement $K\in\mathcal{S}$ induces a nonconvex constraint on the closed-loop map $\Phi$. We make the same assumption~\ref{ass::samegraph} as in Chapter~\ref{chap:H2ctrl} to eschew this difficulty, which ensures \(K\in\mathcal{S}\) is QI w.r.t \(P_{22}\). This allows us to reformulate the synthesis in terms of closed-loop maps and obtain the following primal-dual pair of problems.
 
 
  
@@ -109,13 +100,6 @@ The QI assumption ensures that the search for a structured controller remains co
 % \(\Phi\) is the closed-loop defined by \(\Phi= \mathrm{lft}(P,K) = P_{11} + P_{12} K(I-P_{22}K)^{-1} P_{21}\). 
 % \end{opt}
 
-
-\begin{rem}
-It's well known that the QI condition applies when the plant is also a networked system and the sub-controllers' communications are richer and faster than the sub-plants' dynamical interactions.
-Furthermore, a stabilizing structured controller is guaranteed to be network implementable under that condition if the network realization of the plant is known~\cite{Yuanji2024disH2}. In this paper, we focus on the synthesis of structured stabilizing controllers and refer the reader to the existing literature for details on controller implementation.
-\end{rem}
-
-Reformulating the synthesis in terms of closed-loop maps under the QI condition yields the following primal–dual pair.
 
 \begin{opt}[Primal \(\ell_1\)]\label{Prob::l1min_primal}
 \begin{subequations}
@@ -166,15 +150,15 @@ The Youla Parameterization provides an elegant approach to characterize $\mathfr
 \begin{align} 
 \mu_1 = \underset{Q\in\ell_1^{n_u\times n_y}}{\inf}\ \quad &\|\Phi(Q)\|_1=\underset{Q\in\ell_1}{\inf} \|G_{11}^0 - G_{12} Q G_{21}\|_1 \\
 \textit{subject to} \quad &
-\Phi_{22} = (Y_r - M_r (Q + R_0)) M_l\in\mathcal{S}.
+\Phi_{22} = (Y_r - M_r (Q + R_0)) M_l\in\mathcal{S}. \label{eqn:l1:strconstr}
 \end{align}
 \end{subequations}
 \end{opt}
 In the cost function, \(\Phi(Q)\) implicitly characterizes the affine space \(\mathfrak{T}_\mathrm{fea} = \{\Phi \vert \Phi = G_{11}^0 - G_{12} Q G_{21}\}\). Notably, $\mathfrak{T}_{\mathrm{fea}}$ is invariant with respect to the particular choice of Youla parameterization and depends only on the plant. Moreover, 
-The constraint~\eqref{eqn:mmstructconstr} replaces generic condition \(K_\stab = (Y_r - M_r Q) (X_r - N_r Q)^{-1} \in \mathcal{S}\) as a result of Assumption~\ref{ass::QI}.
+The constraint~\eqref{eqn:l1:strconstr} replaces generic condition \(K_\stab = (Y_r - M_r Q) (X_r - N_r Q)^{-1} \in \mathcal{S}\) as a result of Assumption~\ref{ass::samegraph}.
 
 \subsection{Vectorized response and structure enforcement}
-In our previous work on networked \(\mathcal{H}_2\) optimal control, we established a methodology to characterize the general infinite impulse response (IIR) solutions to the constraint~\eqref{eqn:mmstructconstr}~\cite{Yuanji2024disH2}. Our approach vectorizes the Youla parameter \(Q\) and the closed-loop map \(\Phi_{22}\)'s impulse response and views them as paired input and output sequences of an auxiliary state-space system.
+In our previous work on networked \(\mathcal{H}_2\) optimal control, we established a methodology to characterize the general infinite impulse response (IIR) solutions to the constraint~\eqref{eqn:l1:strconstr}~\cite{Yuanji2024disH2}. Our approach vectorizes the Youla parameter \(Q\) and the closed-loop map \(\Phi_{22}\)'s impulse response and views them as paired input and output sequences of an auxiliary state-space system.
 
 Meanwhile, the structural constraint appearing as a sequence of support constraints \(\{\mathcal{S}_i\}\) on \(\Phi_{22}\)'s responses,
 \[
@@ -187,7 +171,7 @@ is transformed into a span of vector space after vectorization,
 \(E_i\) is the orthonormal basis of \(\vc(\mathcal{S}_i)\).
 When there are only sparsity and relative order constraints on elements, responses support pattern grows monotonically. We have \(\mathcal{S}_0 \subset\mathcal{S}_1 \hdots \subset \mathcal{S}_m = \mathcal{S}_{m+1} = \hdots\) or \(\mathrm{span}(E_0)\subset\mathrm{span}(E_1)\hdots\subset\mathrm{span}(E_m) = \hdots\).
 
-We compound and restate these preliminary results as Lemma \ref{lm::reducedsys} without proof. 
+We compound and restate these preliminary results as Lemma~\ref{lm::reducedsys} without proof. 
 
 % Furthermore, sequences \(\eta,q,\phi\) are all in \(\ell_2\). For later use, we succinctly write \eqref{eqn::ss::vecPhitovecQ} as \(q = \mathcal{O}(\phi)\), where \(\mathcal{O} : \left( \mathbb{N} \to \mathbb{R}^{n_u n_y , 1} \right) \to \left( \mathbb{N} \to \mathbb{R}^{n_u n_y , 1} \right)\).
 
@@ -236,7 +220,7 @@ b = T_l b_0.
 \]
 \end{lemma}
 \begin{rem}
-This vectorization approach enforces~\eqref{eqn:mmstructconstr} over $\ell_2$. Since $\ell_1 \subset \ell_2$, this temporarily enlarges the search space without loss of optimality for the $\ell_1$ problem.
+This vectorization approach enforces~\eqref{eqn:l1:strconstr} over $\ell_2$. Since $\ell_1 \subset \ell_2$, this temporarily enlarges the search space without loss of optimality for the $\ell_1$ problem.
 \end{rem}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -265,7 +249,7 @@ For any \(N\in \mathbb{N}\), \(\mathbb{P}_N x\) is always a finite sequence. All
 M_1 \|\mathbb{P}_N x\|_2\leq\|\mathbb{P}_N x\|_1 \leq M_2 \|\mathbb{P}_N x\|_2.
 \]
 Since \(\|x\|_{2}^2 = \|\mathbb{P}_N x\|_2^2 + \|\mathbb{T}_N x\|_2^2\).
-We can find
+We can put
 \[
 c_1 = \min\{M_1,\sqrt{c}\},\ c_2 = \max\{M_2,\sqrt{c}\}
 \] and conclude the proof.
@@ -383,7 +367,7 @@ Therefore, the Primal Problem~\ref{Prob::l1Nsteps} can be recast as a nested opt
 \[
 \mu_{N,c}^2 =\underset{Q_1}{\inf} \left(\|\mathbb{P}_{N} \Phi\|_1^2 + c\cdot \underset{Q_2\in \ell_2}{\inf} \|\mathbb{T}_{N} \Phi\|_2^2 \right),
 \]
-subject to~\eqref{eqn:mmstructconstr}.
+subject to~\eqref{eqn:l1:strconstr}.
 \end{opt}
 For a fixed finite-horizon decision variable \(Q_1\), the inner problem optimizes over \(Q_2 \in \ell_2\) and captures the infinite-horizon tail cost. In contrast, the outer problem involves only the finite-horizon component \(Q_1\). The following theorem shows that the inner-layer problem admits a closed-form symbolic solution based on Lemma~\ref{lm::reducedsys}, thereby eliminating the infinite-dimensional optimization and reducing the overall problem to a single-layer finite-horizon program.
 \begin{thm}\label{thm::tailoptimizer}
@@ -425,7 +409,6 @@ Because \(N\) will go sufficiently large to approximate the optimal solution, it
 \end{rem}
 
 Theorem \ref{thm::tailoptimizer} finds unique explicit inner-layer optimal solution \(Q_2\) and simplifies the \(\|\cdot\|_{N,c}\) minimization problem into a finite-dimensional optimization problem with \(Q_1\) as the variable. 
-
 More importantly, for a given horizon \(N\), the optimal solution \(\Phi_{N,c}\) to Problem~\ref{Prob::l1Nsteps} is a rational sequence with finitely many poles. Consequently, it constitutes a valid suboptimal solution to the original \(\ell_1\) problem, despite the search being conducted over the larger \(\ell_2\) space.
 
 \subsection{Convergent upper and lower bound}
@@ -468,13 +451,12 @@ Since $\mu_{N,c}\to\mu_1$, for any $\epsilon>0$ there exists $N_0$ such that
 \|\bar{\Phi}_{N_s}\|_1 \le (\mu_1+\epsilon)\sqrt{1-\delta^2}, \qquad \forall\, N_s\ge N_0.
 \]
 Hence, $\{\bar{\Phi}_{N_s}\}$ is uniformly bounded in $\ell_1$, and by the Banach--Alaoglu theorem there exists a subsequence, denoted $\{\bar{\Phi}_{N_{sr}}\}$, that converges weak$^\star$ to some $\bar{\Phi}^{w^\star}$.
-
 Moreover, since \(\|\Phi_{N_{sr},c}-\bar{\Phi}_{N_{sr}}\|_1 \to 0\), the sequences $\{\Phi_{N_{sr},c}\}$ and $\{\bar{\Phi}_{N_{sr}}\}$ share the same weak$^\star$ limit. Consequently, \(\bar{\Phi}^{w^\star} = \Phi^{w^\star}\).
 
 Since \(\epsilon\) can be arbitrarily small, \(\|\Phi^{w^\star}\|_1 \leq \mu_1 \sqrt{1 -\delta^2}\), which contradicts the optimality of \(\mu_1\). Therefore, $\mu_{2N}\to 0$ as $N\to\infty$.
 \end{proof}
 
-Theorem~\ref{thm::H2tailto0} immediately yields the following tight upper and lower bounds for \(\mu_1\).
+Theorem~\ref{thm::H2tailto0} immediately yields the following tightly convergent upper bound in Corollary~\ref{cor:UB} and lower bounds in Corollary~\ref{cor:LB} for \(\mu_1\).
 \begin{cor}\label{cor:UB}
 Let \(\bar{\mu}_N = \|\Phi_{N,c}\|_1\), then \(\bar{\mu}_N\geq\mu_1\) and \(\lim_{N\rightarrow \infty} \bar{\mu}_N = \mu_1\).
 \end{cor}
@@ -511,10 +493,10 @@ By Theorem~\ref{thm:auxconverge} and \ref{thm::H2tailto0}, \(\mu_{1N} \to \mu_1\
 
 
 \subsection{Synthesis methodology}
-The truncated $\ell_2$-norm of $\Phi$ is given by
-\begin{align*}
-    \|\mathbb{P}_N \Phi\|_2^2 & = \sum_{i=0}^{N-1}\mathrm{trace}(\Phi[i]^\top \Phi[i]) = \sum_{i=0}^{N-1}\vc(\Phi[i])^\top \vc(\Phi[i]) = \bar{\phi}_N^\top \bar{\phi}_N = \|H_N - U_N \bar{q}_v\|_2^2\\
-\end{align*}
+The \(N\)-level truncated prefix $\ell_2$-norm of $\Phi$ can be computed by
+\begin{equation*}
+    \|\mathbb{P}_N \Phi\|_2^2 = \sum_{i=0}^{N-1}\mathrm{trace}(\Phi[i]^\top \Phi[i]) = \sum_{i=0}^{N-1}\vc(\Phi[i])^\top \vc(\Phi[i]) = \bar{\phi}_N^\top \bar{\phi}_N = \|H_N - U_N \bar{q}_v\|_2^2
+\end{equation*}
 Here, $\bar{q}_v = \ver\left[q[i]\right]_{i \in \mathcal{H}_N}$ is the vertical concatenation of the vectorized impulse response of $Q$. The stacked vector of the impulse responses of $\mathbb{P}_N \Phi$ is
 \begin{equation}\label{eqn:phiN_q}
     \bar{\phi}_N = \ver[\vc(\Phi[i])]_{i \in \mathcal{H}_N} = H_N - U_N \bar{q}_v    
@@ -532,7 +514,7 @@ U[N-1] & \hdots & U[0]
 \end{bmatrix},
 \]
 where $U[k] = \sum_{i=0}^{k} (G_{21}[i])^\top \otimes G_{12}[k-i]$.
-Theorem~\ref{thm::tailoptimizer} shows that
+We apply our Theorem~\ref{thm::tailoptimizer} to explicitly compute the optimal tail \(\ell_2\) norm of the closed-loop response with a given \(Q_1\).
 \begin{equation*}
 \begin{split}
 \underset{\Phi\in\mathcal{S}}{\inf} & \|\mathbb{T}_N \Phi\|_2^2  = \underset{\Phi\in\mathcal{S}}{\inf} \left(\|\Phi\|_2^2 - \|\mathbb{P}_N \Phi\|_2^2\right) \\
@@ -540,7 +522,7 @@ Theorem~\ref{thm::tailoptimizer} shows that
 & = \bar{q}_v^\top (I_N \otimes \Gamma) \bar{q}_v + \|\zeta[N]\|_X^2 + \|G_{11}^0\|_2^2 - \|H_N - U_N \bar{q}_v\|_2^2 = \|\begin{bmatrix} \bar{q}_v \\ 1 \end{bmatrix} \|_{\Pi_N}^2 + \|\zeta[N]\|_X^2
 \end{split}
 \end{equation*}
-where,
+In this expression, the symmetric matrix \(\Pi_N\in\mathbb{S}^{N \times n_y \times n_u + 1}\):
 \[
 \Pi_N \coloneqq \begin{bmatrix}
 I_N \otimes \Gamma - U_N^\top U_N & U_N^\top H_N\\
@@ -548,9 +530,6 @@ H_N^\top U_N & \|G_{11}^{0}\|_2^2 - H_N^\top H_N
 \end{bmatrix}.
 \]
 % The term \(\| \zeta[N]\|_X^2\) is the cost penalty produced by \(Q_2\) to ensure \(\Phi_{22} \in \mathcal{S}\).
-
-
-
 We now combine the preceding developments into a quadratic programming problem that solves Problem~\ref{Prob::l1Nsteps}. 
 \begin{opt}[QP synthesis formulation]\label{Prob::l1NFir_SDP}
 \begin{equation}
@@ -609,10 +588,10 @@ subject to
 \begin{bmatrix}
     I \\ \mathbf{0}
 \end{bmatrix}; \label{eqn:SLSstabr} \\
-R & \in \mathbb{R}^{n_x \times n_x} \times \mathcal{F}_N;\;
-M \in \mathbb{R}^{n_x \times n_y} \times \mathcal{F}_N;\; \\
-N & \in \mathbb{R}^{n_u \times n_x} \times \mathcal{F}_N;\;
-L \in \mathbb{R}^{n_u \times n_y} \times \mathcal{F}_N \cap \mathcal{S}.
+R & \in \mathbb{R}^{n_x \times n_x} \times \mathcal{H}_N;\;
+M \in \mathbb{R}^{n_x \times n_y} \times \mathcal{H}_N;\; \\
+N & \in \mathbb{R}^{n_u \times n_x} \times \mathcal{H}_N;\;
+L \in \mathbb{R}^{n_u \times n_y} \times \mathcal{H}_N \cap \mathcal{S}.
 \end{align}
 \end{subequations}
 \end{opt}
@@ -681,11 +660,10 @@ B_w =
     D_{zw} = \mathbf{0}_{5\times 5};\ D_{yu} = \mathbf{0}_{3\times 3}.
 \end{equation}
 The partition of states, inputs, and outputs are \(\mathcal{P}_x =[2;2;2], \mathcal{P}_y = \mathcal{P}_u =[1;1;1]\).
-\begin{figure}[hb]
+\begin{figure}[htbp]
     \centering
-    \includegraphics[width= 0.75\linewidth]{figures/DisCtrlfigure/_3nodeEx_L1result.png}
-    \caption[Convergence of \(\{N,c\}\)-norm for different \(c\) values]{Convergence of surrogate problems for different \(c\) values. Colors denote \(c\); \(\triangle\) marks \(\bar{\mu}_N\) provided by Corollary~\ref{cor:UB}, and \(\nabla\) marks \(\underline{\mu}_N\) provided by Corollary~\ref{cor:LB}. The black line with a circle mark is the sub-optimal solution found by SLS.}
-    \label{fig:Exl1soln}
+    \includegraphics[width= 0.65\linewidth]{figures/DisCtrlfigure/_3nodeEx_L1result.png}
+    \caption[Convergence of \(\{N,c\}\)-norm for different \(c\) values]{Convergence of surrogate problems for different \(c\) values. Colors denote \(c\); \(\triangle\) marks \(\bar{\mu}_N\) provided by Corollary~\ref{cor:UB}, and \(\nabla\) marks \(\underline{\mu}_N\) provided by Corollary~\ref{cor:LB}. The black line with a circle mark is the sub-optimal solution found by SLS.}\label{fig:Exl1soln}
 \end{figure}
 We'd like to find a controller \(K\in\mathcal{S}\), consistent with the graph in Figure~\ref{fig:netCL_3node},
 \[
@@ -754,14 +732,16 @@ B_w =
 \end{equation*}
 \(D\) terms, partitions and controller structure remain the same. 
 Our approach still effectively solves the problem because it finds IIR solutions.
-\begin{figure}[h]
+\begin{figure}[htbp]
     \centering
-    \includegraphics[width= 0.75\linewidth]{figures/DisCtrlfigure/_3nodeEx_unco_L1result.png}
+    \includegraphics[width= 0.65\linewidth]{figures/DisCtrlfigure/_3nodeEx_unco_L1result.png}
     \caption{The result of the uncontrollable and unobservable plant.}
-    \label{fig:Exl1soln}
+    \label{fig:Exl1soln_ucuo}
 \end{figure}
 \section{Conclusion}
 
-This paper presented an approximation approach to find the distributed \(\ell_1\) output feedback controller under QI assumption. Unlike prior work that relied on in-structure parameterization, our method began with a standard non-structured parameterization and only required a spectral factorization of the plant.
-We introduced a mixed \(\ell_1/\ell_2\) norm with arbitrary truncation level, showed that its minimization was jointly convex, developed a two-stage solution procedure and cast the mixed norm problem into a quadratic programming problem. 
-It can approximate with a tunable parameter \(c\) and provides converging upper and lower bound of the optimal cost. Future work involves adapting the methodolgy to mixed objective distributed control.
+This chapter presented an approximation approach for the optimal \(\ell_1\) output feedback controller respecting a network structure under the QI assumption. Our approach begins with a standard, non-structured parameterization and requires only a spectral factorization of the plant.
+
+We introduced a mixed \(\ell_1/\ell_2\) norm with arbitrary division level as a proxy of the \(\ell_1\) cost. Given a fixed prefix horizon \(N\) and tail \(\ell_2\) norm weight \(c\), the exact solution to the mixed \(\ell_1/\ell_2\) norm minimization problem can be obtained via a nested optimization procedure. As the partition level increases, the optimal solutions of the surrogate problems converge to the optimal solution of the \(\ell_1\) problem. 
+
+Moreover, the procedure yields convergent upper and lower bounds on the optimal cost, which provide a natural stopping criterion once a prescribed performance tolerance is achieved. Numerical examples validate the effectiveness of the proposed method for both controllable and stabilizable (but uncontrollable) plants.

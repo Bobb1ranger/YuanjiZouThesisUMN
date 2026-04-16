@@ -1,5 +1,17 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % abstract.tex: Abstract
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Networked distributed control is a key approach in modern systems control, allowing physically distributed subsystems to coordinate through information exchange, achieve local decision-making, and improve overall system performance. This paradigm enhances resilience and scalability compared with centralized control, particularly in large-scale or spatially distributed systems. However, it introduces challenges for controller design, including obtaining optimal performance under communication constraints, handling delays, and ensuring robustness against adverse network effects.
 
+This thesis primarily addresses two problems: designing optimal distributed controllers under delayed or sparse information structures, 
+and evaluating system robustness under stochastic network connections. 
+For the controller design problem, we develop a framework based on Youla parameterization, through which a distributed $\mathcal{H}_2$ controller is obtained by solving a Riccati equation combined with a backward recursion. 
+Building on this, we leverage convex optimization to compute a distributed $\ell_1$ controller. 
+To analyze robustness against stochastic network effects, we propose the notion of robust mean square stability (RMSS) of uncertain stochastic systems and establish computational methods for evaluating robustness margins by frequency-wise linear matrix inequalities.
+
+The proposed synthesis method for distributed $\mathcal{H}_2$ controllers is the first to compute the exact optimal solution without relying on finite-impulse-response approximations, significantly improving controller order and computational efficiency compared with existing approaches. 
+The distributed $\ell_1$ method introduces the first approximation scheme that provides convergent upper and lower bounds on the optimal cost. Meanwhile, the RMSS framework rigorously quantifies the interplay between model uncertainty and stochastic network effects, enabling more robust, safe, and reliable operation of distributed cyber-physical systems and remote stabilization applications.
+
+
+% {\bf{keywords:}} Networked control, Optimal control, Stochastic system, Robust control.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

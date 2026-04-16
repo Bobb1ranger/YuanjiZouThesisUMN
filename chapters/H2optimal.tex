@@ -1,6 +1,5 @@
-\chapter{Distributed \(\mathcal{H}_2\) control}
+\chapter{Distributed {$\mathcal{H}_2$} control}
 \label{chap:H2ctrl}
-\section{Gist of the Chapter}
 
 This chapter addresses the problem of $\mathcal{H}_2$ optimal control for networked systems. We aim to find the optimal internally stabilizing output-feedback controller that respects the communication constraints of the underlying network. Our approach builds on the Youla parameterization by the centralized \(\mathcal{H}_2\) controller, where the network structure imposes an infinite-dimensional affine constraint on the Youla parameter. We reformulate the structural constraints induced by the network as an equivalent time-domain dynamical condition. By analyzing this representation, we derive necessary and sufficient conditions for the existence of stabilizing controllers within the prescribed structure and provide an exact synthesis method for the optimal distributed $\mathcal{H}_2$ controller. The proposed approach yields rational, implementable solutions without approximation.
 
@@ -15,7 +14,7 @@ Unlike recent approaches that over-parameterize stabilizing controllers, we take
 
 
 
-\section{State-of-the-art on distributed \(\mathcal{H}_2\) optimal control}
+\section{Distributed \(\mathcal{H}_2\) optimal control literature review}
 
 Searching for stabilizing controllers with an arbitrary structure is not a convex problem in general~\cite{Tsitsiklis1985NP_decentralized}. Optimal controllers for an LTI plant in some structures can even be non-linear~\cite{ Witsenhausen1968ACI}. While the Youla parametrization enables us to search over stabilizing controllers convexly through closed-loop (CL) maps \cite{YoulaPar} when there is no structure, the structural constraints on the controllers may be projected into nonconvex constraints on the Youla Parameter, as their convexity is not preserved under linear fractional transformation (LFT).
 
@@ -130,9 +129,9 @@ The above problem is still non-convex for two reasons:
 \subsection{Youla Parameterization}
 % {\color{blue} Youla Parameterization is used to transform the non-convex cost function about \(K\) into a model-matching like cost function about Youla Parameter \(Q\) via a change of variables.}
 The Youla-Kucera Parameterization is a well-established framework for resolving the non-convexity of both the linear fractional transformation and the stabilizing controller set by parametrizing all proper internally stabilizing controllers and recasting the objective function into a convex model-matching form with a stable variable \(Q\), often referred to as the Youla parameter~\cite{YoulaPar}.
-\begin{figure}[ht]
+\begin{figure}[htbp]
     \centering
-    \includegraphics[width=0.6\linewidth]{figures/DisCtrlfigure/YoulaParablkdiagram.png}
+    \includegraphics[width=0.5\linewidth]{figures/DisCtrlfigure/YoulaParablkdiagram.png}
     \caption[Youla parameterization block diagram]{The block diagram of Youla parameterization. \(
     K_\mathrm{stab} = \lft(J_{YP},Q) = (Y_r - M_r Q) (X_r - N_r Q)^{-1}\). \(J_{YP}\) can be considered as an initial stabilizing controller. Setting \(Q = \mathbf{0}\) recovers the observer-based controller. A non-zero \(Q\) maps the output estimation error \(e = y - C_y \hat{x}\) to an additional input \(v\) that modifies the feedback behavior.}
     \label{fig:Youlapar}
@@ -168,7 +167,7 @@ As the stabilizable and detectable realization of the plant is available, we con
     \end{array}\right]. \label{DCF_l}
 \end{align}
 \end{subequations}
-By such construction, we have all stabilizing controller parametrized by:
+By such construction, every internally stabilizing LTI controller \(K_{\mathrm{stab}}\) is parametrized a Youla parameter \(Q\):
 \begin{equation}\label{eqn::allstabK}
 \begin{split}
 K_{\mathrm{stab}} & = \lft(J_{YP},Q) 
@@ -194,7 +193,7 @@ J_{YP} & = \begin{bmatrix}
 \right].
 \end{split}
 \end{equation}
-The resulting CL \(\Phi_{zw}\) is given by:
+The resulting closed loop transfer function \(\Phi_{zw}\) is affine with the Youla parameter:
 \begin{equation}
 \Phi_{zw} = \lft(P,K_\mathrm{stab}) = \lft(P,\lft(J_{YP},Q))\\
 = \lft(\lft(P,J_{YP}),Q) = G_{11} -G_{12} Q G_{21}.    
@@ -207,7 +206,7 @@ The resulting CL \(\Phi_{zw}\) is given by:
     \text{subject to}\quad & K_\mathrm{stab} = (Y_r - M_r Q) (X_r - N_r Q)^{-1} \in \mathcal{S}.
 \end{split}
 \end{equation}
-Unfortunately, forcing \(K_\mathrm{stab} \in \mathcal{S}\) doesn't necessarily pose a convex constraint on \(Q\).
+Unfortunately, \(K_\mathrm{stab} \in \mathcal{S}\) is not a convex constraint on \(Q\).
 Early researchers noticed the significance of \textbf{structured DCF}, which means finding all the eight TFMs in~\eqref{eqn:Bezout} in \(\mathcal{S}\) 
 \footnote{Finding \(F\in S(\mathcal{A}_c,\mathcal{P}_u,\mathcal{P}_x)\) and \(L\in S(I_n,\mathcal{P}_x,\mathcal{P}_y)\) is a straightforward method to obtain the structured DCF. However, this is hard in general. \cite{Vamsi_Realizable} provides a sufficient condition that ensures the existence of such \((F,L)\) pair.}.
 The structured DCF simplifies the constraint~\eqref{eqn:mmstructconstr} into \(Q \in \mathcal{S}\), by exploiting the closure under addition and multiplication properties presented in Corollary~\ref{cor:cls}. They relied on structured DCF in those cases with special structures where structured DCFs are easily available to formulate convex synthesis. However, structured DCFs are hard to obtain in general.
@@ -215,7 +214,7 @@ The structured DCF simplifies the constraint~\eqref{eqn:mmstructconstr} into \(Q
 \subsection{Quadratic Invariance}\label{subsec::QI}
 Initially, quadratic invariance(QI) was proposed as a condition to unify the structures (w.r.t the plant) so that one can search over \(K_{\mathrm{stab}}\in \mathcal{S}\) by equivalently searching for CL \(\Phi \coloneqq \mathrm{feedback}(K_\mathrm{stab},P_{22}) = K_\mathrm{stab}( I - P_{22} K_\mathrm{stab})^{-1} \in \mathcal{S}\)~\cite{SanjayLQIsufficient}. Later, it's shown that QI is the necessary and sufficient condition that ensures \(K_\mathrm{stab} \in \mathcal{S}\) poses a convex constraint on \(Q\)~\cite{LessardQI, Sabau2011Vec}. The definition of QI is given as: 
 \begin{defn}
-${\cal S}$ is quadratic invariant w.r.t. $P_{22}$ if \(KP_{22}K\subset {\cal S}\), \(\forall K\in {\cal S}\).
+${\cal S}$ is quadratic invariant w.r.t. $P_{22}$ if \(KP_{22}K\in {\cal S}\), \(\forall K\in {\cal S}\).
 \end{defn}
 % When QI holds and the plant is stable or there is a stable stabilizing controller in \(\mathcal{S}\), \(\Phi\in \mathcal{S}\) can be a trivial structured DCF can be found for the plant.
 \begin{thm}~\cite{Sabau2011Vec}\label{thm:struct_stab_cont_para}
@@ -241,7 +240,7 @@ Theorem~\ref{thm:struct_stab_cont_para} provides a means to translate the struct
 Conventional FIR approximation methods for solving model-matching problems are not applicable to Problem~\ref{Prob::H2minafterpara}, since the constraint~(\ref{eqn:mmstructconstr}) generally does not admit FIR solutions and tolerates no approximation error directly violates the structural constraints\footnote{When the graph is strongly connected, \(\Phi\) is a full block transfer function matrix with relative order constraints on some entries.}.
 
 \subsection{Partially nestedness assumption}
-The optimization in (\ref{eqn::YoulaNonQI}) remains nonconvex when the QI condition doesn't hold. In this paper, we focus on scenarios where every interaction link in the plant dynamics is also available to the controller. Formally:
+The optimization in (\ref{eqn::YoulaNonQI}) remains nonconvex when the QI condition doesn't hold. In this thesis, we focus on scenarios where every interaction link in the plant dynamics is also available to the controller. Formally:
 \begin{assumption}\label{ass::samegraph}
 We assume \(\mathcal{A}^c \succeq \mathcal{A}^p\), where \(\mathcal{A}^p\) and \(\mathcal{A}^c\) denote the adjacency matrices of the plant and controller network graphs, respectively.
 % \[
@@ -320,6 +319,8 @@ K_{\mathrm{dis}} = \begin{bmatrix}
 % \begin{rem}
 % Example~\ref{exp:4nodediamond} gives a case where QI holds, but the lack of Assumption~\ref{ass::samegraph} prevents distributed implementation despite structural conformity.
 % \end{rem}
+
+
 \begin{rem}
 Since replicating stable poles preserves internal stability, constructing stable network dynamics is more manageable. Consequently, prior studies have relied on the stabilized closed-loop to realize networked controllers on networks~\cite{wang2019SLS, Gulnihal2018thesis, Rantzer2019Netimpl}. In this work, we adopt the realization approach of~\cite{Gulnihal2018thesis}. Notably, all existing network realization methods require the network realization of \(P_{22}\); developing realizations without this information remains an open problem.
 \end{rem}
@@ -336,6 +337,7 @@ These results complete and substantiate our earlier work \cite{Yuanji2024disH2, 
 \begin{algorithm}
 \caption{Optimal structured controller solution}\label{alg::optcontroller}
 \begin{algorithmic}[1]
+\State \textbf{Begin}
 \State Solve DAREs for centralized \(\mathcal{H}_2\) controller, see \eqref{eqn::centralizedH2contParas} in the appendix. Use spectral factorization \(F,L\) to establish Youla Parameterization. Problem~\ref{Prob::H2minafterpara} becomes Problem~\ref{Prob::H2min_infHorQuad}. 
 \State Vectorize cost and constraint in Problem~\ref{Prob::H2min_infHorQuad}. 
 Find the orthonormal basis \(E_0,\hdots,E_m\) of the vectorized support \(\vc(\supp(\Phi[i]))\) that equivalently enforces \(\Phi \in \mathcal{S}\). Follow \eqref{eqn::ss::vecmat} and Lemma~\ref{lemma:redsys} to formulate Problem~\ref{Prob::H2min_ssqp}.
@@ -345,6 +347,7 @@ Find the orthonormal basis \(E_0,\hdots,E_m\) of the vectorized support \(\vc(\s
 \Else
 \State No \(K_{\mathrm{stab}}\) in \(\mathcal{S}\). (Problems~\ref{Prob::H2minafterpara},~\ref{Prob::H2min_infHorQuad},~\ref{Prob::H2min_ssqp} are infeasible).
 \EndIf
+\State \textbf{End}
 \end{algorithmic}
 * Note that this synthesis approach is valid for all QI structures even without Assumption~\ref{ass::samegraph}.
 \end{algorithm}
@@ -515,19 +518,17 @@ By optimizing over \(\ell_2\) sequences \(q\) and \(u\) that satisfy \eqref{eqn:
 \end{rem}
 \begin{rem} The vectorized state-space is where the structural constraint can be imposed more easily. However, the presence of sparsity constraints (\(\mathbf{E}\)) induces changes to an otherwise stabilizable system. The lack of stabilizability arises as a potential concern. It needs to be carefully studied as it can be artificial but intrinsic in the state-space expansion of the vectorizations, together with the limitations of the structured control actions.
 
-The following subsection contains the core of this analysis and the paper's main technical contribution, which enables the safe and lossless removal of fictitious obstacles to stabilization.
+The following subsection presents the core of this analysis and our main technical contribution, enabling the safe and lossless removal of fictitious obstacles to stabilization.
 \end{rem}
 
 On the other side, letting \(v[i] = \vc(V[i])\), the cost term in Problem~\ref{Prob::H2min_infHorQuad} is equivalently transformed into
-\begin{equation}\label{eqn:veccost}
-\begin{split}
+\begin{align}\label{eqn:veccost}
     & \|\Gamma_b^{\frac{1}{2}}(Q-R_0) \Gamma_c^{\frac{1}{2}}\|_{\mathcal{H}_2}^2   = \sum_{i=0}^{\infty} v[i]^\top v[i], \\
     & v[i] = \begin{cases}
         \Gamma^{\frac{1}{2}}(q[0]-\vc(R_0)) & i = 0\\
         \Gamma^{\frac{1}{2}} q[i] & i \geq 1
     \end{cases},\quad \Gamma \doteq \Gamma_c \otimes \Gamma_b,
-\end{split}
-\end{equation}
+\end{align}
 leveraging that vectorization preserves inner product.
 
 % We employ the idea from \cite{Lamperski2015H2} that converts the equality relationship, captured in (\ref{eqn:mmstructconstr}), between two rational TFMs, Youla parameter \(Q\) and closed-loop \(\Phi\), into a constraint of their vectorized unilateral time-domain impulse responses. As the search will be done in the time domain, we take an inversion of (\ref{eqn:mmstructconstr}) for better explanation.
@@ -553,7 +554,7 @@ In the state-space~\eqref{eqn:strct_vecss}, the initial condition is zero, and t
 Let \(T_r\) be the orthonormal basis of the reachable subspace of \((A_v,[B_v E_m,b_0])\), and chose \(T_r^\perp\) to make \(\begin{bmatrix} T_r & T_r^\perp\end{bmatrix}\) an orthonormal matrix. Let \(T_l = T_r^\top\) and \(T_l^\perp = (T_r^\perp)^\top\). Put \(A_r = T_l A_v T_r\), \(C_r = C_v T_l\), and \(b_r = T_l b_0\). For each \(i\leq m\), let \(B_r^i = T_l B_v E_i,\ D_i = D_v E_i\). By such construction, we have \(T_l^\perp \eta[i] \equiv 0\) in \eqref{eqn:strct_vecss} and the state-space:
 \begin{equation}\label{eqn::ss::lemmared_xi}
 \begin{split}
-    \xi[i+1] & =A_r \xi[i] + B_r^i u[i] + b_r \delta; \xi[0] =\mathbf{0};\\
+    \xi[i+1] & =A_r \xi[i] + B_r^i u[i] + b_r \delta;\quad \xi[0] =\mathbf{0};\\
     q[i] &= C_r \xi[i] +D_i u[i]
 \end{split}
 \end{equation}
@@ -571,8 +572,8 @@ Combining with \eqref{eqn:veccost}, the minimal dynamical system capturing the a
 subject to
 \begin{equation}\label{eqn::ss::reduced2norm}
 \begin{split}
-    \zeta[i+1] &=A_r \zeta[i] + B_r^i u[i] + b_r \delta; \ \zeta[0] =\mathbf{0}\\
-    v[i] &= \Gamma^{\frac{1}{2}} C_r \zeta[i] + \Gamma^{\frac{1}{2}} D_i u[i] -\Gamma^{\frac{1}{2}}\vc(R_0)\delta,\\
+    \zeta[i+1] &=A_r \zeta[i] + B_r^i u[i] + b_r \delta; \ \zeta[0] =\mathbf{0};\\
+    v[i] &= \Gamma^{\frac{1}{2}} C_r \zeta[i] + \Gamma^{\frac{1}{2}} D_i u[i] -\Gamma^{\frac{1}{2}}\vc(R_0)\delta.\\
 \end{split}
 \end{equation}
 \end{opt}
@@ -794,7 +795,7 @@ Since $(u^\circ,\eta^\circ,q^\circ)$ is finite horizon and $(u^*,\eta^*,q^*)$ is
 % \end{equation}
 \end{proof}
 \begin{rem}
-The $\Leftarrow$ case proof provides a constructive method that extends any finite-horizon input sequences into a full infinite-horizon solution to constraint \eqref{eqn:strct_vecss}.
+The $\Leftarrow$ proof provides a constructive method that extends any finite-horizon input sequences into a full infinite-horizon solution to constraint \eqref{eqn:strct_vecss}.
 \end{rem}
 % \begin{cor}
 % Construct \(T_r\) as statement \ref{enuitem3} in Theorem~\ref{thm::vecconstraintsoln}. 
@@ -849,12 +850,13 @@ Assume \(\mathcal{S}\) is QI under \(P_{22} = C_y(zI -A)^{-1}B_u\), and \(A\) is
 for any unstable eigenvalue \(\lambda\) of \(A\). \(\mu_\lambda\) and \(\nu_\lambda\) are respectively the paired left and right eigenvectors of \(A\) associated with \(\lambda\).
 \end{cor}
 \begin{rem}
-In centralized multivariable control, a stabilizing controller exists if and only if all unstable modes are observable and controllable, as determined by the PBH test. These two conditions can be verified independently, as a centralized controller fully connects all inputs to output channels.
+In centralized multivariable control, a stabilizing controller exists if and only if all unstable modes are observable and controllable, as determined by the PBH test. These two conditions can be verified independently. This is fundamentally because a centralized controller fully connects all inputs to output channels and all actuators rely on a common state estimate constructed from the complete set of sensor measurements. 
 
-In contrast, sparsity prevents some actuators from accessing some particular sensors, so the structured stabilization criterion must further account for the structure, which is incorporated by \(E_m\). Unsurprisingly, this condition reduces to the PBH test when the graph is strongly connected (\(E_m = I\)).
+In contrast, sparsity prevents some actuators from accessing some particular sensors. This asymmetry forces sub-controllers to construct local—and potentially distinct—state estimates, based only on the information available to them, and to make decisions accordingly. As a result, the stabilization criterion must explicitly account for this asymmetric information pattern, which is collectively represented by \(E_m\). Unsurprisingly, this condition reduces to the PBH test when the graph is strongly connected (\(E_m = I\)).
+
 \end{rem}
 \begin{rem}
-The structured stabilizability condition in Theorem \ref{thm::genfea} holds for general QI structures and does not rely on the Assumption \ref{ass::samegraph} used in this paper. For instance, it applies to verifying the existence of structured stabilizing controllers in Example~\ref{exp:4nodediamond}.
+The structured stabilizability condition in Theorem \ref{thm::genfea} holds for general QI structures and does not rely on the Assumption \ref{ass::samegraph} used in this chapter. For instance, it applies to verifying the existence of structured stabilizing controllers in Example~\ref{exp:4nodediamond}.
 \end{rem}
 
 
@@ -942,10 +944,15 @@ Problem~\ref{Prob::H2min_ssqp} is a standard infinite-horizon LQR problem. The o
 \begin{subequations}\label{eqn:vecDARE}
 \begin{align}
     X_m &= \mathrm{DARE}(A_r, B_r^m, {C_r}^\top \Gamma {C_r}, {D_m}^\top\Gamma D_m,{C_r}^\top \Gamma {D_m},I);\\
-    \Theta_m & = {D_{m}}^\top\Gamma D_m + {B_r^m}^\top X_{m}{B_r^m}; \\
-    \kappa_m &= -\Theta_m^{-1} ({B_r^m}^\top X_{m} A_r +{D_{m}}^\top\Gamma C_r).
+    \Theta_m & \coloneqq {D_{m}}^\top\Gamma D_m + {B_r^m}^\top X_{m}{B_r^m}; \\
+    \kappa_m & \coloneqq -\Theta_m^{-1} ({B_r^m}^\top X_{m} A_r +{D_{m}}^\top\Gamma C_r).
 \end{align}
 \end{subequations}
+\begin{rem}
+When the communication graph \(\mathcal{G}^c\) is strongly connected, i.e. \(E_m = I_{n_u n_y}\), the DARE the DARE admits only the trivial solution \(X_m = \mathbf{0}\), and the corresponding steady-state optimal feedback gain reduces to \(\kappa_m = -C_r\).
+\end{rem}
+
+
 For \(i= m-1,\hdots,0\), the optimal cost-to-go after (exclusive) step \(i\) takes a quadratic form only about state \(\zeta[i+1]\),
 \[
 J_\mathrm{opt}^{i + 1} = \inf\sum_{j \geq i + 1} v[j]^\top v[j] = \zeta[i + 1]^\top X_{i+1} \zeta[i + 1],
@@ -999,13 +1006,13 @@ u^*[0] = -\Theta_0^{-1} ({B_r^0}^\top X_{1} b_r -{D_{0}}^\top\Gamma \vc(R_0))
 We iteratively recover optimal input sequence \(\{u^*\}\), state sequence \(\{\zeta^*\}\) and output sequence \(\{q^*\}\) from \(u^*[0]\).
 \begin{equation}\label{eqn::YPrecovery1}
 \begin{split}
-    &\zeta^*[1] = B_r^0 u^*[0] + b;\ q^*[0] = D_0 u^*[0];\ \\
+    &\zeta^*[1] = B_r^0 u^*[0] + b_r;\ q^*[0] = D_0 u^*[0];\ \\
     &
     \begin{cases}
         u^*[i] = \kappa_i \zeta^*[i] &  \\
         \zeta^*[i+1] = (A_r + B_r^i \kappa_i)\zeta^*[i] & \\
         q^*[i] = (C_r + D_i \kappa_i)\zeta^*[i] & \\
-    \end{cases} ,\ i = 1,\hdots,m-1\\
+    \end{cases} ,\ i = 1,\hdots,m-1;\\
     &
     \begin{cases}
         u^*[i] = \kappa_m (A_r + B_r^m \kappa_m)^{i-m} \zeta^*[m] &  \\
@@ -1027,14 +1034,14 @@ Finally, we find the optimal controller in \(\mathcal{S}\) with:
 Algorithm~\ref{alg::optcontroller} provides a structured stabilizing controller TFM. One can follow Theorem~\ref{thm:samegraphReal} to construct the networked implementation of \(K_\mathrm{str, opt}\) when Assumption~\ref{ass::samegraph} is satisfied.
 
 \subsection{A simplified solution for full-state-feedback problems}
-It's notable that the full-state-feedback optimal control problem has been thoroughly solved by \cite{Lamperski2015StateFB}. Even though, we'd like to present the variation of our output feedback solution in such case. 
+\cite{Lamperski2015StateFB} provides a solution for full-state-feedback distributed control under the assumption that process noises are independent across subsystems (\(B_w\) being block diagonal). As a by-product, our algorithm reduces to a variation of this full-state-feedback solution without requiring the noises to be decoupled. 
 \begin{opt}[State-feedback structured optimal control]\label{Prob::H2minSF}
 \begin{subequations}
 \begin{align}
 \mu_{\mathrm{str}, \mathcal{H}_2}= \underset{Q\in\mathcal{RH}_\infty}{\min}\quad & \|G_{11} - G_{12} Q G_{21}\|_{\mathcal{H}_2}^2 \\ 
     % & = \|H_0\|_2^2 + \|U (Q + F) B_w\|_2^2 \\
-    = \|H_0\|_2^2 + \min_{Q\in\mathcal{RH}_\infty} \quad & \|\Gamma_b^{1/2} (Q + F) B_w\|_{\mathcal{H}_2}^2 \\
-\textit{subject to} \quad & \Phi=(Y_r - M_r Q)\in\mathfrak{T}(\mathcal{G}_c,P_u,P_y)
+    = \|H_0\|_2^2 + & \underbrace{\min_{Q\in\mathcal{RH}_\infty} \quad \|\Gamma_b^{1/2} (Q + F) B_w\|_{\mathcal{H}_2}^2}_{J_\mathcal{S}} \\
+\textit{subject to} \quad & (Y_r - M_r Q)\in\mathfrak{T}(\mathcal{G}_c,P_u,P_x) \label{eqn:SFconst}
 \end{align}
 \end{subequations}
 Here, \(F\) is selected as the LQR feedback gain for \(P_{12}\) and consequently \(G_{12}^\sim G_{12} = \Gamma_b\). \(H_0\) is the centralized \(\mathcal{H}_2\) optimal closed-loop response given by:
@@ -1042,26 +1049,50 @@ Here, \(F\) is selected as the LQR feedback gain for \(P_{12}\) and consequently
 H_0 = G_{11} + G_{12} F G_{21} = (C_z + D_{zu} F) (zI-A_F)^{-1} B_w + D_{zw}.
 \end{equation*}
 \end{opt}
+
 \begin{rem}
+Problem~\ref{Prob::H2minSF} can be transformed into the following infinite dimensional Frobenium norm minimization problem and can be solved by dynamic programming.
+\begin{subequations}
+\begin{align}
+J_\mathcal{S} = \min_{\Phi \in\mathcal{RH}_\infty} \quad & \sum_{i = 0}^\infty\|\Gamma_b^{1/2} (F X[i] - \Phi[i]) B_w\|_{\mathrm{F}}^2 \\
+\textit{subject to} \quad X[i+1] & =A X[i] + B_u \Phi[i]; \quad X[0] = I_{n_x} \\
+\Phi[i] & \in \mathcal{S}[i].
+\end{align}
+\end{subequations}
+Note that \(X[i]\)s and \(\Phi[i]\)s are real-matrix-valued. 
+\end{rem}
+
+
+
+\begin{rem}
+In the state-feedback setting, state estimation is not required. 
+In this case, $P_{22}$ admits a trivial network-compatible left coprime factorization given by
+\[
+M_l = I_{n_x} - z^{-1} A \in \mathfrak{T}(\mathcal{G}_c,\mathcal{P}_x,\mathcal{P}_x), 
+\quad 
+N_l = z^{-1} B_u \in \mathfrak{T}(\mathcal{G}_c,\mathcal{P}_x,\mathcal{P}_u).
+\]
+As a result, constraint~\eqref{eqn:mmstructconstr} simplifies to~\eqref{eqn:SFconst} by Corollary~\ref{cor:cls}.  
+
+Furthermore, for any $Q$ satisfying~\eqref{eqn:SFconst}, the corresponding controller admits a network implementation described by the block interconnection in Fig.~\ref{fig:SF_real}, consisting of three stable networked systems over the graph $\mathcal{G}_c$.
+\begin{figure}
+    \centering
+    \includegraphics[width=0.6\linewidth]{figures/DisCtrlfigure/SF_Realiazation.png}
+    \caption[State-feedback distributed controller network implementation]{The network implementation of the state-feedback distributed controller.}
+    \label{fig:SF_real}
+\end{figure}
+
 \end{rem}
 
 
 
 
 
-
-\begin{equation}
-\begin{split}
-    X[i+1] &=A X[i] + B_u \Phi[i] - A \delta,\\
-    Q[i] &= F X[i] - \Phi[i]
-\end{split}
-\end{equation}
-
 \section{Numerical Examples}\label{sec:Exp}
 \label{sec::numex}
 
-In this section, we cover the solution to two example problems. Both problems continue from the examples firstly introduced in Chapter~\ref{chap:networksys}. In Example~\ref{exp:4nodediamond}, we use our approach to find optimal controller \(K_\mathrm{opt}\) in \(\mathcal{S}\), where \(\mathcal{S}\) is QI w.r.t the plant but not fitting in Assumption~\ref{ass::samegraph}. We prove that \(K_\mathrm{opt}\) is not realizable on its graph.
-After that, we consider Example~\ref{exp:plant_3node} and provide an illustrative solution and compare our algorithm with an SLS-based solution.
+In this section, we present solutions to three example problems. The first two problems continue from the examples firstly introduced in Chapter~\ref{chap:networksys}. In Example~\ref{exp:4nodediamond}, we use our approach to find optimal controller \(K_\mathrm{opt}\) in \(\mathcal{S}\), where \(\mathcal{S}\) is QI w.r.t the plant but not fitting in Assumption~\ref{ass::samegraph}. We prove that \(K_\mathrm{opt}\) is not realizable on its graph.
+After that, we consider Example~\ref{exp:plant_3node}, provide an illustrative solution, and compare our algorithm with an SLS-based solution.
 
 \subsection{4-agent structured control problem}
 In this example, continuing from Example~\ref{exp:4nodediamond} given in Chapter~\ref{chap:networksys}, we first walk through the construction of the aggregate state-space of a networked plant from the dynamics of all individual sub-plants. We show that our approach is still effective in finding \(K_\mathrm{opt}\in \mathcal{S}\), but the found controller is not realizable on the desired information graph without Assumption~\ref{ass::samegraph}.
@@ -1331,7 +1362,7 @@ As a result, any realization structured as in (\ref{eqn::4nodereal}) will violat
     \label{fig:4nodefakedis}
 \end{figure}
 In summary, the controller cannot be implemented on the network in Fig.~\ref{fig:4nodecannot_real} without violating internal stability. 
-Instead, the resulting controller corresponds to the centralized configuration shown in Fig.~\ref{fig:4nodefakedis}. This distinction cannot be captured by transfer functions alone.
+Instead, the resulting controller corresponds to the centralized configuration shown in Fig.~\ref{fig:4nodefakedis}. This distinction cannot be captured by the transfer functions alone.
 
 
 
@@ -1432,20 +1463,191 @@ For this plant, the centralized \(\mathcal{H}_2\) gives a norm \(\|G_{11}^0\|_2 
     \caption[Our exact optimal solution and the suboptimal SLS solutions]{The top subplot plots the optimal \(\mathcal{H}_2\) norm obtained by SLS approach, while the bottom subplot plots the value \((\|\cdot\|^2 - \mu_{\mathrm{dis}, \mathcal{H}_2}^2)\) on a logarithm scale.}
     \label{fig:SLScostvsFIR}
 \end{figure}
-% \begin{figure}[ht]
-%     \centering
-%     \includegraphics[width=0.85\linewidth]{figures/DisCtrlfigure/SLSvsFIRsteps_3nodeV2.png}
-%     \caption{The optimization time consumption and controller states number versus the FIR truncation level.}
-%     \label{fig:SLSRuntmevsFIR}
-% \end{figure}
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.75\linewidth]{figures/DisCtrlfigure/SLSvsFIRsteps_3nodeV2.png}
+    \caption{The optimization time consumption and controller states number versus the FIR truncation level.}
+    \label{fig:SLSRuntmevsFIR}
+\end{figure}
 
-In comparison, the SLS approach approximates the optimal controller by designing closed-loop dynamics with FIR truncation levels ranging from 10 to 60 in increments of 5. In this case, FIR solutions exist for the SLS method since \((A,B_u)\) is controllable and \((A,C_y)\) is observable~\cite{SLSparametrization}.
-As the FIR horizon increases, the achieved cost gradually converges toward the optimal value.
+In comparison, the SLS approach approximates the optimal controller by designing closed-loop dynamics with FIR truncation levels ranging from 10 to 60 in increments of 5. In this case, FIR solutions exist for the SLS method since \((A,B_u)\) is controllable and \((A, C_y)\) is observable~\cite{SLSparametrization}. As the FIR horizon increases, the achieved cost gradually converges toward the optimal value.
 
-We find that the controller order grows linearly with the number of FIR steps. The computational time for convex optimization also grows with the number of steps. With 60 steps of FIR, the optimization problem takes \(2.29s\) to solve and gives a controller with 546 states, but the cost is still suboptimal. This trend indicates that while longer FIR horizons improve accuracy, the approximation can never produce the exact optimal closed-loop behavior.
+We find that the controller order grows linearly with the number of FIR steps. The computational time for convex optimization also grows with the number of steps. With 60 steps of FIR, the optimization problem takes \(2.29s\) to solve and yields a controller with 546 states, but the cost remains suboptimal. This trend indicates that while longer FIR horizons improve accuracy, the approximation can never produce the exact optimal closed-loop behavior.
 
 
-\section{Summary}
+\subsection{Platoon Control Example}
+We use a 4-vehicle platoon control problem to validate our algorithm. Vehicle 0 runs as a reference signal and vehicles 1,2 and 3 are to be controlled. Vehicle 0 is expected to run at a nominal constant speed \(\bar{v}_0\) but is subject to a mean-zero additive Gaussian noise acceleration \(\dot{v}_0 = \gamma_{\rm{lead}} w_0^{\rm{lead}}\). The actual speed of vehicle 0 is \(v_0 = \bar{v}_0+ \gamma_{\rm{lead}} \int w_0 dt\). Vehicles 1,2 and 3 are controlled to maintain a constant spacing \(d_0\) from the front vehicle.
+
+The graph $\mathcal{G}$ consists of vertices $\{1,2,3\}$ and edges $\{(1,2),(2,3)\}$, in addition to self-loops. 
+In Fig.~\ref{fig:Platoon}, $d_i$ denotes the distance from vehicle $i$ to the lead vehicle (vehicle 0). 
+Each sub-controller measures the spacing relative to the preceding vehicle and subtracts $d_0$ to form the local measurement $y_i$, which is corrupted by additive measurement noise $w_{i}^{\mathrm{mea}}$. 
+The variable $v_i$ denotes the velocity, and $u_i$ represents the commanded acceleration. 
+The engine dynamics are modeled as a first-order system with time constant $\tau$, and the actual acceleration $a_i$ is affected by additive actuation noise $w_{i}^{\mathrm{act}}$.
+
+We assume $w_{i}^{\mathrm{mea}}, w_{i}^{\mathrm{act}} \sim \mathcal{N}(0,1)$ are independent standard Gaussian noises. 
+Their magnitudes are scaled by $\gamma_{\mathrm{mea}}$ and $\gamma_{\mathrm{act}}$, respectively. Together with \(\gamma_{\rm{lead}}\), they can be tuned for different closed-loop target behaviors. 
+
+\begin{equation}
+\begin{aligned}
+    y_i &=
+    \begin{cases}
+    d_i - d_0 + \gamma_{\mathrm{mea}} w_{i}^{\mathrm{mea}}, & i = 1,\\
+    d_i - d_{i - 1} - d_0 + \gamma_{\mathrm{mea}} w_{i}^{\mathrm{mea}}, & i > 1,
+    \end{cases} \\
+    a_i &= \frac{1}{\tau s + 1} \big(u_i + \gamma_{\mathrm{act}} w_{i}^{\mathrm{act}}\big), \quad \forall i.
+\end{aligned}
+\end{equation}
+
+\begin{figure}[htb]
+    \centering
+    \includegraphics[width = 0.8\linewidth]{figures/DisCtrlfigure/_3car_Platoon.png}
+    \caption{The 4-vehicle platoon model.}
+    \label{fig:Platoon}
+\end{figure}
+Define the state as the position offsets, speed offsets, and accelerations of vehicles \(1\), \(2\), and \(3\).
+\[
+x = \ver[x_i]_{i = 1,2,3};\quad x_i = 
+\begin{bmatrix}
+d_i - i \cdot d_0 \\
+v_i - v_0\\
+a_i \\
+\end{bmatrix}.
+\]
+The state differential equation of each vehicle is given by:
+\[
+\dot{x}_i = \begin{bmatrix}
+    0 & -1 & 0 \\
+    0 & 0 & 1 \\
+    0 & 0 & -\frac{1}{\tau}
+\end{bmatrix} x_i + 
+\begin{bmatrix}
+    0 & 0\\
+    -\gamma_{\rm{lead}} & 0\\
+    0 & \frac{\gamma_{\rm{act}}}{\tau} \\
+\end{bmatrix}
+\begin{bmatrix}
+    w_0^{\rm{lead}} \\
+    w_{i}^{\rm{act}} \\
+\end{bmatrix}
++ \begin{bmatrix}
+    0 \\ 0 \\ \frac{1}{\tau} \\
+\end{bmatrix}
+u_i
+\]
+The performance outputs include the spacing error and the commanded acceleration magnitude, used as a regularization term to avoid aggressive control actions. \(\beta\) is another adjustable weight to obtain different closed-loop responses.
+\[
+z =\ver[z_i],\quad z_i =  \begin{bmatrix}
+    x_i - x_{i-1} \\ \beta u_i\\
+\end{bmatrix},\; (x_0 = 0).
+\]
+The measured outputs are:
+\[
+y = \ver[y_i],\quad y_i = x_i - x_{i-1} + \gamma_{\mathrm{mea}} w_{i}^{\mathrm{mea}}, \; (x_0 = 0).
+\]
+We obtain a discrete-time platoon generalized plant by the zero-order hold method. Model parameters are set as:
+\begin{table}[htbp]
+    \caption{System parameters}
+    \label{tab:Platoon_config}
+    \centering
+    \begin{tabular}{cc|cc|cc}
+    \hline
+    Property & Value & Property & Value & Property & Value \\
+    \hline
+    $\gamma_{\rm{lead}}$ & $1$ & $\gamma_{\rm{act}}$ & $1$ 
+          & $f_s$ & $40\,\mathrm{Hz}$ \\
+    $\gamma_{\rm{mea}}$ & $0.2$ & $\beta$ & $1$
+          & $\tau$ & $0.15 \rm{s}$ \\
+    \hline
+    \end{tabular}
+\end{table}
+
+
+In this problem, the plant and controller graphs form a lower cascading triangle. Mathematically, 
+\begin{equation}
+\mathcal{A}(\mathcal{G}) = 
+\left[
+\begin{array}{ccc}
+0 & 0 & 0 \\
+1 & 0 & 0 \\
+0 & 1 & 0 \\
+\end{array}
+\right];\quad 
+\mathcal{D}(\mathcal{G}) = 
+\left[
+\begin{array}{ccc}
+0 & \infty & \infty \\
+1 & 0 & \infty \\
+2 & 1 & 0 \\
+\end{array}
+\right]
+\end{equation}
+\(\mathfrak{T}(\mathcal{G},\mathcal{P}_y,\mathcal{P}_u)\) is the class of transfer function that involves both sparsity and delay patterns.
+\begin{equation}
+\mathfrak{T}(\mathcal{G},\mathcal{P}_u,\mathcal{P}_y) = 
+\left[
+\begin{array}{ccc}
+\mathcal{R}_p & 0 & 0 \\
+\frac{1}{z}\mathcal{R}_p & \mathcal{R}_p & 0 \\
+\frac{1}{z^2}\mathcal{R}_p & \frac{1}{z}\mathcal{R}_p & \mathcal{R}_p \\
+\end{array}
+\right]
+\end{equation}
+Notably, the dynamics of each vehicle are decoupled from those of the others; that is, the matrices $A$ and $B_u$ are block diagonal. 
+The coupling arises instead from the control goal, which relies on measurements of distances to preceding vehicles, thereby inducing a \(C_y \in S(\mathcal{A}(\mathcal{G}),\mathcal{P}_y,\mathcal{P}_x)\) and an input--output structure consistent with the graph $\mathcal{G}$.
+
+
+
+
+\begin{table}[!h]
+\begin{center}\label{Tab::ExampleResult}
+\caption{Performance Comparison of different controllers}
+\begin{tabular}{c c c c}
+\hline
+Controller Name & \# of states & \(\|T\|_2\) & \(\|T_{dw_{\rm{lead}}}\|_2\)\\ 
+\hline
+\(K_\mathrm{cen}\) & 9 & 1.0128 & 0.4539\\  
+\(K_\mathrm{tf}\) & 16 & 1.0203 & 0.4746\\  
+\(K_\mathrm{nw}\) & [13,12,6] & 1.0203 & 0.4746\\
+\(K_\mathrm{sp,df}\) & [13,10,5] & 1.0504 & 0.4922\\ 
+\(K_{\mathrm{diag,PID}}\) & [2,2,2] & 1.9207 & 1.1732\\
+\(K_{\mathrm{diag},\mathcal{H}_2}\) & [3,3,3] & 1.0375 & 0.5351\\
+\hline
+\end{tabular}\\
+\end{center}
+\(T = \mathrm{lft}(P,\star)\) is the closed-loop response with weights.
+\(T_{dw_{\rm{lead}}} \in \mathcal{R}_p^{3\times 1}\) is the closed-loop transfer function from leading vehicle disturbance to all spacing errors. 
+\end{table}
+
+In the chart, we compare the closed-loop performance of the distributed $\mathcal{H}_2$ controller with several alternative controllers. 
+The controller $K_{\mathrm{cen}}$ denotes the standard $\mathcal{H}_2$ controller without any information structure constraints. 
+The controller $K_{\mathrm{tf}}$ represents the transfer function of the distributed controller obtained via Algorithm~\ref{alg::optcontroller}, 
+while $K_{\mathrm{nw}}$ denotes its network implementation following \cite{Vamsi_Realizable}. 
+The controller $K_{\mathrm{nw}}$ achieves identical performance to $K_{\mathrm{tf}}$, but is realized with local distributed internal states. 
+Note that this network realization may not be minimal, and identifying a minimal realization is left for future research.
+
+The controller $K_{\mathrm{sp,df}}$ denotes a delay-free, strictly proper distributed controller. 
+It is implemented over a communication graph $\bar{\mathcal{G}}$, which corresponds to the transitive closure of the original graph. 
+All communication links are assumed to be delay-free; however, each control input is subject to one-step strict properness. 
+This setting corresponds to the scenario in which the most recent measurements are instantaneously propagated across the network before each subcontroller computes its control action. The network implementation also follows \cite{Vamsi_Realizable}.
+
+The controller $K_{\mathrm{sp,df}}$ has the following structure:
+\[
+\begin{bmatrix}
+\frac{1}{z}\mathcal{R}_p & 0 & 0 \\
+\frac{1}{z}\mathcal{R}_p & \frac{1}{z}\mathcal{R}_p & 0 \\
+\frac{1}{z}\mathcal{R}_p & \frac{1}{z}\mathcal{R}_p & \frac{1}{z}\mathcal{R}_p
+\end{bmatrix}.
+\]
+
+We also include two decentralized controllers for comparison. Their aggregate transfer functions are diagonal, as they rely solely on local measurements.
+\(K_{\mathrm{diag},\mathcal{H}_2}\) is the controller structured as \(K_{\mathcal{H}_2}\times I_3\), where \(K_{\mathcal{H}_2}\) is the optimal \(\mathcal{H}_2\) SISO controller for the 2-vehicle platoon problem (1 vehicle following) with the same disturbance and performance weights.
+\(K_{\mathrm{diag, PID}} = K_{\mathrm{PID}}\times I_3\), where \(K_{\mathrm{PID}}\) is manually tuned to reduce the interested norm and may not be optimal. 
+Note that a diagonal control architecture does not guarantee string stability in a cascaded system; consequently, the performance of such controllers degrades significantly as the number of vehicles increases.
+\(K_\mathrm{nw}\) and \(K_\mathrm{sp,df}\) out-performances \(K_{\mathrm{diag},\mathcal{H}_2}\) and \(K_{\mathrm{diag, PID}}\) as expected. 
+
+
+
+\section{Conclusion and Discussion}
 
 In this chapter, we derived the exact finite-dimensional solution to the network-distributed $\mathcal{H}_2$ control problem for an LTI networked plant, assuming that the controller network is at least as well-connected as the plant dynamics. This setup defines a subclass of QI problems that not only satisfies QI conditions but also guarantees the implementability of structured controllers over networks. 
 

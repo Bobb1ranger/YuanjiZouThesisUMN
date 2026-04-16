@@ -99,7 +99,7 @@ In the realm of control theory, robustness has been an essential aspect of contr
 
 In networked control systems, communication reliability is not always guaranteed, introducing an additional source of model uncertainty. This uncertainty is often modeled as a nominal mean feedback gain perturbed by memoryless random multiplicative noise.
 
-To assess stability under such conditions, \cite{Meansquarenorm} introduces the concept of Mean Square Stability (MSS), which requires that the expected state second-moment matrix converges as time approaches infinity. Analogous to the role of the open-loop \(\mathcal{H}_\infty\) norm to classical robustness theory, in classical robustness theory, \cite{Meansquarenorm} defines an open-loop performance metric, referred to as the mean square norm, which is closely related to MSS. This framework establishes a foundation for evaluating robustness in the presence of unreliable communication. However, many more fundamental questions remain open.
+To assess stability under such conditions, \cite{Elia2005stabfading} introduces the concept of Mean Square Stability (MSS), which requires that the expected state second-moment matrix converges as time approaches infinity. Analogous to the role of the open-loop \(\mathcal{H}_\infty\) norm to classical robustness theory, in classical robustness theory, \cite{Elia2005stabfading} defines an open-loop performance metric, referred to as the mean square norm, which is closely related to MSS. This framework establishes a foundation for evaluating robustness in the presence of unreliable communication. However, many more fundamental questions remain open.
 
 
 
@@ -142,3 +142,13 @@ Towards the optimal control problems of networked system, several progresses hav
 
 \subsection{Unveiling interplay between model uncertainties and unreliable communications}
 Based on mean square stability theory, I'm interested in the problem of how to evaluate one system's tolerance to modeling error when unreliable communications are present in the feedback control system. In Chapter~\ref{chap:RMSS}, we establish the stability analysis when both unreliable communications and modeling errors are present. Our method rely on Linear Matrix Inequality to bound the worst-case frequency response of the uncertain system and assess the mean square stability.
+
+\section{Publications}
+The following Publications came out of this thesis work.
+\begin{itemize}
+    \item Y. Zou and N.Elia, ``Exact finite-dimensional solution for network distributed \(\mathcal{H}_2\) control'', IEEE Transactions on Automatic Control (Accepted).
+    \item Y. Zou and N. Elia, ``A quadratic programming approach for network distributed \(\ell_1\) optimal control'', 2025 IEEE Conference on Decision and Control, Rio de Janeiro, Brazil, 2025. 
+    \item Y. Zou and N. Elia, ``Algebraic Riccati equation approach for network distributed optimal \(\mathcal{H}_2\) synthesis'', 2024 IEEE Conference on Decision and Control, Milan, Italy, 2024.
+    \item Y. Zou and N. Elia, ``A synthesis approach for distributed \(\mathcal{H}_2\) control problems with communication delays'', 2024 Allerton Conference, Urbana, USA, 2024.
+    \item Y. Zou and N. Elia, ``Robust mean square stability'', 2022 European Control Conference (ECC), London, United Kingdom, 2022, pp. 1623-1628.
+\end{itemize}

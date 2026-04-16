@@ -4,77 +4,85 @@
 \chapter{RMSS Appendices}
 \label{appsec:RMSS}
 \section{System configuration}
-\begin{table}[h]
-    \caption{The setting of system parameters}\label{tab:sys_config}
+The nominal model parameters are given in Table~\ref{tab:sys_config}.
+\begin{table}[htbp]
+    \caption{System parameters}
+    \label{tab:sys_config}
     \centering
-    \begin{tabular}{ccc}
+    \begin{tabular}{ccc|ccc}
     \hline
-        Properties  & Value &description\\
+    Property & Value & Description & Property & Value & Description \\
     \hline
-        $m_c$ & 2 kg& Mass of cart\\
-        $m_p$ & 0.1 kg& Mass of pendulum\\
-        $l$ & 1 m &Length of pendulum\\
-        $f_s$ & \(60\mathrm{Hz}\) & Sampling Frequency\\
-        \hline
+    $m_c$ & $1\,\mathrm{kg}$ & Mass of cart 
+          & $f_s$ & $50\,\mathrm{Hz}$ & Sampling frequency \\
+    $m_p$ & $0.1\,\mathrm{kg}$ & Mass of pendulum 
+          & $h$ & $[1,0.6]\,\mathrm{m}$ & Fixation heights \\
+    $l$   & $1\,\mathrm{m}$ & Length of pendulum 
+          &  &  \\
+    \hline
     \end{tabular}
 \end{table}
-Let $x=[\theta,\dot{\theta},s, \dot{s}]^T$, the upper settings yield following discrete time state space matrices for plant $P$:
+The parameter configuration gives the discrete time state space matrices for the nominal plant $P_\mathrm{nom}$:
 \begin{equation}
     \begin{split}
     &   A = \left[\begin{array}{cccc}
-            1.0014 & 0.0167 & 0 & 0\\
-            0.1716 & 1.0014 & 0 & 0\\
-           -0.0001 & -0.0000 &  1 & 0.0167 \\
-           -0.0082 & -0.0001 &       0 & 1
+            1.0021 & 0.0200 & 0 & 0\\
+            0.2059 & 1.0021 & 0 & 0\\
+           -0.0001 & -0.0000 &  1.0021 & 0.0200 \\
+           -0.0098 & -0.0001 &       0 & 1.0021
         \end{array}\right];\ B = \left[\begin{array}{c}
-            -6.9\times 10^{-5}\\
-            -8.3\times 10^{-3}\\
-            6.9\times 10^{-5}\\
-            8.3\times 10^{-3}
+            -1.0\times 10^{-4}\\
+            -1.0\times 10^{-2}\\
+            1.0\times 10^{-4}\\
+            1.0\times 10^{-2}
         \end{array}\right];\\
     &   C = \left[\begin{array}{cccc}
-            1 & 0 & 0 & 0\\
-            0 & 0 & 1 & 0\\
+            h & 0 & 1 & 0\\
         \end{array}\right];\ D = \left[\begin{array}{c}
             0\\
-            0
-        \end{array}\right];
+        \end{array}\right]; \quad h = 0.6 \text{ or }1.
     \end{split}    
 \end{equation}
 
-\section{$H_\infty$ optimal controller design}
+\section{$\mathcal{H}_\infty$ optimal controller design}
 The mean system varies with different dropout probabilities $e$. Since \(\E\{\xi\}= (1-e)I\). To avoid designing the optimal controller for different mean systems, we do some block diagram transformations to an architecture where the optimal controller/receiver changes linearly w.r.t. $e$ \cite{Jeff2005Packet}. Use $\tilde{L}$ to denote $z^{-1} L$. 
 
-% \begin{figure}[h]
-%     \centering
-%     \includegraphics[scale=0.5]{Figures/block_diagram_operation.PNG}
-%     \caption{The step by step operations from figure (\ref{fig:CLblock}.a) to figure (\ref{fig:CLblock}.b)}
-%     \label{fig:detailedblocksteps}
-% \end{figure}
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width = 0.6\linewidth]{figures/RMSSfigure/ClosedloopBDG.PNG}
+    \caption[Block diagram transformation]{(a) is the same as Figure~\ref{fig:Ctrl_Receiver}. By block diagram transformations in Figure~\ref{fig:detailedblocksteps}, we obtain (b). In (c), . By adjusting $\hat{K}_e$ and $\hat{L}_e$ w.r.t. $e$, we can always ensure the mean system of (d) is (c). In (d), $\bar{\Delta} =\mathrm{diag}(\delta_{s_1},\delta_{s_2})$, $\delta_{s_i}$ are IID mean 0, variance $e/(1-e)$, with $e$ probability to take $-1$ and $1-e$ probability to take $e/(1-e)$.}
+    \label{fig:CLblock}
+\end{figure}
 
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width = 0.6\linewidth]{figures/RMSSfigure/blktransfrom.png}
+    \caption{The step by step operations from figure (\ref{fig:CLblock}.a) to figure (\ref{fig:CLblock}.b)}
+    \label{fig:detailedblocksteps}
+\end{figure}
+ 
 
 When there is no packet drop, $e=0$ and $\xi$ is perfectly connected as in Figure (\ref{fig:CLRMSplant}.c). Let $\hat{K} = K(I-\tilde{L})^{-1}$, $\hat{L} = L(I-\tilde{L})^{-1}$. Write $K$ and $L$ in terms of $\hat{K}$ and $\hat{L}$.
 $$
 L =\hat{L} (z^{-1} \hat{L}+I)^{-1} ;\ K = \hat{K} (z^{-1} \hat{L}+I)^{-1} .
 $$
-When there is $e$ probability of packet drop in each channel, see Figure~\ref{fig:CLblk}.d. We can accordingly adjust the optimal controller to generate the same closed loop mean system as below,
+When there is $e$ probability of packet drop in each channel, see Figure~\ref{fig:CLblock}.d. We can accordingly adjust the optimal controller to generate the same closed loop mean system as below,
 \begin{subequations}\label{eqn:transfrom_LK}
 \begin{align}
     L & =\hat{L}_e (z^{-1} \hat{L}_e+I)^{-1} ;\ K = \hat{K}_e (z^{-1} \hat{L}_e+I)^{-1}. \\
     \hat{L}_e & = \frac{1}{1-e} \hat{L};\ \hat{K}_e = \frac{1}{1-e} \hat{K}.
 \end{align}
 \end{subequations}
-$[\hat{K},\hat{L}]^T$ is a stabilizing controller for the system $[P,-z^{-1} I_{2}]$. So we can use $H_\infty$ synthesis to obtain this controller. The solution of $H_\infty$ synthesis is guaranteed to be proper and well-posed. From equation (\ref{eqn:transfrom_LK}), we know $L$ and $K$ are proper and well-posed for any arbitrary value $e$ takes. 
+$[\hat{K},\hat{L}]^T$ is a stabilizing controller for the system $[P,-z^{-1} I_{2}]$. So we can use $\mathcal{H}_\infty$ synthesis to obtain this controller. The solution of $H_\infty$ synthesis is guaranteed to be proper and well-posed. From equation (\ref{eqn:transfrom_LK}), we know $L$ and $K$ are proper and well-posed for any arbitrary value $e$ takes. 
 
-Then in the closed loop mean system, we add following noise and choose following performance output to complete the $H_\infty$ optimal synthesis, shown in figure (\ref{fig:GPlantForHinfsyn}).
-\begin{figure}[h]
-    \centering
-    \includegraphics[width = 0.8\linewidth]{figures/RMSSfigure/Generalizedplant1.PNG}
-    \caption[\(\mathcal{H}_\infty\) optimal control with weighted noises]{$w$ are the noises, while $q$ are the performance outputs. $W_i$ is the weight matrix for inputs. $W_o$ is the weight matrix for outputs.}
-    \label{fig:GPlantForHinfsyn}
-\end{figure}
-By finely tuning the weight matrix $W_i$ and $W_o$, we can obtain a satisfactory controller.
-With this controller, the $H_\infty$ norm from $w_1$ to $q_1$ in figure(\ref{fig:GPlantForHinfsyn}) is $1.62$. 
+% \begin{figure}[htbp]
+%     \centering
+%     \includegraphics[width = 0.8\linewidth]{figures/RMSSfigure/Generalizedplant1.PNG}
+%     \caption[\(\mathcal{H}_\infty\) optimal control with weighted noises]{$w$ are the noises, while $q$ are the performance outputs. $W_i$ is the weight matrix for inputs. $W_o$ is the weight matrix for outputs.}
+%     \label{fig:GPlantForHinfsyn}
+% \end{figure}
+
 
 \section{State space representation of CL system}
 The state space representation for $[P,-z^{-1}I_2]$ is
@@ -84,7 +92,7 @@ $$
 $$
 \bar{C} = [C,-I_2];\ \bar{D}=[D,\mathbf{0}_{2\times2}]=\mathbf{0}_{2\times3}
 $$
-Now we assume controller and receiver 
+Now we assume the controller and receiver 
 $$
 \left[\begin{array}{c}
     \hat{K}  \\

@@ -479,7 +479,7 @@ Left multiply \(\tau \nu_\lambda^\top\), where \(\tau\) is arbitrary vector in \
 From \(w^\top B_v E_m=\mathbf{0}\),
 \begin{equation*}
 \begin{split}
-     & w^\top B_v E_m = w_1^\top (I_{n_y} \otimes B_u)E_m = (\beta^\top \otimes \mu_\lambda^\top) (I_{n_y} \otimes B_u)E_m \\
+     w^\top B_v E_m & = w_1^\top (I_{n_y} \otimes B_u)E_m = (\beta^\top \otimes \mu_\lambda^\top) (I_{n_y} \otimes B_u)E_m \\
      & = (\nu_\lambda^\top F^\top \alpha) ((\nu_\lambda^\top C_y^\top) \otimes (\mu_\lambda^\top B_u)) E_m = \mathbf{0}.
 \end{split}
 \end{equation*}
@@ -707,7 +707,7 @@ The feedback gains are initialized using the infinite-horizon LQR solution. Let 
     \left((B_r^m)^\top X_m A_r + D_m^\top \Gamma C_r\right).
 \end{align*}
 For $i<m$, the gain $\kappa_i$ and the associated cost-to-go matrix $X_i$ are computed recursively via the backward Riccati recursion
-\begin{equation}\label{eqn::backrec}
+\begin{equation}
 \begin{aligned}
     R_i &\coloneqq D_i^\top \Gamma D_i + (B_r^i)^\top X_{i+1} B_r^i, \\
     \kappa_i &\coloneqq -R_i^{-1}\!\left((B_r^i)^\top X_{i+1} A_r + D_i^\top \Gamma C_r\right), \\
@@ -869,7 +869,7 @@ The prefix \(\ell_1\) norm and tail \(\ell_2\) norm are changed into:
 % \end{split}
 % \]
 
-Therefore, we can reformulate Problem~\ref{Prob::l1NFir_QP} with \(\bar{v}_N\) as an unconstrained variable.
+Therefore, we can reformulate Problem~\ref{Prob::l1NFir_SDP} with \(\bar{v}_N\) as an unconstrained variable.
 \begin{opt}[QP implementation]\label{Prob::l1NFir_QP_tech}
 \begin{equation}
 \begin{split}
@@ -884,6 +884,7 @@ The notation $\ell_1$ norm is used with a slight abuse of terminology here, sinc
 \begin{algorithm}
 \caption{Vecotorized finite response sequence \(\ell_1\) norm evaluation}\label{alg::FRl1cal}
 \begin{algorithmic}[1]
+\State \textbf{Begin}
 \State \(\beta \gets \mathrm{abs}((h_N - U_N h_N^2) -U_N U_N^2 \bar{v}_N)\). Calculate the element-wise absolute value of the vector.
 
 \State \(\mathrm{RSPv}_i \gets \beta_{i n_z n_w +1 \colon (i + 1) n_z n_w}, \forall i\in \mathcal{F}_N\). Each \(\mathrm{RSPv}_i\) is an \(n_z n_w\) vector.
@@ -895,6 +896,7 @@ The notation $\ell_1$ norm is used with a slight abuse of terminology here, sinc
 \State \(z_\mathrm{max} \gets \mathrm{RSP}_\mathrm{sum} \mathbf{1}_{n_w}\). \(z_\mathrm{max}\) is an \(n_z\) size vector with the \(i\)-th element recording the largest magnitude \(z_i\) can reach by restricting \(|w_i| \le 1\).
 
 \State \(\mu_1^N \gets \max_{j \in \{1, \hdots, n_z\}} z_\mathrm{max}[j]\)
+\State \textbf{End}
 \end{algorithmic}
 \end{algorithm}
 \end{rem}
